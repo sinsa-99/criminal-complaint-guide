@@ -1,0 +1,10 @@
+# 빌드 부산물
+_body.html
+_combined.md
+_page_labels.tsv
+
+# macOS
+.DS_Store
+
+# 중복 (한국어 파일명은 URL에서 깨질 수 있어 index.html만 사용)
+고소의_기술_통합정리집.html

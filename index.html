@@ -1,0 +1,7498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>고소의 기술 — 통합 정리집</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --border: #e5e7eb;
+  --code-bg: #f6f8fa;
+  --table-stripe: #f9fafb;
+  --quote-border: #2563eb;
+  --quote-bg: #eff6ff;
+  --shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --fg: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #60a5fa;
+  --accent-soft: #1e3a5f;
+  --border: #1e293b;
+  --code-bg: #1e293b;
+  --table-stripe: #1a2436;
+  --quote-border: #60a5fa;
+  --quote-bg: #172033;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--fg);
+  background: var(--bg);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 사이드바 (TOC) */
+#sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  background: var(--bg);
+  z-index: 100;
+}
+#sidebar h2 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#sidebar li { margin: 2px 0; }
+#sidebar a {
+  display: block;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: var(--fg);
+  text-decoration: none;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+}
+#sidebar a:hover {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+#sidebar ul ul { margin-left: 10px; border-left: 1px solid var(--border); }
+#sidebar ul ul a { font-size: 13px; color: var(--muted); }
+#sidebar ul ul ul { display: none; }  /* 3단 이상 숨김 */
+
+/* 본문 */
+main {
+  flex: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 48px 96px;
+  min-width: 0;
+}
+h1 { font-size: 2em; margin-top: 1.5em; padding-bottom: 0.3em; border-bottom: 2px solid var(--border); }
+h2 { font-size: 1.5em; margin-top: 1.8em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.2em; margin-top: 1.5em; }
+h4 { font-size: 1.05em; margin-top: 1.3em; color: var(--accent); }
+h1, h2, h3, h4 { line-height: 1.3; font-weight: 700; }
+p { margin: 0.8em 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* 표 */
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+  font-size: 0.95em;
+  box-shadow: var(--shadow);
+  display: block;
+  overflow-x: auto;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--accent-soft); font-weight: 600; }
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* 코드·인용 */
+code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  margin: 1em 0;
+  padding: 12px 18px;
+  border-left: 4px solid var(--quote-border);
+  background: var(--quote-bg);
+  border-radius: 4px;
+}
+blockquote p { margin: 0.3em 0; }
+
+/* Mermaid 컨테이너 */
+pre.mermaid {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  text-align: center;
+  padding: 24px;
+}
+
+/* 컨트롤 (다크모드 토글 + 인쇄 + 글자크기) */
+#controls {
+  position: fixed;
+  top: 16px;
+  right: 24px;
+  display: flex;
+  gap: 8px;
+  z-index: 200;
+}
+#controls button {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  font-family: inherit;
+}
+#controls button:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+/* 모바일 사이드바 토글 */
+#menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 900px) {
+  body { display: block; }
+  #sidebar {
+    position: fixed;
+    left: -100%;
+    width: 280px;
+    transition: left 0.25s;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  #sidebar.open { left: 0; }
+  main { max-width: 100%; padding: 64px 20px 64px; }
+  #menu-toggle { display: block; }
+  #controls { top: 16px; right: 16px; }
+  #controls button { padding: 8px 10px; font-size: 13px; }
+  table { font-size: 0.88em; }
+  h1 { font-size: 1.6em; }
+  h2 { font-size: 1.3em; }
+}
+
+/* 인쇄 */
+@media print {
+  body { display: block; }
+  #sidebar, #controls, #menu-toggle { display: none; }
+  main { max-width: 100%; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  pre, blockquote, table { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  pre.mermaid { border: none; }
+}
+
+/* 글자 크기 토글 */
+body[data-fontsize="large"] { font-size: 18px; }
+body[data-fontsize="xlarge"] { font-size: 20px; }
+
+/* 부드러운 진입 */
+main > * { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body data-theme="light" data-fontsize="normal">
+
+<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ 목차</button>
+
+<div id="controls">
+  <button onclick="toggleTheme()">🌓 다크모드</button>
+  <button onclick="cycleFont()">Aa 글자</button>
+  <button onclick="window.print()">🖨 인쇄/PDF</button>
+</div>
+
+<aside id="sidebar">
+  <h2>📑 목차</h2>
+  
+</aside>
+
+<main>
+<p style="font-size:13px;color:var(--muted);margin:0 0 24px 0;">
+by Kim Donghyeon
+</p>
+<h1 id="고소의-기술-통합-정리집">고소의 기술 — 통합 정리집</h1>
+<blockquote>
+<p>학습용 변환된 자료. 형사절차 표준 지식 + 법제처 실시간 조회 법령·판례
++ 가상 사례로 재구성.</p>
+</blockquote>
+<h2 id="이-문서의-구성">이 문서의 구성</h2>
+<ol type="1">
+<li><strong>용어 사전</strong> — 고소·송치·기소·무죄까지 핵심 용어</li>
+<li><strong>절차 플로우차트</strong> — 고소→수사→재판 트리 (Mermaid
+다이어그램)</li>
+<li><strong>상황별 고소가능 죄목</strong> — 무슨 죄로 매칭되는지</li>
+<li><strong>고소장 작성법</strong> — 9블록 표준 + 실패 패턴</li>
+<li><strong>고소당했을 때 대처법</strong> — 피의자 방어 8단계
+매뉴얼</li>
+<li><strong>22개 실전 상황 가이드</strong> — 일상 사건별 매뉴얼</li>
+<li><strong>심화 팁 + 실전 고소장 완성본 + 변호사 상담
+체크리스트</strong></li>
+<li><strong>실제 판례집</strong> — 대법원·고등법원 사건번호·핵심
+쟁점</li>
+</ol>
+<h2 id="이-문서의-한계">이 문서의 한계</h2>
+<ul>
+<li>일반 학습·참고용. 본인 사건 처리 시 변호사 상담 권장</li>
+<li>법령·판례는 2026년 5월 기준 (이후 개정 가능)</li>
+<li>가상 사례의 인물·사건은 모두 가명·허구</li>
+</ul>
+<hr />
+<hr />
+<h1 id="형사절차-핵심-용어-사전">형사절차 핵심 용어 사전</h1>
+<blockquote>
+<p>학습용. 헷갈리는 용어들을 “왜 이 단어가 필요한가 / 어디서 쓰이는가”
+중심으로 정리.</p>
+</blockquote>
+<hr />
+<h2 id="고소란-무엇인가-한-문장으로">⓪ 고소란 무엇인가 — 한
+문장으로</h2>
+<blockquote>
+<p><strong>고소(告訴)</strong> = 범죄 피해자(또는 그 법정대리인)가
+수사기관에 <strong>“이 사람을 처벌해 달라”고 공식 요청</strong>하는
+행위.</p>
+</blockquote>
+<h3 id="풀어서-왜-이게-필요한가">풀어서 — 왜 이게 필요한가</h3>
+<ul>
+<li>수사기관은 모든 사건을 알 수 없음 → 피해자가 “여기 범죄 있다”고
+알려야 시작됨</li>
+<li>단순한 <strong>신고</strong>(아무나 “여기 사고 났어요”)와 다름 —
+<strong>고소는 “처벌 의사”</strong> 가 들어가야 함</li>
+<li>그래서 고소장 끝에 <strong>“처벌하여 주시기 바랍니다”</strong>
+문구가 반드시 들어감</li>
+</ul>
+<h3 id="고소의-법적-근거">고소의 법적 근거</h3>
+<ul>
+<li>형사소송법 §223: “범죄로 인한 피해자는 고소할 수 있다.”</li>
+<li>헌법 §27 (재판받을 권리), §10 (인간 존엄·국가 보호 의무)에서
+파생되는 권리</li>
+</ul>
+<hr />
+<h2 id="고소의-종류-5가지-기준으로-갈라보기">⓪-2 고소의 종류 — 5가지
+기준으로 갈라보기</h2>
+<h3 id="기준-1-누가-고소하느냐-고소권자">기준 1) <strong>누가</strong>
+고소하느냐 (고소권자)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>종류</th>
+<th>누가</th>
+<th>언제 쓰나</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>본인 고소</strong></td>
+<td>피해자 본인</td>
+<td>가장 일반적</td>
+</tr>
+<tr>
+<td><strong>법정대리인 고소</strong></td>
+<td>미성년자·금치산자의 부모·후견인</td>
+<td>피해자가 미성년이거나 의사능력 없을 때</td>
+</tr>
+<tr>
+<td><strong>친족 고소</strong></td>
+<td>배우자·직계친족·형제자매</td>
+<td>피해자가 사망·실종 등으로 고소 불가 시 (형소법 §225)</td>
+</tr>
+<tr>
+<td><strong>대리 고소</strong></td>
+<td>변호사 등 위임받은 자</td>
+<td>위임장 필수, 본인이 작성 어려울 때</td>
+</tr>
+<tr>
+<td><strong>지정 고소</strong></td>
+<td>검사가 친족 중 지정</td>
+<td>친고죄에 피해자가 무능력자이고 친족이 없을 때 (§228)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="기준-2-어떤-죄에-대한-고소냐-죄목-성격">기준 2) <strong>어떤
+죄</strong>에 대한 고소냐 (죄목 성격)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>종류</th>
+<th>의미</th>
+<th>예시</th>
+<th>특이점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>친고죄 고소</strong></td>
+<td>고소가 있어야만 처벌 가능</td>
+<td>모욕죄(§311), 사자명예훼손(§308)</td>
+<td>고소 없으면 수사기관도 처벌 X</td>
+</tr>
+<tr>
+<td><strong>반의사불벌죄 고소</strong></td>
+<td>처벌의사 철회되면 종결</td>
+<td>폭행(§260), 협박(§283), 명예훼손(§307), 임금체불(근기법 §109)</td>
+<td>처벌불원서가 종결 카드</td>
+</tr>
+<tr>
+<td><strong>일반범죄 고소</strong></td>
+<td>누구나 신고만 해도 처벌 가능</td>
+<td>사기(§347), 횡령(§355), 스토킹</td>
+<td>고소 없어도 인지수사 가능</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>친고죄와 반의사불벌의 차이</strong>: 친고죄는 “고소가
+있어야 처벌”, 반의사불벌은 “처벌 의사가 없으면 처벌 X”. 출발점과 종결
+방향이 반대.</p>
+</blockquote>
+<h3 id="기준-3-어떤-형식이냐-방법">기준 3) <strong>어떤
+형식</strong>이냐 (방법)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>종류</th>
+<th>방법</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>서면 고소</strong></td>
+<td>고소장 작성 → 접수</td>
+<td>표준. 99%가 이 방식</td>
+</tr>
+<tr>
+<td><strong>구술 고소</strong></td>
+<td>수사관 앞에서 말로 → 조서 작성</td>
+<td>형소법 §237. 긴급할 때</td>
+</tr>
+<tr>
+<td><strong>온라인 고소</strong></td>
+<td>형사사법포털(KICS) 전자제출</td>
+<td>야간·휴일 가능</td>
+</tr>
+<tr>
+<td><strong>우편 고소</strong></td>
+<td>등기로 경찰서·검찰청 송부</td>
+<td>접수 확인 늦음</td>
+</tr>
+</tbody>
+</table>
+<h3 id="기준-4-몇-명이-고소하느냐-인원">기준 4) <strong>몇 명이</strong>
+고소하느냐 (인원)</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>종류</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>단독 고소</strong></td>
+<td>피해자 1명 단독</td>
+</tr>
+<tr>
+<td><strong>공동 고소</strong></td>
+<td>동일 사건 다수 피해자가 함께 → 수사 우선순위 ↑ (예: 다중 사기
+피해자)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="기준-5-고소의-흐름취소">기준 5) 고소의
+<strong>흐름·취소</strong></h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>단계</th>
+<th>핵심 규칙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>고소</strong></td>
+<td>언제든 가능. 단, 친고죄는 <strong>범인을 안 날부터 6개월 내</strong>
+(§230)</td>
+</tr>
+<tr>
+<td><strong>고소 취소</strong></td>
+<td>1심 판결 전까지만 가능 (§232①)</td>
+</tr>
+<tr>
+<td><strong>재고소</strong></td>
+<td>고소 취소했다면 <strong>같은 사건 다시 고소 불가</strong>
+(§232②)</td>
+</tr>
+<tr>
+<td><strong>고소 포기</strong></td>
+<td>검찰 단계에서 “처벌의사 없음” 표시 → 반의사불벌 사건 종결</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>친고죄·반의사불벌 사건 합의 시 절대 금지</strong>: “절대
+다시 고소 안 한다” 약속을 받고 합의금 줬는데 또 고소하면 → 피의자가
+무고죄로 역공소. 합의 시 <strong>합의서에 처벌불원·재고소 포기 명시
+필수</strong>.</p>
+</blockquote>
+<hr />
+<h2 id="고소-vs-민사소송-vs-형사소송-가장-중요한-비교">⓪-3 고소 vs
+민사소송 vs 형사소송 — 가장 중요한 비교</h2>
+<blockquote>
+<p>자주 받는 질문: “고소는 형사처벌 받게 하려고 하는 것”. <strong>정확히
+맞습니다.</strong> 그러면 <strong>소송</strong>과는 뭐가 다른가? 그리고
+<strong>민사</strong>와 <strong>형사</strong>는 어떻게 갈리는가?</p>
+</blockquote>
+<h3 id="한-줄-정리">한 줄 정리</h3>
+<ul>
+<li><strong>고소</strong> = 형사 절차의 <strong>출발점</strong>
+(수사기관에 “처벌해 달라” 신청)</li>
+<li><strong>형사소송</strong> = 검사가 법원에 청구하는 <strong>처벌
+재판</strong> (목적: 죄/형 확정)</li>
+<li><strong>민사소송</strong> = 본인이 법원에 청구하는 <strong>권리 다툼
+재판</strong> (목적: 돈·물건·이행)</li>
+</ul>
+<blockquote>
+<p>💡 <strong>고소는 “재판 청구”가 아니라 “수사 시작 요청”</strong>.
+재판은 검사가 기소해야 시작됨. 💡 <strong>민사와 형사는 별개
+트랙</strong> — 동시에 진행 가능. 형사로 처벌받아도 돈은 민사로
+따로.</p>
+</blockquote>
+<h3 id="전체-비교표">전체 비교표</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>구분</th>
+<th><strong>고소</strong></th>
+<th><strong>형사소송</strong></th>
+<th><strong>민사소송</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>누가 시작</td>
+<td>피해자 (또는 대리인)</td>
+<td>검사 (검찰 단독 권한)</td>
+<td>권리 침해받은 본인</td>
+</tr>
+<tr>
+<td>어디로</td>
+<td><strong>수사기관</strong> (경찰·검찰)</td>
+<td><strong>법원</strong></td>
+<td><strong>법원</strong></td>
+</tr>
+<tr>
+<td>목적</td>
+<td>가해자 <strong>처벌 요청</strong></td>
+<td>죄·형 <strong>확정</strong></td>
+<td><strong>돈·이행</strong> 받기</td>
+</tr>
+<tr>
+<td>결과물</td>
+<td>수사 → 송치/불송치, 기소/불기소</td>
+<td><strong>유죄/무죄/공소기각/면소</strong></td>
+<td><strong>승소/패소</strong>, 강제집행 가능한 판결</td>
+</tr>
+<tr>
+<td>받는 것</td>
+<td>(직접 돈 X — 처벌만)</td>
+<td>형벌: 징역·벌금·과료·자격정지 등</td>
+<td>손해배상·이행·반환 등 <strong>돈/물건</strong></td>
+</tr>
+<tr>
+<td>증명 책임</td>
+<td>수사기관 (고소인은 자료 제공)</td>
+<td><strong>검사</strong></td>
+<td><strong>원고(소 제기한 사람)</strong></td>
+</tr>
+<tr>
+<td>증명 강도</td>
+<td>—</td>
+<td><strong>합리적 의심 없을 정도</strong> (가장 엄격)</td>
+<td>“<strong>더 그럴듯하다</strong>” 정도 (개연성)</td>
+</tr>
+<tr>
+<td>비용</td>
+<td>무료</td>
+<td>무료 (변호인비 별도)</td>
+<td><strong>인지대·송달료</strong> (청구액의 ~1%) + 변호인비</td>
+</tr>
+<tr>
+<td>합의 효과</td>
+<td>친고·반의사 → 종결 가능</td>
+<td>양형 참작 (사기·횡령은 합의해도 처벌)</td>
+<td><strong>합의금 수령 = 소 취하</strong> 가능</td>
+</tr>
+<tr>
+<td>처벌받는 사람</td>
+<td>피의자 (이후 피고인)</td>
+<td>피고인</td>
+<td>(처벌 없음, 의무자에 강제집행)</td>
+</tr>
+<tr>
+<td>무죄 vs 패소</td>
+<td>—</td>
+<td><strong>무죄</strong> = 죄 없음</td>
+<td><strong>패소</strong> = 권리 인정 안 됨</td>
+</tr>
+</tbody>
+</table>
+<h3 id="같이-가는-그림-형사민사-2트랙-진행-표">같이 가는 그림 —
+형사·민사 2트랙 진행 표</h3>
+<blockquote>
+<p>같은 사건(예: 사기 1,000만원)을 양쪽 트랙으로 동시에 진행 가능. 처벌
++ 돈 회수 둘 다 노리는 표준 패턴.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>단계</th>
+<th>🚓 형사 트랙</th>
+<th>⚖️ 민사 트랙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 시작</td>
+<td><strong>고소장 제출</strong> (경찰)</td>
+<td><strong>손해배상 소장 제출</strong> (법원)</td>
+</tr>
+<tr>
+<td>② 진행</td>
+<td>경찰 수사 (수사관 조사)</td>
+<td>답변서·변론 (피고가 반박)</td>
+</tr>
+<tr>
+<td>③ 분기</td>
+<td><strong>송치 / 불송치</strong> 결정</td>
+<td>1심 판결 (승소 / 패소)</td>
+</tr>
+<tr>
+<td>④ 결정</td>
+<td>검사 처분: <strong>기소 / 불기소</strong></td>
+<td><strong>강제집행</strong> (계좌·부동산 압류)</td>
+</tr>
+<tr>
+<td>⑤ 후속</td>
+<td>1심 → 2심 → 3심 재판</td>
+<td>항소·상고 또는 돈 회수</td>
+</tr>
+<tr>
+<td>⑥ 종착</td>
+<td><strong>유죄 → 징역·벌금</strong> / 무죄</td>
+<td><strong>돈 회수 완료</strong></td>
+</tr>
+</tbody>
+</table>
+<p>→ 둘은 <strong>별도 트랙</strong>이지만 <strong>증거는 공유</strong>,
+형사 유죄는 민사에서 <strong>강력한 증거</strong>가 됨.</p>
+<p>→ 형사 진행 중 <strong>가압류·가처분</strong>으로 상대 재산을 미리
+묶어두는 게 핵심.</p>
+<h3 id="고소-하나에-형사민사가-어떻게-연결되나">“고소” 하나에
+형사·민사가 어떻게 연결되나</h3>
+<ol type="1">
+<li>피해자가 <strong>고소</strong> (형사 출발)</li>
+<li>동시에 <strong>가압류·가처분</strong> 신청 → 가해자 재산 묶음 (민사
+보전)</li>
+<li>경찰 수사 → 송치 → 검찰 기소</li>
+<li>동시에 <strong>민사 소장 제출</strong> → 손해배상 청구</li>
+<li>형사 유죄 확정 → 민사에서 “이미 인정된 사실”로 이용 가능</li>
+<li>민사 판결 확정 → 강제집행 (가압류해둔 자산 + 추가 자산)</li>
+</ol>
+<h3 id="자주-헷갈리는-3가지">자주 헷갈리는 3가지</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Q</th>
+<th>A</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“고소도 소송 아니야?”</td>
+<td>❌. 고소는 수사 시작 신청. 소송은 법원 재판.</td>
+</tr>
+<tr>
+<td>“민사로 돈 받으면 형사도 끝나?”</td>
+<td>❌. <strong>합의서에 처벌불원 명시</strong>되어야 형사 영향. 단순
+합의금 수령으로는 안 끝남.</td>
+</tr>
+<tr>
+<td>“형사 무죄면 민사도 자동 패소?”</td>
+<td>❌. 증명 강도가 달라서 <strong>형사 무죄·민사 승소</strong> 가능.
+(예: O.J. 심슨 케이스)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="외워둘-한-줄">외워둘 한 줄</h3>
+<blockquote>
+<p><strong>고소 → 처벌</strong> <strong>민사 → 돈</strong> <strong>형사
+= 검사의 처벌 재판</strong></p>
+</blockquote>
+<p>처벌도 받게 하고 돈도 받고 싶다면 → <strong>두 트랙
+동시</strong>.</p>
+<hr />
+<h2 id="a.-사건의-시작-누가-알리느냐">A. 사건의 시작 — 누가
+알리느냐</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>용어</th>
+<th>누가</th>
+<th>의미</th>
+<th>차이 포인트</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>고소(告訴)</strong></td>
+<td><strong>피해자 본인</strong> (또는 법정대리인)</td>
+<td>범죄 피해자가 수사기관에 처벌을 요청</td>
+<td>“내가 당했다”고 본인이 신고</td>
+</tr>
+<tr>
+<td><strong>고발(告發)</strong></td>
+<td>제3자 (누구든)</td>
+<td>범죄 사실을 알게 된 사람이 신고</td>
+<td>피해자가 아니어도 됨</td>
+</tr>
+<tr>
+<td><strong>진정(陳情)</strong></td>
+<td>누구든</td>
+<td>수사 요청 또는 민원</td>
+<td>법적 강제력 약함, 처벌 의사 불분명</td>
+</tr>
+<tr>
+<td><strong>인지(認知)</strong></td>
+<td>수사기관 스스로</td>
+<td>경찰·검찰이 직접 사건 발견</td>
+<td>외부 신고 없이 자체 시작</td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 구별하나?</strong> 친고죄(예: 일부 명예 관련 죄, 과거
+강간죄 등은 폐지)는 <strong>고소가 있어야만</strong> 처벌 가능. 진정은
+처벌 의사가 약해 사건이 묻힐 수 있음.</p>
+<hr />
+<h2 id="b.-사람의-이름-단계별로-호칭이-바뀐다">B. 사람의 이름 — 단계별로
+호칭이 바뀐다</h2>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>호칭</th>
+<th>한자</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>수사 시작 전</td>
+<td>용의자</td>
+<td>容疑者</td>
+</tr>
+<tr>
+<td>정식 수사 대상</td>
+<td><strong>피의자</strong></td>
+<td>被疑者</td>
+</tr>
+<tr>
+<td>기소되어 재판 받음</td>
+<td><strong>피고인</strong></td>
+<td>被告人</td>
+</tr>
+<tr>
+<td>유죄 확정</td>
+<td>수형자/전과자</td>
+<td>受刑者</td>
+</tr>
+<tr>
+<td>신고한 측</td>
+<td>고소인 / 고발인 / 피해자</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 헷갈리는가?</strong> 같은 사람인데 단계마다 부르는 이름이
+바뀝니다. “피의자”라는 말 들으면 “아직 수사 단계구나”로 읽으면 됨.</p>
+<hr />
+<h2 id="c.-경찰-단계-송치-vs-불송치-2021년-개정-후-가장-중요">C. 경찰
+단계 — 송치 vs 불송치 (2021년 개정 후 가장 중요)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>용어</th>
+<th>한자</th>
+<th>풀이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>송치(送致)</strong></td>
+<td>送致</td>
+<td>경찰이 “혐의 있다”고 판단해 사건을 <strong>검찰로 넘김</strong></td>
+</tr>
+<tr>
+<td><strong>불송치(不送致)</strong></td>
+<td>不送致</td>
+<td>경찰이 “혐의 없다”고 판단해 <strong>검찰로 안 넘기고
+종결</strong></td>
+</tr>
+<tr>
+<td><strong>이의신청</strong></td>
+<td>—</td>
+<td>불송치 결정에 고소인이 불복 → 검찰로 강제 송치 (통지받은 날부터
+<strong>90일 내</strong>)</td>
+</tr>
+<tr>
+<td><strong>수사중지</strong></td>
+<td>—</td>
+<td>피의자 소재불명 등으로 수사 못 함 (잠정 중단)</td>
+</tr>
+<tr>
+<td><strong>재수사 요청</strong></td>
+<td>—</td>
+<td>검사가 경찰 결정을 보고 다시 수사하라고 요청</td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 2021년 이후 중요?</strong> 검경수사권 조정으로 경찰이 1차
+수사 종결권을 가짐. 옛날엔 무조건 검찰로 갔지만, 지금은 경찰 단계에서
+끝날 수 있음.</p>
+<hr />
+<h2 id="d.-검찰-단계-기소-불기소-약식">D. 검찰 단계 — 기소 / 불기소 /
+약식</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>용어</th>
+<th>한자</th>
+<th>풀이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>기소(起訴)</strong></td>
+<td>起訴</td>
+<td>검사가 법원에 재판을 청구 → 정식 공판</td>
+</tr>
+<tr>
+<td><strong>공소제기</strong></td>
+<td>公訴提起</td>
+<td>기소의 정식 명칭</td>
+</tr>
+<tr>
+<td><strong>불기소(不起訴)</strong></td>
+<td>不起訴</td>
+<td>검사가 재판 청구를 하지 않음 (여러 사유)</td>
+</tr>
+<tr>
+<td><strong>약식기소</strong></td>
+<td>略式起訴</td>
+<td>가벼운 사건을 서면 재판으로 처리 → 벌금</td>
+</tr>
+<tr>
+<td><strong>구공판(求公判)</strong></td>
+<td>—</td>
+<td>정식 공판 청구 (실무 용어)</td>
+</tr>
+<tr>
+<td><strong>구약식(求略式)</strong></td>
+<td>—</td>
+<td>약식명령 청구 (실무 용어)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="불기소-5종-무혐의가-다-같은-무혐의가-아니다">불기소 5종 —
+무혐의가 다 같은 무혐의가 아니다</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>불기소 종류</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>혐의없음</strong></td>
+<td>증거 부족 또는 죄가 안 됨</td>
+</tr>
+<tr>
+<td><strong>죄가안됨</strong></td>
+<td>위법성·책임이 조각됨 (정당방위 등)</td>
+</tr>
+<tr>
+<td><strong>공소권없음</strong></td>
+<td>친고죄 고소취소, 공소시효 만료, 반의사불벌 처벌불원 등</td>
+</tr>
+<tr>
+<td><strong>각하</strong></td>
+<td>고소 자체가 형식 요건 미달, 동일 사안 재고소 등</td>
+</tr>
+<tr>
+<td><strong>기소유예</strong></td>
+<td>죄는 있지만 처벌 안 함 (전과 X, 양형 참작)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>기소유예 주의</strong> — 무혐의처럼 보이지만 “죄는 있다”가
+전제입니다. 본인이 동의 못 하면 <strong>헌법소원</strong>으로 다툼.</p>
+<hr />
+<h2 id="e.-불기소-불복-항고-재항고-재정신청">E. 불기소 불복 — 항고 /
+재항고 / 재정신청</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>용어</th>
+<th>어디로</th>
+<th>누가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>항고(抗告)</strong></td>
+<td>고등검찰청</td>
+<td>고소인</td>
+</tr>
+<tr>
+<td><strong>재항고(再抗告)</strong></td>
+<td>대검찰청</td>
+<td>고소인 (항고 기각 후)</td>
+</tr>
+<tr>
+<td><strong>재정신청(裁定申請)</strong></td>
+<td>고등법원</td>
+<td>고소인 — 법원이 받아들이면 <strong>기소 강제</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>재정신청이 강력한 이유</strong> — 법원이 “기소하라” 결정하면
+검사가 거부 못 함.</p>
+<hr />
+<h2 id="f.-법원-단계-판결의-종류">F. 법원 단계 — 판결의 종류</h2>
+<table>
+<thead>
+<tr>
+<th>용어</th>
+<th>한자</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>유죄(有罪)</strong></td>
+<td>有罪</td>
+<td>죄 인정 → 형 선고</td>
+</tr>
+<tr>
+<td><strong>무죄(無罪)</strong></td>
+<td>無罪</td>
+<td>죄 인정 안 됨</td>
+</tr>
+<tr>
+<td><strong>공소기각</strong></td>
+<td>公訴棄却</td>
+<td>절차상 하자로 재판 없이 끝냄</td>
+</tr>
+<tr>
+<td><strong>면소(免訴)</strong></td>
+<td>免訴</td>
+<td>공소시효 만료 등으로 면제</td>
+</tr>
+<tr>
+<td><strong>선고유예</strong></td>
+<td>—</td>
+<td>형은 정해두고 일정 기간 뒤 면제</td>
+</tr>
+<tr>
+<td><strong>집행유예</strong></td>
+<td>—</td>
+<td>형은 선고하되 일정 기간 집행 보류</td>
+</tr>
+<tr>
+<td><strong>약식명령</strong></td>
+<td>—</td>
+<td>서면 재판으로 벌금 결정</td>
+</tr>
+</tbody>
+</table>
+<h3 id="심-2심-3심">1심 / 2심 / 3심</h3>
+<table>
+<thead>
+<tr>
+<th>심급</th>
+<th>법원</th>
+<th>다투는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1심</td>
+<td>지방법원 (단독판사 / 합의부)</td>
+<td>사실관계 + 법률</td>
+</tr>
+<tr>
+<td>2심 (항소)</td>
+<td>고등법원</td>
+<td>사실관계 + 법률 (다시 다툼)</td>
+</tr>
+<tr>
+<td>3심 (상고)</td>
+<td>대법원</td>
+<td><strong>법률 적용</strong>만 (사실관계는 원칙 X)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="g.-강제처분-영장이-필요한-행위">G. 강제처분 — 영장이 필요한
+행위</h2>
+<table>
+<thead>
+<tr>
+<th>용어</th>
+<th>풀이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>체포영장</strong></td>
+<td>피의자 신병 확보</td>
+</tr>
+<tr>
+<td><strong>구속영장</strong></td>
+<td>도주·증거인멸 우려 시 가두기</td>
+</tr>
+<tr>
+<td><strong>압수수색영장</strong></td>
+<td>증거물·서류·휴대폰 등 압수</td>
+</tr>
+<tr>
+<td><strong>긴급체포</strong></td>
+<td>영장 없이 체포 (사후 48시간 내 영장)</td>
+</tr>
+<tr>
+<td><strong>현행범 체포</strong></td>
+<td>누구든 가능, 영장 불요</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="h.-죄의-분류-친고죄-반의사불벌죄">H. 죄의 분류 — 친고죄 /
+반의사불벌죄</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>용어</th>
+<th>풀이</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>친고죄(親告罪)</strong></td>
+<td>고소가 있어야만 처벌 가능</td>
+<td>모욕죄</td>
+</tr>
+<tr>
+<td><strong>반의사불벌죄(反意思不罰罪)</strong></td>
+<td>피해자가 처벌을 원치 않으면 처벌 불가</td>
+<td>단순폭행, 명예훼손</td>
+</tr>
+<tr>
+<td><strong>일반범죄</strong></td>
+<td>고소·고발 없어도 처벌 가능</td>
+<td>사기, 살인, 절도</td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 알아야 하나?</strong> 친고죄·반의사불벌죄는
+<strong>합의</strong>가 사건을 종결시키는 가장 강력한 카드. 가해자
+입장에선 빠른 합의가 전부일 수도.</p>
+<hr />
+<h2 id="i.-자주-보는-부속-용어">I. 자주 보는 부속 용어</h2>
+<table>
+<thead>
+<tr>
+<th>용어</th>
+<th>풀이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>공소시효(公訴時效)</strong></td>
+<td>일정 기간 지나면 더 이상 기소 못 함</td>
+</tr>
+<tr>
+<td><strong>양형(量刑)</strong></td>
+<td>형의 무게 결정</td>
+</tr>
+<tr>
+<td><strong>양형사유</strong></td>
+<td>형을 무겁게/가볍게 만드는 사정 (반성, 합의, 전과 등)</td>
+</tr>
+<tr>
+<td><strong>무혐의 처분</strong></td>
+<td>검찰 단계의 “혐의없음” 결정 — 무죄와 다름</td>
+</tr>
+<tr>
+<td><strong>혐의인정</strong></td>
+<td>피의자가 죄를 인정함</td>
+</tr>
+<tr>
+<td><strong>묵비권</strong></td>
+<td>진술하지 않을 권리 (헌법 보장)</td>
+</tr>
+<tr>
+<td><strong>변호인 조력권</strong></td>
+<td>변호사를 둘 권리 (헌법 보장)</td>
+</tr>
+<tr>
+<td><strong>국선변호인</strong></td>
+<td>국가가 붙여주는 변호사</td>
+</tr>
+<tr>
+<td><strong>참고인</strong></td>
+<td>피의자 아닌 진술자 (목격자 등)</td>
+</tr>
+<tr>
+<td><strong>대질(對質)</strong></td>
+<td>고소인과 피의자를 대면시켜 진술 받음</td>
+</tr>
+<tr>
+<td><strong>피의자 신문조서</strong></td>
+<td>피의자 진술을 기록한 문서 — 매우 중요</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="j.-가장-헷갈리는-3쌍">J. 가장 헷갈리는 3쌍</h2>
+<ol type="1">
+<li><strong>무혐의 ≠ 무죄</strong></li>
+</ol>
+<ul>
+<li>무혐의 = 검찰 단계 처분, 재판 가기 전</li>
+<li>무죄 = 법원 판결, 재판 끝</li>
+</ul>
+<ol start="2" type="1">
+<li><strong>고소 ≠ 고발</strong></li>
+</ol>
+<ul>
+<li>고소 = 피해자 본인</li>
+<li>고발 = 제3자</li>
+</ul>
+<ol start="3" type="1">
+<li><strong>송치 ≠ 기소</strong></li>
+</ol>
+<ul>
+<li>송치 = 경찰 → 검찰 (사건이 검찰로 감)</li>
+<li>기소 = 검찰 → 법원 (재판으로 감)</li>
+</ul>
+<hr />
+<h1 id="고소-절차-한눈에-시간순-플로우-송치불송치유무죄-분기">고소 절차
+한눈에 — 시간순 플로우 / 송치·불송치·유무죄 분기</h1>
+<blockquote>
+<p>학습용 변환 자료. 한국 형사절차 표준 절차를 정리한 것. 근거:
+형사소송법, 검찰청법, 경찰수사규칙(2021 검경수사권 조정 반영).</p>
+</blockquote>
+<hr />
+<h2 id="큰-그림-시간순-한-줄">1) 큰 그림 — 시간순 한 줄</h2>
+<pre><code>[사건 발생] → [고소 결심] → [고소장 제출] → [경찰 수사]
+   → [경찰 결정: 송치 / 불송치]
+       ├─ 송치   → [검찰 수사·보완] → [검찰 처분: 기소 / 불기소]
+       │                                   ├─ 기소   → [법원 재판: 1심 → 2심 → 3심] → [유죄/무죄]
+       │                                   └─ 불기소 → [고소인 불복: 항고 → 재항고 → 재정신청]
+       └─ 불송치 → [고소인 불복: 이의신청] → 검찰로 사건 송치되어 재검토</code></pre>
+<hr />
+<h2 id="절차-그래프-mermaid">2) 절차 그래프 (Mermaid)</h2>
+<blockquote>
+<p>각 노드의 <strong>T+</strong> 표기는 고소장 접수 시점을 T=0으로 한
+<strong>누적 경과 시간</strong> (실무 평균). 사건 복잡도·법원 상황에
+따라 ±50% 변동 가능.</p>
+</blockquote>
+<pre class="mermaid">
+flowchart TD
+    A["사건 발생 (T-α)"] --> B["고소 결심"]
+    B --> C["고소장 작성·제출 (T+0)"]
+    C -->|경찰서 직접접수| D["경찰 수사 개시 (~T+2주)"]
+    C -->|형사사법포털 온라인| D
+    C -->|검찰청 접수| D2["검찰→경찰 이송 (~T+1개월)"]
+    D2 --> D
+
+    D --> E["고소인 조사 (T+2주~1개월)"]
+    E --> F["피의자·참고인 조사·증거 수집 (T+1~3개월)"]
+    F --> G{"경찰 수사 종결 (T+3~6개월)"}
+
+    G -->|혐의 인정| H["송치 결정"]
+    G -->|혐의 없음| I["불송치 결정"]
+
+    I --> J{"고소인 이의신청 (불송치 통지 90일 내)"}
+    J -->|이의신청 O| K["검찰 송치되어 재검토 (T+5~9개월)"]
+    J -->|이의신청 X| Z1["사건 종결"]
+    K --> L
+
+    H --> L["검찰 송부 (T+4~7개월)"]
+    L --> M["검찰 보완수사·직접수사 (T+5~10개월)"]
+    M --> N{"검사 처분 (T+6~12개월)"}
+
+    N -->|기소| O1["공판 청구 (구공판)"]
+    N -->|약식기소| O2["약식명령 청구 (구약식)"]
+    N -->|불기소| P["혐의없음·죄가안됨·공소권없음·각하·기소유예"]
+    N -->|중지| Q["기소중지·참고인중지"]
+
+    P --> R{"고소인 불복"}
+    R -->|항고 3개월 내| R1["고등검찰청"]
+    R1 -->|재항고| R2["대검찰청"]
+    R1 -->|재정신청 10일 내| R3["고등법원 (기소강제)"]
+    R --> Z2["사건 종결"]
+
+    O1 --> S["1심 지방법원 (T+1~2년)"]
+    O2 --> T["약식명령 송달"]
+    T -->|정식재판 청구 7일내| S
+    T -->|이의 없음| U["약식명령 확정 — 벌금형 등"]
+
+    S --> V{"1심 판결"}
+    V -->|유죄| W1["형 집행 또는 항소 7일 내"]
+    V -->|무죄| W2["검사 항소 가능"]
+    V -->|공소기각·면소| W3["절차상 종결"]
+
+    W1 -->|항소| X["2심 고등법원 (T+1.5~3년)"]
+    W2 -->|항소| X
+    X --> X1{"2심 판결"}
+    X1 -->|상고| Y["3심 대법원 (T+2~4년)"]
+    Y --> Y1["최종 확정"]
+</pre>
+<h3 id="단계별-누적-경과-시간-한-줄-요약">📅 단계별 누적 경과 시간 한 줄
+요약</h3>
+<table>
+<thead>
+<tr>
+<th>시점</th>
+<th>단계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>T+0</strong></td>
+<td>고소장 접수</td>
+</tr>
+<tr>
+<td><strong>T+2주</strong></td>
+<td>경찰 1차 조사 시작</td>
+</tr>
+<tr>
+<td><strong>T+1개월</strong></td>
+<td>고소인 조사 완료</td>
+</tr>
+<tr>
+<td><strong>T+1~3개월</strong></td>
+<td>피의자·참고인 조사</td>
+</tr>
+<tr>
+<td><strong>T+3~6개월</strong></td>
+<td>경찰 수사 종결 (송치/불송치)</td>
+</tr>
+<tr>
+<td><strong>T+4~7개월</strong></td>
+<td>검찰 송부</td>
+</tr>
+<tr>
+<td><strong>T+5~10개월</strong></td>
+<td>검찰 보완수사</td>
+</tr>
+<tr>
+<td><strong>T+6~12개월</strong></td>
+<td>검사 처분 (기소/불기소)</td>
+</tr>
+<tr>
+<td><strong>T+1~2년</strong></td>
+<td>1심 판결</td>
+</tr>
+<tr>
+<td><strong>T+1.5~3년</strong></td>
+<td>2심 판결</td>
+</tr>
+<tr>
+<td><strong>T+2~4년</strong></td>
+<td>3심 (대법원) 확정</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 형사 사건이 1심에서 끝나면 보통 <strong>1~2년</strong>. 3심까지
+가면 <strong>2~4년</strong>. 💡 약식 사건(벌금형)은
+<strong>6개월~1년</strong> 내 종결 다수.</p>
+</blockquote>
+<hr />
+<h2 id="분기-핵심-송치-vs-불송치-vs-무죄">3) 분기 핵심 — 송치 vs 불송치
+vs 무죄</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>단계</th>
+<th>이름</th>
+<th>누가 정함</th>
+<th>의미</th>
+<th>고소인의 다음 카드</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>경찰 종결</td>
+<td><strong>송치</strong></td>
+<td>경찰</td>
+<td>혐의 인정 → 검찰로 넘김</td>
+<td>검찰 처분 기다리기</td>
+</tr>
+<tr>
+<td>경찰 종결</td>
+<td><strong>불송치</strong></td>
+<td>경찰</td>
+<td>혐의 없음 → 경찰 단계 종결</td>
+<td><strong>이의신청</strong> (90일 내)</td>
+</tr>
+<tr>
+<td>검찰 종결</td>
+<td><strong>기소</strong></td>
+<td>검사</td>
+<td>재판 청구</td>
+<td>(피의자가 다툼)</td>
+</tr>
+<tr>
+<td>검찰 종결</td>
+<td><strong>불기소</strong></td>
+<td>검사</td>
+<td>재판 안 넘김</td>
+<td><strong>항고 → 재항고 / 재정신청</strong></td>
+</tr>
+<tr>
+<td>법원 종결</td>
+<td><strong>유죄</strong></td>
+<td>판사</td>
+<td>죄 인정</td>
+<td>(피고인이 항소)</td>
+</tr>
+<tr>
+<td>법원 종결</td>
+<td><strong>무죄</strong></td>
+<td>판사</td>
+<td>죄 인정 안 됨</td>
+<td>검사가 항소 가능</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="결정-단계별-걸리는-시간-감각">4) 결정 단계별 “걸리는 시간”
+감각</h2>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>통상 소요</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>고소장 접수 → 경찰 1차 조사</td>
+<td>2주 ~ 2개월</td>
+</tr>
+<tr>
+<td>경찰 수사 전체</td>
+<td>3 ~ 6개월 (사건 복잡도에 따라 1년 이상도)</td>
+</tr>
+<tr>
+<td>송치 후 검찰 처분</td>
+<td>1 ~ 6개월</td>
+</tr>
+<tr>
+<td>1심 재판</td>
+<td>6개월 ~ 1년</td>
+</tr>
+<tr>
+<td>2심</td>
+<td>4 ~ 8개월</td>
+</tr>
+<tr>
+<td>3심</td>
+<td>4개월 ~ 1년</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>실무 감각이지 법정 기한은 아닙니다. 형사소송법상 수사기관 처리기한은
+강행규정이 적고, 지연돼도 그것만으로 사건이 무효가 되지 않습니다.</p>
+</blockquote>
+<hr />
+<h2 id="가장-흔한-오해">5) 가장 흔한 오해</h2>
+<ul>
+<li>“고소장만 내면 알아서 처리해준다” → ✗. 고소인이 <strong>증거를
+정리해서 제출</strong>해야 수사관이 움직입니다.</li>
+<li>“송치되면 처벌 확정이다” → ✗. 송치는 검찰이 다시 판단하는 시작점일
+뿐.</li>
+<li>“불송치는 끝이다” → ✗. <strong>90일 내 이의신청</strong>으로 검찰
+송치 가능.</li>
+<li>“무혐의 = 무죄” → ✗. 무혐의(혐의없음, 검찰 처분)와 무죄(법원 판결)는
+다른 단계.</li>
+</ul>
+<hr />
+<h1 id="상황별-어떤-죄가-성립하고-어디-몇-조-위반인가">상황별 — 어떤
+죄가 성립하고, 어디 몇 조 위반인가</h1>
+<blockquote>
+<p>법령 조문은 법제처 Open API로 직접 가져온 형법·스토킹처벌법
+원문입니다. 흔한 죄목 순서대로 정리: 사기 &gt; 폭행 ≒ 명예훼손 ≒ 스토킹
+&gt; 횡령 &gt; 모욕.</p>
+</blockquote>
+<hr />
+<h2 id="사기죄-가장-많이-다루는-죄">1. 사기죄 — 가장 많이 다루는 죄</h2>
+<h3 id="형법-제347조-사기">📜 형법 제347조 (사기)</h3>
+<blockquote>
+<p>① 사람을 <strong>기망</strong>하여 재물의 교부를 받거나 재산상의
+이익을 취득한 자는 <strong>20년 이하의 징역 또는 5천만원 이하의
+벌금</strong>에 처한다. ② 전항의 방법으로 제삼자로 하여금 재물의 교부를
+받게 하거나 재산상의 이익을 취득하게 한 때에도 전항의 형과 같다.</p>
+</blockquote>
+<h3 id="성립-4요소-이게-다-있어야-사기로-인정">성립 4요소 — 이게 다
+있어야 사기로 인정</h3>
+<ol type="1">
+<li><strong>기망행위(欺罔)</strong> — 거짓말, 속이는 행동, 침묵으로
+속이기 포함</li>
+<li><strong>상대방의 착오</strong> — 그 말을 진짜로 믿었어야 함</li>
+<li><strong>재물의 교부 / 재산상의 이익</strong> — 돈, 물건, 채권 양도
+등</li>
+<li><strong>인과관계</strong> — “속았기 때문에 줬다”가 이어져야 함</li>
+</ol>
+<h3 id="자주-등장하는-패턴-요약">자주 등장하는 패턴 (요약)</h3>
+<ul>
+<li><strong>차용금 사기</strong> — 갚을 능력·의사 없이 빌리고 안 갚음
+(핵심: 빌릴 때 시점의 상태)</li>
+<li><strong>물품대금 사기</strong> — 납품받고 대금 미지급 (납품 시점에
+변제의사가 없었음을 입증)</li>
+<li><strong>투자 사기</strong> — 수익률·원금보장 허위 약속</li>
+<li><strong>부동산 이중매매</strong> — 같은 부동산을 둘에게 팜</li>
+</ul>
+<h3 id="고소인이-입증해야-하는-것">고소인이 입증해야 하는 것</h3>
+<ul>
+<li>“차용 당시” 갚을 능력 / 의사가 없었다는 정황</li>
+<li>도박빚, 다중채무, 신용불량, 거짓 직장 등 — <strong>돈 빌리던 그
+시점</strong>의 사정</li>
+<li><strong>단순히 안 갚는 건 민사</strong>. “처음부터 속였다”가
+형사</li>
+</ul>
+<h3 id="흔히-헷갈리는-포인트">💡 흔히 헷갈리는 포인트</h3>
+<ul>
+<li>빌려주고 안 갚으면 무조건 사기? → <strong>NO</strong>. 빌려준 후
+사정이 나빠진 건 민사.</li>
+<li>“처음부터 갚을 생각이 없었다”를 어떻게 보여주나? → 빌리기 직전의
+통장 잔고, 이미 진 빚, 거짓 직업·담보 → 정황 증거</li>
+</ul>
+<hr />
+<h2 id="명예훼손-모욕">2. 명예훼손 / 모욕</h2>
+<h3 id="형법-제307조-명예훼손">📜 형법 제307조 (명예훼손)</h3>
+<blockquote>
+<p>① <strong>공연히 사실을 적시</strong>하여 사람의 명예를 훼손한 자는
+2년 이하의 징역이나 금고 또는 500만원 이하의 벌금 ② <strong>공연히
+허위의 사실을 적시</strong>하여 사람의 명예를 훼손한 자는 5년 이하의
+징역, 10년 이하의 자격정지 또는 1천만원 이하의 벌금</p>
+</blockquote>
+<h3 id="형법-제311조-모욕">📜 형법 제311조 (모욕)</h3>
+<blockquote>
+<p>공연히 사람을 <strong>모욕</strong>한 자는 1년 이하의 징역이나 금고
+또는 200만원 이하의 벌금에 처한다.</p>
+</blockquote>
+<h3 id="명예훼손-vs-모욕-자주-헷갈리는-차이">명예훼손 vs 모욕 — 자주
+헷갈리는 차이</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>구분</th>
+<th>명예훼손 (307조)</th>
+<th>모욕 (311조)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>핵심</td>
+<td><strong>구체적 사실</strong> 적시</td>
+<td>추상적·경멸적 표현</td>
+</tr>
+<tr>
+<td>예시</td>
+<td>“○○씨가 회사 돈 빼돌렸다”</td>
+<td>“○○씨는 미친놈이다”</td>
+</tr>
+<tr>
+<td>진실 항변</td>
+<td>진실 + 공익 = 면책 가능 (310조)</td>
+<td>진실 항변 없음</td>
+</tr>
+<tr>
+<td>친고·반의사</td>
+<td><strong>반의사불벌죄</strong> (피해자 처벌불원 시 X)</td>
+<td><strong>친고죄</strong> (고소 있어야 처벌)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="정보통신망법-위반-인터넷sns의-경우">정보통신망법 위반 —
+인터넷·SNS의 경우</h3>
+<ul>
+<li>📜 정보통신망법 제70조 — <strong>인터넷·SNS에서의 명예훼손은 형이 더
+무거움</strong></li>
+<li>사실 적시: 3년 이하 징역 또는 3천만원 이하 벌금</li>
+<li>허위 적시: 7년 이하 징역 / 10년 이하 자격정지 / 5천만원 이하
+벌금</li>
+</ul>
+<h3 id="성립-핵심-공연성公然性">성립 핵심 — “공연성(公然性)”</h3>
+<ul>
+<li><strong>불특정 다수가 인식할 수 있는 상태</strong> = 공연성</li>
+<li>둘만 있는 자리에서 한 말도 → 그게 퍼져나갈 가능성(전파성)이 있으면
+인정</li>
+<li>단톡방, 카페 댓글, 공개 게시판 → 거의 다 공연성 인정</li>
+</ul>
+<hr />
+<h2 id="폭행-협박">3. 폭행 / 협박</h2>
+<h3 id="형법-제260조-폭행">📜 형법 제260조 (폭행)</h3>
+<blockquote>
+<p>① 사람의 신체에 대하여 폭행을 가한 자는 2년 이하의 징역, 500만원
+이하의 벌금, 구류 또는 과료에 처한다. ② 직계존속 폭행은 5년 이하 징역
+또는 700만원 이하 벌금. ③ <strong>피해자의 명시한 의사에 반하여 공소를
+제기할 수 없다.</strong> (= 반의사불벌죄)</p>
+</blockquote>
+<h3 id="형법-제283조-협박">📜 형법 제283조 (협박)</h3>
+<blockquote>
+<p>① 사람을 협박한 자는 3년 이하의 징역, 500만원 이하의 벌금, 구류 또는
+과료에 처한다. ② 직계존속 협박은 5년 이하 징역 또는 700만원 이하 벌금. ③
+<strong>반의사불벌죄.</strong></p>
+</blockquote>
+<h3 id="폭행-의외로-넓은-정의">폭행 — 의외로 넓은 정의</h3>
+<ul>
+<li>신체 접촉 없이도 폭행 성립 가능 (예: 멱살을 잡지 않고 코앞에서
+위협)</li>
+<li>침 뱉기, 물 뿌리기, 큰 소리로 위협하기 → 폭행으로 본 판례 다수</li>
+<li><strong>상해 발생 시</strong> → 상해죄(257조)로 가중 (7년 이하
+징역)</li>
+</ul>
+<h3 id="협박-해악-고지-가-핵심">협박 — “해악 고지” 가 핵심</h3>
+<ul>
+<li>구체적으로 해를 끼치겠다는 통보</li>
+<li>“죽여버린다”, “가족 가만 안 둔다”, “회사에 알려서 망하게 한다”</li>
+<li>단순 욕설은 모욕, 해악 통보는 협박</li>
+</ul>
+<h3 id="합의의-위력">합의의 위력</h3>
+<ul>
+<li>두 죄 모두 반의사불벌죄 → <strong>합의서 + 처벌불원서</strong>가
+핵심 카드</li>
+<li>가해자 입장: 빠른 합의 = 거의 끝</li>
+<li>피해자 입장: 합의금 협상 여지 있음</li>
+</ul>
+<hr />
+<h2 id="횡령-배임">4. 횡령 / 배임</h2>
+<h3 id="형법-제355조-횡령-배임">📜 형법 제355조 (횡령, 배임)</h3>
+<blockquote>
+<p>① 타인의 재물을 <strong>보관하는 자</strong>가 그 재물을 횡령하거나
+그 반환을 거부한 때에는 5년 이하의 징역 또는 1천500만원 이하의 벌금 ②
+타인의 사무를 처리하는 자가 그 임무에 위배하는 행위로써 재산상의 이익을
+취득하거나 제삼자로 하여금 이를 취득하게 하여 본인에게 손해를 가한
+때에도 전항의 형과 같다.</p>
+</blockquote>
+<h3 id="횡령-vs-배임-vs-사기-자주-헷갈림">횡령 vs 배임 vs 사기 — 자주
+헷갈림</h3>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>출발점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>사기</strong></td>
+<td>처음부터 속여서 가져감</td>
+</tr>
+<tr>
+<td><strong>횡령</strong></td>
+<td>정당히 맡았는데 도중에 자기 것으로 함</td>
+</tr>
+<tr>
+<td><strong>배임</strong></td>
+<td>남의 일 보면서 그 사람에 손해 끼침</td>
+</tr>
+</tbody>
+</table>
+<h3 id="자주-나오는-횡령-사례-요약">자주 나오는 횡령 사례 (요약)</h3>
+<ul>
+<li>동업자가 공동 자금을 개인 용도로 씀</li>
+<li>직원이 회사 자금을 임의 사용</li>
+<li>임차인이 보증금을 임대인에게 안 돌려주는 행위(특수 경우)</li>
+</ul>
+<h3 id="업무상-횡령배임-356조">업무상 횡령·배임 (356조)</h3>
+<ul>
+<li>직무·업무로 맡은 재물·사무 → 형 가중 (10년 이하 / 3천만원 이하)</li>
+</ul>
+<hr />
+<h2 id="스토킹">5. 스토킹</h2>
+<h3 id="스토킹범죄의-처벌-등에-관한-법률-제2조-정의">📜 스토킹범죄의
+처벌 등에 관한 법률 제2조 (정의)</h3>
+<blockquote>
+<p>“스토킹행위”란 상대방의 의사에 반(反)하여 정당한 이유 없이 다음
+행위로 <strong>불안감 또는 공포심</strong>을 일으키는 것: -
+접근·따라다님·진로를 막음 - 주거·직장·학교 부근에서 기다리거나 지켜봄 -
+우편·전화·정보통신망으로 글·말·물건 도달시킴 - 직접 또는 제3자 통해 물건
+도달시킴 - 주거 부근 물건 훼손 - 개인정보·위치정보 게시·배포 - 사진·신분
+도용해 본인인 척 위장</p>
+<p>“스토킹범죄”란 위 행위를 <strong>지속적 또는 반복적으로</strong> 하는
+것.</p>
+</blockquote>
+<h3 id="같은-법-제18조-스토킹범죄">📜 같은 법 제18조 (스토킹범죄)</h3>
+<blockquote>
+<p>① 스토킹범죄를 저지른 사람은 <strong>3년 이하의 징역 또는 3천만원
+이하의 벌금</strong> ② <strong>흉기 또는 위험한 물건을
+휴대·이용</strong>하여 저지른 사람은 <strong>5년 이하의 징역 또는
+5천만원 이하의 벌금</strong></p>
+</blockquote>
+<h3 id="년-7월-11일-개정-반의사불벌죄-조항-삭제">2023년 7월 11일 개정 —
+“반의사불벌죄” 조항 삭제</h3>
+<ul>
+<li>과거: 피해자가 처벌 안 원하면 처벌 X</li>
+<li><strong>현재: 피해자 의사와 무관하게 처벌 가능</strong> (보복 우려
+차단 목적)</li>
+<li>따라서 합의로도 사건이 종결되지 않음</li>
+</ul>
+<h3 id="잠정조치-고소-즉시-신청-가능">잠정조치 — 고소 즉시 신청
+가능</h3>
+<ul>
+<li>100m 접근금지, 전기통신 이용 접근금지 등</li>
+<li>위반 시 별도 형사처벌</li>
+</ul>
+<hr />
+<h2 id="무고죄-거짓-고소의-위험">6. 무고죄 — 거짓 고소의 위험</h2>
+<h3 id="형법-제156조-무고">📜 형법 제156조 (무고)</h3>
+<blockquote>
+<p>타인으로 하여금 형사처분 또는 징계처분을 받게 할 목적으로 공무소 또는
+공무원에 대하여 <strong>허위의 사실을 신고</strong>한 자는 <strong>10년
+이하의 징역 또는 1천500만원 이하의 벌금</strong></p>
+</blockquote>
+<h3 id="꼭-알아야-할-부분">꼭 알아야 할 부분</h3>
+<ul>
+<li>고소가 인정 안 되면 자동으로 무고죄? → <strong>NO</strong>.</li>
+<li>무고죄 성립은 <strong>“허위인 줄 알고도” 고소</strong>한 경우 (고의
+입증 필요)</li>
+<li>단순히 입증 부족 → 무혐의 처분이지만 무고는 X</li>
+<li>그러나 <strong>명백히 허위인 사실로 고소</strong> → 피의자가 역으로
+무고죄 고소 가능</li>
+</ul>
+<hr />
+<h2 id="죄목별-친고반의사일반-분류표">7. 죄목별 친고·반의사·일반
+분류표</h2>
+<table>
+<thead>
+<tr>
+<th>죄목</th>
+<th>분류</th>
+<th>합의의 효력</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사기</td>
+<td>일반범죄</td>
+<td>합의는 양형 참작만</td>
+</tr>
+<tr>
+<td>명예훼손 (307조)</td>
+<td>반의사불벌죄</td>
+<td>처벌불원 시 공소 X</td>
+</tr>
+<tr>
+<td>모욕 (311조)</td>
+<td><strong>친고죄</strong></td>
+<td>고소 없으면 처벌 X</td>
+</tr>
+<tr>
+<td>폭행 (260조)</td>
+<td>반의사불벌죄</td>
+<td>처벌불원 시 공소 X</td>
+</tr>
+<tr>
+<td>협박 (283조)</td>
+<td>반의사불벌죄</td>
+<td>처벌불원 시 공소 X</td>
+</tr>
+<tr>
+<td>횡령·배임</td>
+<td>일반범죄</td>
+<td>양형 참작</td>
+</tr>
+<tr>
+<td>스토킹</td>
+<td>일반범죄 (2023 개정)</td>
+<td>양형 참작만</td>
+</tr>
+<tr>
+<td>무고</td>
+<td>일반범죄</td>
+<td>양형 참작</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="어떤-상황에-어떤-죄">8. 어떤 상황에 어떤 죄?</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>상황</th>
+<th>1순위 죄목</th>
+<th>추가 검토</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>돈 빌려주고 안 갚음 (처음부터 갚을 의사 없음 정황)</td>
+<td>사기 (형법 347조)</td>
+<td>부동산이면 부당이득</td>
+</tr>
+<tr>
+<td>회사 단톡방에 누가 나에 대해 거짓말 퍼뜨림</td>
+<td>명예훼손 (정보통신망법 70조)</td>
+<td>모욕 (병합)</td>
+</tr>
+<tr>
+<td>헤어진 사람이 계속 연락·집 앞 옴</td>
+<td>스토킹 (스토킹법 18조)</td>
+<td>협박·주거침입 추가</td>
+</tr>
+<tr>
+<td>동업자가 공동 통장 돈 임의 사용</td>
+<td>업무상 횡령 (형법 356조)</td>
+<td>사기·배임</td>
+</tr>
+<tr>
+<td>누가 나 욕하면서 멱살 잡음</td>
+<td>폭행 (260조) + 모욕(311조)</td>
+<td>상해 발생 시 가중</td>
+</tr>
+<tr>
+<td>인터넷에서 거짓 후기로 가게 망함</td>
+<td>정보통신망법 명예훼손 (사실/허위)</td>
+<td>업무방해 (314조)</td>
+</tr>
+<tr>
+<td>협박 메시지 받음</td>
+<td>협박 (283조)</td>
+<td>정보통신망법 70조의2</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="고소장-잘-쓰는-법-설계하는-법">고소장 — 잘 쓰는 법 / 설계하는
+법</h1>
+<blockquote>
+<p>직접 고소장을 써야 한다면 이 순서·이 마인드로.</p>
+</blockquote>
+<hr />
+<h2 id="큰-마인드-고소장은-수사관을-설득하는-문서다">0. 큰 마인드 —
+고소장은 “수사관을 설득하는 문서”다</h2>
+<p>고소장 = 수사관 책상 위에 올라가는 첫 문서. - 수사관은 사건이 200건씩
+쌓여 있다. - “이 사건은 죄가 명백하고, 입증이 쉽고, 처리할 가치가
+있다”는 인상을 30초 안에 줘야 함. - 사실관계를 시간순으로 정리 + 죄목
+명시 + 증거 목록 = 3박자.</p>
+<hr />
+<h2 id="고소장-표준-구조-9블록">1. 고소장 표준 구조 (9블록)</h2>
+<pre><code>[1] 고소인 정보 — 이름, 주민번호, 주소, 연락처
+[2] 피고소인 정보 — 이름, (주민번호/생년), 주소, 연락처
+[3] 고소취지 — &quot;○○죄로 처벌해 달라&quot;는 한 문장
+[4] 고소이유 — 시간순 사실관계 (가장 중요한 블록)
+[5] 적용 법조 — 형법 제○조 ○항 / 정보통신망법 제○조
+[6] 입증방법(증거) — 증거 1, 2, 3 … (별첨 ①②③ 표기)
+[7] 관할 — 어디 경찰서/검찰청
+[8] 작성일·서명 — 날짜, 고소인 자필 서명·도장
+[9] 첨부 — 증거 사본·증인 진술서 등</code></pre>
+<hr />
+<h2 id="고소이유-한-줄도-흘리지-않게-쓰는-법">2. “고소이유” — 한 줄도
+흘리지 않게 쓰는 법</h2>
+<h3 id="시간순으로-사실만-한-문단-한-사건">2-1. 시간순으로, 사실만, 한
+문단 = 한 사건</h3>
+<p>✅ <strong>좋은 예 (요약 패턴)</strong> &gt; “2025. 3. 1. 피고소인은
+고소인에게 카카오톡으로 ’○○사업 투자하면 매월 5% 수익 보장’이라는
+메시지를 보냈습니다(증거 ①). &gt; 2025. 3. 5. 고소인은 피고소인 명의
+신한은행 계좌(110-<strong><em>-</em></strong>)로 500만원을
+송금했습니다(증거 ②). &gt; 2025. 3. 10. 피고소인은 ’사업 망했다’며
+연락을 끊었고, 이후 확인 결과 피고소인은 이미 2024년부터 신용불량
+상태였습니다(증거 ③).”</p>
+<p>❌ <strong>나쁜 예</strong> &gt; “피고소인은 정말 나쁜 사람으로 저를
+속여서 500만원을 갈취했고 매우 괘씸합니다.” &gt; → 감정·평가·수식어가
+많음. 수사관이 무엇을 조사해야 할지 안 보임.</p>
+<h3 id="w1h를-빠짐-없이">2-2. 5W1H를 빠짐 없이</h3>
+<ul>
+<li><strong>언제</strong> (날짜·시간) — “2025년 3월 1일 14시경”</li>
+<li><strong>어디서</strong> — 카카오톡 / 강남구 ○○카페 / 통화</li>
+<li><strong>누가</strong> — 피고소인이 직접? 제3자 통해?</li>
+<li><strong>누구에게</strong> — 고소인? 다른 사람?</li>
+<li><strong>무엇을</strong> — 한 말·행동을 그대로 인용</li>
+<li><strong>어떻게</strong> — 수단·방법</li>
+</ul>
+<h3 id="한-사건-한-죄목-한-단락-원칙">2-3. 한 사건 = 한 죄목 = 한 단락
+원칙</h3>
+<ul>
+<li>사기 사례 + 명예훼손 사례를 섞어서 쓰지 말 것</li>
+<li>죄목별로 분리해서 각각 시간순 정리</li>
+</ul>
+<hr />
+<h2 id="증거-정리-고소장의-절반은-증거-목록이다">3. 증거 정리 — 고소장의
+절반은 증거 목록이다</h2>
+<h3 id="핵심-증거-유형">핵심 증거 유형</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>증거 종류</th>
+<th>예시</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>서증</td>
+<td>계약서, 차용증, 영수증, 통장 사본</td>
+<td>원본 보관, 사본 제출</td>
+</tr>
+<tr>
+<td>통신증</td>
+<td>카톡, 문자, 통화녹음, 이메일</td>
+<td>캡처는 <strong>전체 화면 + URL/번호</strong> 포함</td>
+</tr>
+<tr>
+<td>영상·사진</td>
+<td>CCTV, 휴대폰 영상</td>
+<td>시각·장소 메타데이터</td>
+</tr>
+<tr>
+<td>진술서</td>
+<td>목격자·관계인 진술서</td>
+<td>자필 서명·날짜</td>
+</tr>
+<tr>
+<td>사실확인서</td>
+<td>은행·관공서·회사 발급</td>
+<td>공적 증거로 강력</td>
+</tr>
+</tbody>
+</table>
+<h3 id="증거-번호-매기는-법">증거 번호 매기는 법</h3>
+<ul>
+<li>증거 ①, 증거 ②, … 로 본문에 표기 → 별첨도 동일 번호</li>
+<li>증거 목록 페이지를 따로 둠</li>
+</ul>
+<pre><code>[증거 목록]
+① 2025. 3. 1. 카카오톡 대화 캡처 (2장)
+② 2025. 3. 5. 신한은행 송금내역 (1장)
+③ 피고소인 신용정보 조회 결과 (1장)</code></pre>
+<h3 id="통신-녹음-합법-vs-불법">통신 녹음 — 합법 vs 불법</h3>
+<ul>
+<li><strong>본인이 대화 당사자</strong> → 합법 (상대방 동의 불필요)</li>
+<li><strong>제3자 대화 무단 녹음</strong> → 통신비밀보호법 위반 →
+증거능력 X + 별도 처벌</li>
+<li>카카오톡 캡처는 본인 단톡방 캡처는 합법, 제3자 단톡 도용은 위험</li>
+</ul>
+<hr />
+<h2 id="죄목법조-막연한-처벌이-아니라-구체적-조항">4. 죄목·법조 —
+“막연한 처벌”이 아니라 “구체적 조항”</h2>
+<h3 id="죄목을-정확히-적어라">4-1. 죄목을 정확히 적어라</h3>
+<p>나쁜 예: “처벌해 달라” 좋은 예: “<strong>형법 제347조 제1항
+사기죄</strong>로 처벌해 달라”</p>
+<h3 id="헷갈리면-복수-죄목-병기">4-2. 헷갈리면 복수 죄목 병기</h3>
+<blockquote>
+<p>“주위적: 형법 제347조 사기, 예비적: 형법 제355조 횡령” -
+수사관·검사가 어느 죄로 가는지 판단 가능</p>
+</blockquote>
+<h3 id="자주-헷갈리는-매칭">4-3. 자주 헷갈리는 매칭</h3>
+<ul>
+<li>인터넷 욕설 → 정보통신망법 제70조 (형법 307·311조보다 형
+무거움)</li>
+<li>직원이 회사돈 → 형법 제356조 업무상 횡령 (355조보다 가중)</li>
+<li>흉기 동반 협박 → 폭처법 또는 특수협박 (284조)</li>
+</ul>
+<hr />
+<h2 id="잘못된-고소장-자주-보는-실패-패턴">5. 잘못된 고소장 — 자주 보는
+실패 패턴</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>패턴</th>
+<th>왜 망하는가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>감정 토로형</td>
+<td>“정말 나쁜 사람”, “도저히 용서 못 함” → 사실관계 안 보임</td>
+</tr>
+<tr>
+<td>시간 뒤죽박죽</td>
+<td>사건이 여러 개 섞임 → 수사관이 사건 구분 못 함</td>
+</tr>
+<tr>
+<td>죄목 부정확</td>
+<td>“사기 같다, 횡령 같다” 다 적음 → 수사방향 흐려짐</td>
+</tr>
+<tr>
+<td>증거 미첨부</td>
+<td>“증거는 나중에 내겠다” → 수사 지연·각하 위험</td>
+</tr>
+<tr>
+<td>너무 김</td>
+<td>50페이지 자서전 → 핵심이 묻힘 (10페이지 이내 권장)</td>
+</tr>
+<tr>
+<td>인적사항 부실</td>
+<td>피고소인 이름만 있고 주소·연락처 없음 → 수사 시작 못 함</td>
+</tr>
+<tr>
+<td>처벌의사 불명확</td>
+<td>“선처 바란다” 같은 문구 → 처벌의사 약하다고 판단</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="접수-방법-어디로-어떻게">6. 접수 방법 — 어디로, 어떻게?</h2>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>장단점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>경찰서 직접접수</strong></td>
+<td>가장 일반적. 즉석에서 보완 요청 가능</td>
+</tr>
+<tr>
+<td><strong>검찰청 접수</strong></td>
+<td>검사→경찰 이송. 시간 더 걸림</td>
+</tr>
+<tr>
+<td><strong>형사사법포털 온라인</strong></td>
+<td>24시간 가능. 첨부 용량 제한</td>
+</tr>
+<tr>
+<td><strong>우편 접수</strong></td>
+<td>등기 권장. 접수 확인 늦음</td>
+</tr>
+</tbody>
+</table>
+<h3 id="관할-일반-원칙">관할 — 일반 원칙</h3>
+<ul>
+<li>범죄 발생지 또는 피의자 주소지 관할 경찰서</li>
+<li>인터넷 사건은 피해자 주소지도 가능 (사이버수사대)</li>
+</ul>
+<hr />
+<h2 id="고소-전-체크리스트">7. 고소 전 체크리스트</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />사실관계를 A4 1장 시간순으로 정리할
+수 있는가?</label></li>
+<li><label><input type="checkbox" />피고소인의 인적사항 (최소 이름 +
+연락처)을 안다</label></li>
+<li><label><input type="checkbox" />증거를 5종 이상 모았다
+(서증·통신·진술 등)</label></li>
+<li><label><input type="checkbox" />적용할 법조를 1개 이상
+특정했다</label></li>
+<li><label><input type="checkbox" /><strong>공소시효</strong>가 지나지
+않았다 (사기 10년, 명예훼손 5년 등)</label></li>
+<li><label><input type="checkbox" />친고죄라면 <strong>고소기간
+6개월</strong>(범인을 안 날부터) 안에 있다</label></li>
+<li><label><input type="checkbox" />무고 위험 — 사실관계에 거짓이 없다
+(있다면 빼자)</label></li>
+</ul>
+<hr />
+<h2 id="고소장-설계-단계-권장-워크플로">8. 고소장 설계 단계 — 권장
+워크플로</h2>
+<pre><code>1단계: 사실관계 메모
+ → 시간순으로 떠오르는 대로 메모. 정확한 날짜·인용 확인.
+2단계: 증거 매칭
+ → 각 사실에 증거 번호를 붙임. 부족하면 추가 수집.
+3단계: 죄목 후보 잡기
+ → 사기/명예훼손/협박 등. 법제처에서 조문 확인.
+4단계: 초안 작성
+ → 위 9블록 구조대로. 한 단락 = 한 사건.
+5단계: 다듬기 (가장 중요)
+ → 감정어 빼기. 사실만. 평가는 결론부만.
+ → 수사관이 30초에 핵심 잡을 수 있는지 확인.
+6단계: 변호사 검토 또는 셀프 체크
+ → 7번 체크리스트 통과 후 접수.</code></pre>
+<hr />
+<h2 id="강조해야-할-마인드-요약요지">9. 강조해야 할 마인드
+(요약·요지)</h2>
+<ul>
+<li><strong>소극적 대응으로는 최선 못 얻는다</strong> — 형사절차는
+가만히 있어서는 풀리지 않음</li>
+<li><strong>1차 목표 = 불송치/불기소</strong> — 경찰 단계에서 종결되도록
+설계</li>
+<li><strong>증거 확보가 전부</strong> — 진술만으로는 안 됨, 객관적
+자료가 핵심</li>
+<li><strong>고소장은 공격, 진술조서는 방어</strong> — 서로 다른 문서,
+다른 전략</li>
+</ul>
+<hr />
+<h2 id="다음-우선순위">10. 다음 우선순위</h2>
+<ol type="1">
+<li><strong>자기 사건이 있다면</strong>: 위 7번 체크리스트로
+자가진단부터</li>
+<li><strong>연습용</strong>: 가상 사례 (예: “친구가 200만원 빌려가서
+1년째 안 갚음”) 으로 고소장 초안 1장 써보기</li>
+<li><strong>법령 확인 습관</strong>: 죄목 특정 → 법제처에서 조문 직접
+보기 (이미 MCP 연결됨)</li>
+</ol>
+<hr />
+<h1 id="고소를-당했을-때-피의자-방어-매뉴얼">고소를 당했을 때 — 피의자
+방어 매뉴얼</h1>
+<blockquote>
+<p>지금까지는 <strong>고소하는 측</strong>(피해자·고소인) 관점이었다면,
+이 문서는 반대편. 어느 날 갑자기 <strong>“○○경찰서 ○○수사관”</strong>
+전화를 받았을 때 무엇을, 어떤 순서로 해야 하는가.</p>
+<p>학습용 변환 자료. 일반 형사절차 표준 지식 + 변호인 실무 흐름 + 가상
+사례로 재구성.</p>
+</blockquote>
+<hr />
+<h2 id="큰-그림-피의자-입장-시간트리">1) 큰 그림 — 피의자 입장
+시간트리</h2>
+<pre><code>[수사관 전화·출석 요구]
+   ↓ (1~2일)
+[조사 일정 미루기 + 변호인 1차 상담]
+   ↓
+[고소장 확보 — 정보공개청구]
+   ↓
+[전략 결정: 무죄 주장 vs 유죄 인정·선처]
+   ↓
+[증거 수집·정리 (피의자 측)]
+   ↓
+[피의자 신문조서 — 신중한 진술]
+   ↓
+[1차 목표: 경찰 단계 불송치]
+   ↓ (불송치 실패 시)
+[검찰 단계: 불기소 / 기소유예]
+   ↓ (기소 시)
+[1심 재판 — 방어·합의·양형자료]</code></pre>
+<hr />
+<h2 id="단계-대응-매뉴얼-가장-핵심">2) 8단계 대응 매뉴얼 (가장
+핵심)</h2>
+<h3 id="수사관-전화문자가-왔다-즉시-출석-x">① 수사관 전화·문자가 왔다 —
+즉시 출석 X</h3>
+<p><strong>잘못된 첫 대응</strong>: - “네, 내일 가겠습니다” 즉답 -
+전화로 사건 내용 즉시 설명 - “저는 아무 잘못 없어요” 길게 해명</p>
+<p><strong>좋은 첫 대응</strong>: 1. <strong>본인 확인</strong>
+(“○○경찰서 ○○과 ○○수사관 맞으십니까?”, 이름·소속·내선 메모) 2.
+<strong>사건 핵심만 듣기</strong> (“어떤 사안으로 출석하라는 건가요?”)
+3. <strong>시간 확보</strong> — “일정 확인 후 다시 연락드리겠다” — 보통
+<strong>1~2주 미루기 가능</strong> 4. <strong>전화 끊고 즉시
+메모</strong> — 날짜·시간·번호·핵심 내용 5. <strong>변호인 상담 일정
+잡기</strong> — 그 동안</p>
+<blockquote>
+<p>💡 출석은 강제 X. 합리적 사유로 1~2회 연기 가능. 단 무한정 미루면
+<strong>체포영장</strong> 청구 가능.</p>
+</blockquote>
+<h3 id="변호인-1차-상담-첫-조사-전-무조건">② 변호인 1차 상담 — 첫 조사
+전 무조건</h3>
+<p>본인이 아무리 똑똑해도 <strong>첫 조사 전 변호인 상담은
+필수</strong>: - 어떤 죄목인지 추정·확인 - 어떤 진술 패턴이 위험한지 -
+묵비권 행사 vs 적극 해명 결정 - 변호인 동행 출석 여부</p>
+<p><strong>1회 상담 (30분~1시간, 5~15만원)</strong> 만으로도 큰
+차이.</p>
+<h3 id="고소장-확보-정보공개청구">③ 고소장 확보 — 정보공개청구</h3>
+<p>피고소인은 <strong>본인 사건의 고소장 사본을 청구할 권리</strong>가
+있습니다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>신청처</td>
+<td>해당 경찰서 (또는 정보공개포털 open.go.kr)</td>
+</tr>
+<tr>
+<td>처리기간</td>
+<td>10일 (최대 20일)</td>
+</tr>
+<tr>
+<td>비공개 사유</td>
+<td>사건관계인 명예·증거인멸 우려 등 — 부분공개 가능</td>
+</tr>
+<tr>
+<td><strong>반드시 시점</strong></td>
+<td><strong>첫 조사 전</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 중요한가</strong>: 무엇으로 고소당했는지 정확히 알아야
+방어 가능. 추정만으로 들어가면 엉뚱한 진술하기 쉬움.</p>
+<h3 id="전략-결정-무죄-주장-vs-유죄-인정선처">④ 전략 결정 — 무죄 주장 vs
+유죄 인정·선처</h3>
+<p>이게 <strong>모든 걸 좌우하는 분기</strong>입니다. 잘못 정하면
+돌이키기 어려움.</p>
+<p>자세한 결정 트리는 아래 <strong>3) 결정 트리</strong> 섹션 참고.</p>
+<h3 id="증거-수집-피의자-측-자료">⑤ 증거 수집 — 피의자 측 자료</h3>
+<p>피의자도 능동적으로 증거를 모아야 합니다. 단순히 “고소장 반박”이
+아니라 <strong>본인 측 사실관계 입증</strong>: - 알리바이
+(출근기록·교통카드·CCTV) - 본인 측 카톡·문자 (고소인이 일부만 캡처했을
+가능성) - 거래 관련 서류 (계약서·송금내역·세금계산서) - 본인 평소 행위
+패턴 입증 자료 - 목격자·동료 진술서</p>
+<blockquote>
+<p>💡 고소인이 제출한 증거에 <strong>빠진 맥락이 있을 가능성</strong>
+높음. 본인이 그 빠진 부분 입증.</p>
+</blockquote>
+<h3 id="피의자-신문조서-첫-진술이-끝까지-간다">⑥ 피의자 신문조서 — 첫
+진술이 끝까지 간다</h3>
+<p>조서가 작성되면 <strong>재판까지 핵심 증거</strong>로 따라옵니다.
+자세한 주의사항은 <strong>5) 진술조서</strong> 섹션.</p>
+<h3 id="차-목표-경찰-단계-불송치">⑦ 1차 목표 = 경찰 단계 불송치</h3>
+<p>가능한 한 <strong>경찰 단계에서 종결</strong>되는 게 최선: -
+시간·비용·심적 부담 모두 최소 - 검찰·법원 가면 사건 규모 자체가 커짐 -
+“불송치 → 검찰 송치 안 됨 → 끝” 시나리오를 목표</p>
+<p>이를 위한 패키지: 1. 명확한 사실 진술 (모순 없게) 2. 반박 증거 충분히
+제출 3. 합의 가능한 사건이면 빠른 합의 4. 처벌불원서
+(반의사불벌·친고죄)</p>
+<h3 id="송치된-경우-검찰재판-단계-대응">⑧ 송치된 경우 — 검찰·재판 단계
+대응</h3>
+<p>송치되어도 아직 끝 X: - <strong>검찰 단계</strong>: 불기소 / 기소유예
+/ 약식 협상 - <strong>재판 단계</strong>: 무죄 다툼 또는 양형 자료로 형
+감경 - 합의 시점은 단계마다 협상력 다름 — 변호인과 전략 짜기</p>
+<hr />
+<h2 id="결정-트리-무죄-주장-vs-유죄-인정선처">3) 결정 트리 — 무죄 주장
+vs 유죄 인정·선처</h2>
+<pre><code>[고소장 받았다] 사실관계 검토
+        │
+        ▼
+  실제로 한 일인가?
+        │
+   ┌────┴────┐
+   ▼        ▼
+ NO         YES
+ (안 함)    (했음)
+   │          │
+   ▼          ▼
+[무죄 주장]   증거 명백한가?
+              │
+         ┌────┴────┐
+         ▼        ▼
+        강함     약함
+         │        │
+         ▼        ▼
+   [유죄 인정·    [부분 인정·
+    선처 전략]    방어]</code></pre>
+<h3 id="무죄-주장-전략-언제-적합한가">무죄 주장 전략 — 언제
+적합한가</h3>
+<ul>
+<li>진짜 안 한 경우</li>
+<li>한 행위지만 죄목 자체가 안 됨 (예: 단순 채무불이행 → 민사, 사기
+X)</li>
+<li>정당방위·정당행위 등 위법성 조각 사유</li>
+</ul>
+<p><strong>리스크</strong>: 끝까지 다투면 1심·2심·3심 가능. 패소 시 형
+더 무거워질 수도. 시간·비용 큼.</p>
+<h3 id="유죄-인정선처-전략-언제-적합한가">유죄 인정·선처 전략 — 언제
+적합한가</h3>
+<ul>
+<li>행위는 했고 증거가 명백</li>
+<li>경한 범죄 (단순 폭행·모욕 등)</li>
+<li>초범</li>
+<li>합의·반성으로 양형 감경 여지 큼</li>
+</ul>
+<p><strong>진행 흐름</strong>: 1. 빠른 합의 + 처벌불원서 확보 2.
+반성문·공탁 3. 자수 또는 자백 4. 양형 자료 (사회유대·기부·봉사) →
+<strong>기소유예·약식 벌금·집행유예</strong> 목표</p>
+<h3 id="가장-위험한-패턴-어중간한-부인">가장 위험한 패턴 — “어중간한
+부인”</h3>
+<p>증거 명백한데 무리하게 부인 → <strong>반성 없음</strong>으로 양형
+가중. 이건 최악.</p>
+<p>→ <strong>결정은 변호인과 함께 신중히</strong>. 한 번 정하면
+일관되게.</p>
+<hr />
+<h2 id="고소장-확보-정보공개청구-실무">4) 고소장 확보 — 정보공개청구
+실무</h2>
+<h3 id="신청-방법-3가지">신청 방법 (3가지)</h3>
+<table>
+<thead>
+<tr>
+<th>방법</th>
+<th>절차</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>정보공개포털 (open.go.kr)</strong></td>
+<td>회원가입 → 신청 → 전자공개 또는 우편</td>
+</tr>
+<tr>
+<td><strong>경찰서 정보공개 창구</strong></td>
+<td>신청서 작성, 신분증, 처리 통보</td>
+</tr>
+<tr>
+<td><strong>변호인 위임</strong></td>
+<td>위임장으로 변호인이 대신 청구</td>
+</tr>
+</tbody>
+</table>
+<h3 id="신청서-핵심-기재-사항">신청서 핵심 기재 사항</h3>
+<ul>
+<li>청구인 정보 (피의자 본인)</li>
+<li>공개 청구 대상: “○○년 ○월 ○일 ○○경찰서 ○○수사관 담당 사건의 고소장
+사본”</li>
+<li>사용 목적: “피의자 방어권 행사”</li>
+<li>공개 형식: 사본·전자파일·열람</li>
+</ul>
+<h3 id="공개-가능-범위">공개 가능 범위</h3>
+<table>
+<thead>
+<tr>
+<th>공개</th>
+<th>비공개</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>고소취지·고소이유·죄목</td>
+<td>고소인 주민번호·개인정보 일부</td>
+</tr>
+<tr>
+<td>사실관계 본문</td>
+<td>사건 관련자 사생활 정보</td>
+</tr>
+<tr>
+<td>첨부 증거 목록</td>
+<td>미공개 사유 있는 일부 증거</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>부분공개</strong>가 일반적. 그래도 본질은 다 파악 가능.</p>
+<h3 id="거부당했을-때">거부당했을 때</h3>
+<ul>
+<li><strong>이의신청</strong> (30일 내) → 정보공개심의회 재심사</li>
+<li><strong>행정심판</strong>·<strong>행정소송</strong>까지 가능</li>
+<li>거부 사유가 “수사 진행 중”이면 송치 후 재청구</li>
+</ul>
+<hr />
+<h2 id="진술조서-가장-중요한-문서">5) 진술조서 — 가장 중요한 문서</h2>
+<h3 id="왜-그렇게-중요한가">왜 그렇게 중요한가</h3>
+<ul>
+<li>본인이 한 진술을 수사관이 받아 적은 공식 문서</li>
+<li><strong>재판에서 핵심 증거</strong>로 사용</li>
+<li>“조사실에서 한 진술이 본인 진술의 전부”로 간주</li>
+</ul>
+<h3 id="진술-전-마음가짐">진술 전 — 마음가짐</h3>
+<ol type="1">
+<li><strong>묻는 것에만 답한다</strong> — 동문서답·자발적 추가 설명
+X</li>
+<li><strong>불리한 질문엔 시간 확보</strong> — “잠시 생각해보겠다”
+OK</li>
+<li><strong>모르면 모른다고</strong> — 추측 답변 X (나중에 모순
+잡힘)</li>
+<li><strong>본인 권리 인지</strong>:
+<ul>
+<li>묵비권 (진술거부권) — 헌법 §12</li>
+<li>변호인 조력권</li>
+<li>휴식 요청권</li>
+<li>진술 거부해도 불이익 진술 X (재판에서 불리한 추정 X)</li>
+</ul></li>
+</ol>
+<h3 id="진술-중-7가지-주의">진술 중 — 7가지 주의</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>주의사항</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>유도 질문에 끌려가지 말기</strong> — “○○했죠?”에 “네”라고만
+답 X. 사실관계 본인 입으로</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>수사관이 압축·요약한 표현 그대로 동의 X</strong> — 본인
+표현으로 재진술</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>모순 발견 시 즉시 정정 요청</strong> — “조금 전 답변
+정정하겠습니다” OK</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>감정 표현 자제</strong> — 격앙·울음은 진술 신뢰성 ↓</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>고소인·증인 비방 금지</strong> — 본인 사실관계만</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>장시간 조사 거부 가능</strong> — 휴식 요청·시간 분할</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>변호인 동행 권리</strong> — 변호인 입회 요청 시 거부 못
+함</td>
+</tr>
+</tbody>
+</table>
+<h3 id="진술-후-열람날인이-마지막-관문">진술 후 — 열람·날인이 마지막
+관문</h3>
+<p>조서 작성 끝나면 수사관이 <strong>“열람하시고 틀린 부분 있으면
+말씀하세요”</strong> 합니다.</p>
+<p><strong>이 단계에서 절대 서두르지 말 것</strong>: 1. 한 줄씩 다시
+읽음 (수사관이 압축·요약하면서 본인 의도와 다른 뉘앙스 가능) 2. 사실과
+다르면 <strong>수정 요청</strong> (“이 부분은 ○○로 수정해 주세요”) 3.
+수정 안 해주면 <strong>날인 거부</strong> — “내용에 동의하지 않으니
+서명·날인 거부합니다” 4. 부동의해도 조서는 작성됨. 단지 <strong>증거능력
+약해짐</strong></p>
+<blockquote>
+<p>💡 한 번 “내용 인정”하면 재판에서 뒤집기 매우 어려움.
+신중·신중·신중.</p>
+</blockquote>
+<hr />
+<h2 id="변호인-선임-언제누구를얼마에">6) 변호인 선임 —
+언제·누구를·얼마에</h2>
+<h3 id="선임-시점-빠를수록-유리">선임 시점 (빠를수록 유리)</h3>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>변호인 역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>수사관 전화 직후</strong></td>
+<td>1차 상담, 출석 전 전략 수립</td>
+</tr>
+<tr>
+<td><strong>첫 조사 전</strong></td>
+<td>고소장 정보공개 청구, 진술 시뮬레이션</td>
+</tr>
+<tr>
+<td><strong>첫 조사 동행</strong></td>
+<td>진술 시 옆에서 조언, 부당한 유도 차단</td>
+</tr>
+<tr>
+<td><strong>송치 후 검찰</strong></td>
+<td>불기소 의견서 제출, 검사 면담</td>
+</tr>
+<tr>
+<td><strong>기소 후 재판</strong></td>
+<td>변론, 증거 신청, 증인 신문</td>
+</tr>
+<tr>
+<td><strong>양형 단계</strong></td>
+<td>양형 자료 정리·제출</td>
+</tr>
+</tbody>
+</table>
+<h3 id="어떤-변호인을-선택할까">어떤 변호인을 선택할까</h3>
+<table>
+<thead>
+<tr>
+<th>유형</th>
+<th>적합한 경우</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>형사 전문 변호사</strong></td>
+<td>일반 사건 — 가성비·전문성</td>
+</tr>
+<tr>
+<td><strong>로펌 형사팀</strong></td>
+<td>복잡·중대 사건 — 인력·전관</td>
+</tr>
+<tr>
+<td><strong>국선변호인</strong></td>
+<td>일정 소득 이하 또는 중대범죄 — 무료</td>
+</tr>
+<tr>
+<td><strong>법률구조공단 (132)</strong></td>
+<td>무료 상담 + 일부 사건 무료 대리</td>
+</tr>
+<tr>
+<td><strong>형사 전문 변호사 인증</strong></td>
+<td>대한변호사협회 공식 인증 — 신뢰도 ↑</td>
+</tr>
+</tbody>
+</table>
+<h3 id="비용-시장-평균-2026-기준">비용 시장 평균 (2026 기준)</h3>
+<ul>
+<li>1회 상담: 5~15만원 (무료도 있음)</li>
+<li>경찰·검찰 단계: 300~700만원</li>
+<li>1심: 500~1,500만원</li>
+<li>2심·3심: 300~700만원/심급</li>
+<li>성공보수: 결과에 따라 별도</li>
+</ul>
+<h3 id="위임-전-반드시-확인할-5가지">위임 전 반드시 확인할 5가지</h3>
+<ol type="1">
+<li><strong>선임계약서</strong> 항목 정확히 (착수금·성공보수 구분)</li>
+<li><strong>사건 처리 범위</strong> (단계별 별도 위임 가능)</li>
+<li><strong>연락 방식</strong> (직접 응대 vs 사무직원 통한 응대)</li>
+<li><strong>타 사건과의 이해충돌</strong> 확인</li>
+<li><strong>계약 해지</strong> 조건 (중도 해지 시 환불 비율)</li>
+</ol>
+<hr />
+<h2 id="무고죄-역공소-거짓-고소엔-반격이-가능">7) 무고죄 역공소 — 거짓
+고소엔 반격이 가능</h2>
+<p>본인이 명백히 안 했는데 고소당했고, <strong>고소인이 허위 사실을
+알면서 고소한 경우</strong> → 무고죄로 역고소 가능.</p>
+<h3 id="형법-156-무고">📜 형법 §156 (무고)</h3>
+<blockquote>
+<p>타인으로 하여금 형사처분 또는 징계처분을 받게 할 목적으로 공무소 또는
+공무원에 대하여 <strong>허위의 사실을 신고</strong>한 자는 <strong>10년
+이하의 징역 또는 1천500만원 이하의 벌금</strong></p>
+</blockquote>
+<h3 id="무고죄-성립-요건">무고죄 성립 요건</h3>
+<ol type="1">
+<li><strong>허위 사실</strong>임이 객관적으로 인정</li>
+<li><strong>신고자가 허위임을 알고</strong>(또는 인식 가능했음에도
+무모하게) 고소</li>
+<li>처벌·징계 받게 할 목적</li>
+</ol>
+<h3 id="무고-역공소가-적합한-경우">무고 역공소가 적합한 경우</h3>
+<ul>
+<li>본인 사건이 무혐의·무죄·각하로 끝남</li>
+<li>고소인이 명백히 거짓이라는 정황 (예: 객관적 알리바이 무시한
+고소)</li>
+<li>고소인이 사적 보복·금전 갈취 목적</li>
+</ul>
+<h3 id="주의">주의</h3>
+<ul>
+<li>단순 입증 부족으로 인한 무혐의는 무고 X</li>
+<li>무고 입증은 매우 엄격 (고소인의 “허위 인식” 입증 필요)</li>
+<li>무고 역공소가 늦으면 본인이 또 다른 명예훼손 소송 위험</li>
+<li><strong>변호인과 협의 후 신중히</strong></li>
+</ul>
+<hr />
+<h2 id="자주-하는-실수-7가지-피의자-입장">8) 자주 하는 실수 7가지
+(피의자 입장)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>실수</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>“무죄니까 당당하면 된다”</strong></td>
+<td>수사관에 본인 입장 정리 안 된 채 진술 → 모순 → 불리한 진술조서</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>고소장 안 보고 들어감</strong></td>
+<td>무엇으로 고소당했는지 모름 → 엉뚱한 진술</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>변호인 없이 첫 조사</strong></td>
+<td>압박감·유도 질문에 끌려감</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>인터넷 검색만으로 자가진단</strong></td>
+<td>부정확한 정보·일반론에 휘둘림</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>고소인에 직접 연락·항의</strong></td>
+<td>협박·보복 죄목 추가 (사건이 커짐)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>합의 시점 놓침</strong></td>
+<td>송치·기소 후 합의는 협상력 ↓</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>SNS·주변에 “나 고소당했다” 토로</strong></td>
+<td>명예훼손 역공소·진술 모순 위험</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="단계별-체크리스트">9) 단계별 체크리스트</h2>
+<h3 id="시간-첫-연락-받은-직후">🚨 0~24시간 — 첫 연락 받은 직후</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />수사관 이름·소속·연락처
+메모</label></li>
+<li><label><input type="checkbox" />사건 죄목·핵심 내용 한 줄로
+파악</label></li>
+<li><label><input type="checkbox" />출석 일정 1~2주 연기
+통보</label></li>
+<li><label><input type="checkbox" />변호인 1차 상담 예약</label></li>
+<li><label><input type="checkbox" />절대 고소인에 직접 연락
+X</label></li>
+</ul>
+<h3 id="주-내-변호인-상담-정보공개">📋 1주 내 — 변호인 상담 +
+정보공개</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Part 2 변호사 상담 체크리스트 작성
+(10번 파일)</label></li>
+<li><label><input type="checkbox" />변호인과 무죄/선처 전략
+결정</label></li>
+<li><label><input type="checkbox" /><strong>고소장 정보공개청구</strong>
+접수</label></li>
+<li><label><input type="checkbox" />본인 측 증거 수집 시작
+(알리바이·카톡·계약서)</label></li>
+</ul>
+<h3 id="주-내-조사-준비">📝 2주 내 — 조사 준비</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />고소장 사본 받아서 정독</label></li>
+<li><label><input type="checkbox" />사실관계 시간순으로 본인 정리 (A4
+1장)</label></li>
+<li><label><input type="checkbox" />변호인과 진술
+시뮬레이션</label></li>
+<li><label><input type="checkbox" />합의 가능 사건이면 합의
+시도</label></li>
+</ul>
+<h3 id="조사-당일">🎤 조사 당일</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />신분증·도장·증거 사본
+지참</label></li>
+<li><label><input type="checkbox" />변호인 동행 (가능하면)</label></li>
+<li><label><input type="checkbox" />묵비권·변호인 조력권 사전
+인지</label></li>
+<li><label><input type="checkbox" />조서 열람 시 한 줄씩 검토 → 수정
+또는 부동의</label></li>
+</ul>
+<h3 id="조사-후">📤 조사 후</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />조서 사본 청구 가능 (변호인
+통해)</label></li>
+<li><label><input type="checkbox" />다음 단계 예상·전략 변호인과
+점검</label></li>
+<li><label><input type="checkbox" /><strong>불송치 또는 송치</strong>
+통지 기다리기</label></li>
+<li><label><input type="checkbox" />송치되면 검찰 단계 대비</label></li>
+</ul>
+<hr />
+<h2 id="한-줄-요약">10) 한 줄 요약</h2>
+<table>
+<thead>
+<tr>
+<th>핵심 메시지</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>첫 1주의 행동이 사건 결과의 70%를 좌우한다</strong></td>
+</tr>
+<tr>
+<td><strong>즉시 출석 X, 변호인 상담 O, 고소장 정보공개 O</strong></td>
+</tr>
+<tr>
+<td><strong>진술조서는 한 번 작성되면 끝까지 따라온다 —
+신중·신중</strong></td>
+</tr>
+<tr>
+<td><strong>1차 목표: 경찰 단계 불송치</strong></td>
+</tr>
+<tr>
+<td><strong>공격(고소장) vs 방어(진술조서) — 서로 다른 문서, 다른
+전략</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="가상-사례-한-흐름으로-보기">11) 가상 사례 — 한 흐름으로
+보기</h2>
+<blockquote>
+<p>⚠️ 가명·가상 사례</p>
+</blockquote>
+<p><strong>준호</strong>(가명, 30대 직장인)는 어느 화요일 오후 모르는
+번호로 전화 받음. “○○경찰서 ○○수사관입니다. 사기 사건으로 출석
+부탁드립니다. 내일 오실 수 있을까요?”</p>
+<h3 id="잘못된-시나리오-자주-보는-패턴">잘못된 시나리오 (자주 보는
+패턴)</h3>
+<ol type="1">
+<li>“네, 내일 가겠습니다” 즉답</li>
+<li>전화로 “저는 아무 잘못 없어요” 길게 해명</li>
+<li>다음날 단독 출석</li>
+<li>수사관 질문에 추측 답변·동문서답</li>
+<li>진술조서 그대로 인정·날인</li>
+<li>→ 송치, 검찰 기소, 1심 벌금 500만원</li>
+</ol>
+<h3 id="좋은-시나리오-이-매뉴얼-적용">좋은 시나리오 (이 매뉴얼
+적용)</h3>
+<ol type="1">
+<li><strong>즉답 X</strong>: “일정 확인 후 내일 다시 연락드리겠습니다” →
+끊음</li>
+<li>그날 저녁: <strong>변호인 1차 상담</strong> (10만원)</li>
+<li>변호인 조언: “정보공개청구로 고소장부터 확보, 출석은 2주 뒤로”</li>
+<li>출석 1주 전: <strong>고소장 받음 → 거래 시점 카톡 보고 사실관계
+파악</strong></li>
+<li>본인 측 증거 수집: 거래명세서·송금내역·당시 통화녹음</li>
+<li>출석 전날: 변호인과 진술 시뮬레이션</li>
+<li>출석 당일: 변호인 동행, 묵비권 일부 행사, 사실관계만 진술</li>
+<li>조서 열람 시 2곳 수정 요청</li>
+<li>→ <strong>불송치 결정</strong> (경찰 단계 종결)</li>
+</ol>
+<blockquote>
+<p>💡 두 시나리오의 차이 = <strong>첫 1주의 행동</strong>.</p>
+</blockquote>
+<hr />
+<h2 id="더-읽으면-좋은-곳-이-폴더-안">12) 더 읽으면 좋은 곳 (이 폴더
+안)</h2>
+<ul>
+<li><strong>02 용어사전</strong> B 섹션 — 피의자·피고인 호칭</li>
+<li><strong>04 고소장 작성법</strong> — 고소하는 쪽 시각도 알아야 방어
+가능</li>
+<li><strong>10 심화팁</strong> Part 3 — 진술조서·양형자료·합의·시효</li>
+<li><strong>09 판례집</strong> — 본인 사건 비슷한 사건번호 확인</li>
+</ul>
+<hr />
+<h1 id="가지-실전-상황-시니어-변호사가-알려주는-처신증거고소장">7가지
+실전 상황 — 시니어 변호사가 알려주는 처신·증거·고소장</h1>
+<blockquote>
+<p>⚠️ <strong>모든 사례는 가명·가상 시나리오</strong>입니다. 실존
+인물·사건과 무관합니다. 법령 조문은 법제처 Open API로 직접 가져온 원문
+(시행일 기준 최신). 나중에 비슷한 상황을 겪을 때 바로 꺼내 쓰는 실무
+매뉴얼.</p>
+</blockquote>
+<hr />
+<h2 id="가지-상황-한눈에">📋 7가지 상황 한눈에</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>상황</th>
+<th>핵심 죄목</th>
+<th>가장 중요한 증거</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>OEM 거래처 분쟁</td>
+<td>사기 / 업무상 배임 / 영업비밀 침해</td>
+<td>발주서·세금계산서·메일·제품 시료</td>
+</tr>
+<tr>
+<td>2</td>
+<td>길에서 시비·폭행</td>
+<td>폭행 / 상해 / 모욕 / 특수폭행</td>
+<td><strong>CCTV·블랙박스·진단서·목격자</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>차량 사고 (피해자)</td>
+<td>교통사고처리특례법 / 업무상과실치상</td>
+<td>블랙박스·진단서·보험 사고기록</td>
+</tr>
+<tr>
+<td>4</td>
+<td>보복운전 당함</td>
+<td>특수상해/특수폭행 / 도로교통법</td>
+<td><strong>블랙박스 (전·후방 둘 다)</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>당근마켓 사기</td>
+<td>사기 / 정보통신망법</td>
+<td><strong>거래 화면 캡처·송금내역·계정정보</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>스토킹 피해</td>
+<td>스토킹처벌법</td>
+<td><strong>시간순 로그·메시지·동영상</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>댓글·온라인 시비</td>
+<td>정통망법 명예훼손 / 모욕 / 모욕</td>
+<td><strong>URL·캡처·작성자 정보</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="oem-거래처-분쟁-납품받고-안-갚는다-단가표-빼돌렸다">1️⃣ OEM
+거래처 분쟁 — 납품받고 안 갚는다 / 단가표 빼돌렸다</h1>
+<h3 id="가명-사례-가상">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>민수</strong>(가명, OEM 화장품 제조사 대표)는 6개월 전
+<strong>거래처 K사</strong>(가명)와 단가표·시제품을 공유하며 본 발주를
+기대했다. K사는 1차 시제품을 받고 “단가 협의 중”이라며 본 계약을 미뤘다.
+어느 날 민수는 동종 업계에서 K사가 <strong>민수 회사의 단가표·레시피와
+거의 동일한 사양</strong>으로 다른 제조사와 계약했다는 정보를 입수했다.
+동시에 K사는 1차 시제품 대금 3,000만원도 미지급.</p>
+</blockquote>
+<h3 id="시간트리">⏰ 시간트리</h3>
+<pre><code>[T-6개월] 단가표·시제품 제안서 송부 (이메일·NDA)
+ ↓
+[T-5개월] 시제품 제작·납품 (3,000만원 인보이스 발행)
+ ↓
+[T-3개월] &quot;단가 협의 중&quot; 지연 응답
+ ↓
+[T-1개월] 다른 제조사와 동일 사양 계약 사실 인지
+ ↓
+[T-0] 대금 독촉 → 묵묵부답
+ ↓
+[고소 결심] — 사기 + 영업비밀 침해 + 부정경쟁</code></pre>
+<h3 id="적용-죄목법조">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>사기</strong></td>
+<td>형법 제347조 ①</td>
+<td>20년 이하 징역 또는 5천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>업무상 배임</strong> (회사 내부자 공모 시)</td>
+<td>형법 제356조</td>
+<td>10년 이하 징역 또는 3천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>영업비밀 침해</strong></td>
+<td>부정경쟁방지법 제18조</td>
+<td>10년 이하 징역 또는 5억원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>부정경쟁행위</strong></td>
+<td>부정경쟁방지법 제18조</td>
+<td>〃</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §347</strong> “사람을 기망하여 재물의 교부를 받거나
+재산상의 이익을 취득한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에
+처한다.”</p>
+</blockquote>
+<h3 id="증거-체크리스트-우선순위">🔍 증거 체크리스트 (우선순위)</h3>
+<ol type="1">
+<li><strong>NDA(비밀유지계약서)</strong> — 영업비밀 보호 의무 발생의
+근거</li>
+<li><strong>단가표·시방서·BOM</strong> 송부 이메일 (날짜·수신자
+명확)</li>
+<li><strong>시제품 사양과 K사가 다른 곳에 발주한 사양 비교표</strong>
+(전문가 의견서)</li>
+<li><strong>세금계산서·인보이스</strong> (대금 청구 사실)</li>
+<li><strong>K사의 거래중단 직후 행위</strong> (다른 제조사 발주
+사실)</li>
+<li><strong>사내 통화·메시지 기록</strong> (담당자 약속)</li>
+</ol>
+<h3 id="예방처신">🛡 예방·처신</h3>
+<ul>
+<li>첫 미팅 전에 <strong>NDA 먼저</strong> 서명 — 이게 없으면 영업비밀
+입증이 90% 무너짐</li>
+<li>단가표·BOM은 <strong>워터마크 + 발송기록</strong> 남기기</li>
+<li>시제품 단계라도 <strong>소량 인보이스 발행</strong> — 거래의 정식성
+입증</li>
+<li>“단가 협의 중” 메일이 길어지면 <strong>마감일을 못박은 회신</strong>
+보내기 → 묵묵부답 시 증거화</li>
+<li>동종 업계 정보망 통해 K사의 외부 발주 동향 모니터링</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 K사 대표이사 ○○○을 형법 제347조 사기, 형법 제356조
+업무상배임, 부정경쟁방지법 제18조 영업비밀침해죄로 처벌하여
+주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인은 2025. ○. ○. 고소인과 NDA를 체결하고(증거 ①)
+ 고소인의 단가표·BOM·시제품을 수령하였습니다(증거 ②③).
+2. 피고소인은 본 계약 협의를 명목으로 약 3개월간 협의를 지연시키며
+ 고소인으로 하여금 시제품 제작·납품을 수행하게 하였습니다(증거 ④).
+3. 그러나 피고소인은 2025. ○. ○.경 동일 사양으로 ○○제조에 발주를
+ 진행하였고(증거 ⑤), 고소인의 시제품 대금 3,000만원은 미지급
+ 상태입니다(증거 ⑥).
+4. 위 사실관계에 비추어, 피고소인은 본 계약 체결 의사 없이 고소인의
+ 영업비밀을 취득할 목적으로 거래의 외관을 유지한 것으로
+ 사기 및 영업비밀 침해의 고의가 인정됩니다.</code></pre>
+<hr />
+<h1 id="길에서-시비-갑자기-멱살-잡혔다-욕설폭행">2️⃣ 길에서 시비 — 갑자기
+멱살 잡혔다 / 욕설·폭행</h1>
+<h3 id="가명-사례-가상-1">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>지훈</strong>(가명)이 늦은 밤 편의점 앞에서 줄을 서고 있는데,
+뒤에 있던 <strong>A</strong>(가명, 면식 없음)가 “왜 새치기 했냐”며
+시비를 걸었다. 지훈이 “아니라”고 답하자 A는 욕설을 하며 멱살을 잡았고,
+지훈을 밀쳐 인도 턱에 넘어뜨렸다. 지훈은 손목 인대 손상으로 <strong>전치
+3주 진단</strong>.</p>
+</blockquote>
+<h3 id="시간트리-1">⏰ 시간트리</h3>
+<pre><code>[T+0초] 시비 → 욕설 (&quot;야이 ××새끼야&quot;)
+[T+10초] 멱살 잡기 + 밀침
+[T+15초] 지훈 넘어짐 → 손목 부상
+[T+30초] 주변 행인 신고, 편의점 CCTV 녹화 중
+[T+10분] 112 신고, 경찰 출동
+[T+30분] 지구대 동행, 인적사항 확인
+[D+1일] 병원 → 진단서·상해 사진
+[D+2일] 경찰서 고소장 제출 (현장 신고와 별개로)</code></pre>
+<h3 id="적용-죄목법조-1">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+<th>참고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>폭행</strong></td>
+<td>형법 제260조</td>
+<td>2년 이하 징역, 500만원 이하 벌금</td>
+<td>반의사불벌죄</td>
+</tr>
+<tr>
+<td><strong>상해</strong></td>
+<td>형법 제257조 ①</td>
+<td><strong>7년 이하 징역</strong>, 1천만원 이하 벌금</td>
+<td>진단서 나오면 상해 우선</td>
+</tr>
+<tr>
+<td><strong>특수폭행</strong> (병·돌·우산 등 사용 시)</td>
+<td>형법 제261조</td>
+<td>5년 이하 징역 또는 1천만원 이하 벌금</td>
+<td>반의사불벌 아님</td>
+</tr>
+<tr>
+<td><strong>특수상해</strong></td>
+<td>형법 제258조의2</td>
+<td>1년 이상 10년 이하 징역</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>모욕</strong></td>
+<td>형법 제311조</td>
+<td>1년 이하 징역, 200만원 이하 벌금</td>
+<td>친고죄</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §257①</strong> “사람의 신체를 상해한 자는 7년 이하의
+징역, 10년 이하의 자격정지 또는 1천만원 이하의 벌금에 처한다.”</p>
+</blockquote>
+<h3 id="증거-체크리스트">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>편의점 CCTV</strong> — <strong>D+1일 이내 보존요청</strong>
+(보통 7~30일이면 자동 삭제)</li>
+<li><strong>블랙박스</strong> (주변 차량 포함)</li>
+<li><strong>목격자 인적사항</strong> — 현장에서 즉시 명함·연락처</li>
+<li><strong>진단서</strong> (상해 시 필수, 전치 2주~)</li>
+<li><strong>상해 사진</strong> — 부위·날짜·치수 알 수 있게</li>
+<li><strong>112 신고 녹음 사본</strong> (정보공개청구로 입수 가능)</li>
+<li><strong>본인 휴대폰 위치이력·통화기록</strong> (시간·장소 입증)</li>
+</ol>
+<h3 id="예방처신-사건-직후가-결정적">🛡 예방·처신 — 사건 직후가
+결정적</h3>
+<ul>
+<li><strong>현장에서 절대 같이 폭행 X</strong> → 쌍방폭행 되면 둘 다
+처벌</li>
+<li>가능하면 <strong>휴대폰 영상 녹화</strong> (정당한 자기방어,
+합법)</li>
+<li><strong>112 즉시 신고</strong> — 신고 시각이 객관 시계</li>
+<li>주변 사람에 “<strong>증인 부탁드린다</strong>” 명함·연락처</li>
+<li><strong>편의점·상가 CCTV 보존요청서</strong> 다음날 직접 제출 (구두
+X, 서면)</li>
+<li><strong>합의는 진단서 나온 후에</strong> — 합의금 협상력은 진단서가
+결정</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-1">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 형법 제257조 제1항 상해죄, 형법 제311조 모욕죄로
+처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 2025. ○. ○. 23:○○경 ○○시 ○○구 ○○동 ○○편의점 앞에서,
+ 피고소인은 고소인에게 &quot;야이 ××새끼야 왜 새치기야&quot;라며 공연히
+ 모욕적 언사를 하였습니다(증거 ① CCTV 영상, ② 목격자 진술서).
+2. 같은 시각, 피고소인은 고소인의 멱살을 잡아 인도 턱 방향으로
+ 밀쳐 넘어뜨렸고, 이로 인해 고소인은 좌측 손목 인대 손상으로
+ 전치 3주의 상해를 입었습니다(증거 ③ 진단서, ④ 상해 사진).
+3. 피고소인의 행위는 형법 제257조 제1항 상해죄에 해당하며, 욕설
+ 부분은 별도로 모욕죄(형법 제311조)에 해당합니다.</code></pre>
+<blockquote>
+<p>💡 <strong>모욕죄는 친고죄</strong> — 고소장에 “처벌을 원합니다”를
+명시해야 함. 고소기간은 범인을 안 날부터 6개월.</p>
+</blockquote>
+<hr />
+<h1 id="차량-사고-내가-피해자-사거리에서-신호위반-차에-받힘">3️⃣ 차량
+사고 (내가 피해자) — 사거리에서 신호위반 차에 받힘</h1>
+<h3 id="가명-사례-가상-2">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>수진</strong>(가명)이 주행 중 사거리에서 정상 신호로
+진행하다가, 좌측에서 <strong>신호위반으로 진입한 차량</strong>(운전자 B,
+가명)에 측면 충돌. 수진은 목·허리 통증으로 입원 2주, 자차 손상
+800만원.</p>
+</blockquote>
+<h3 id="시간트리-2">⏰ 시간트리</h3>
+<pre><code>[T+0] 사고 발생
+[T+5분] 112·119 신고, 사진 촬영 (사고 직후 위치)
+[T+30분] 보험사 사고접수, 경찰 사고조사
+[D+1일] 병원 입원, 진단서
+[D+3일] 경찰 사고 사실확인원 발급
+[D+7일] 상대 차량 보험사·운전자와 협상 시작
+[D+14일] 퇴원, 통원 시작
+[D+30일] 사고로 인한 후유증 + 합의 안 되면 → 형사고소</code></pre>
+<h3 id="적용-죄목법조-2">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>업무상과실치상</strong></td>
+<td>형법 제268조</td>
+<td>5년 이하 금고 또는 2천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>교통사고처리특례법</strong></td>
+<td>교특법 제3조</td>
+<td><strong>12대 중과실</strong> 해당 시 형사처벌</td>
+</tr>
+<tr>
+<td>도로교통법 위반</td>
+<td>신호위반 등 개별 조항</td>
+<td>보통 행정처분</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §268</strong> “업무상과실 또는 중대한 과실로 사람을
+사망이나 상해에 이르게 한 자는 5년 이하의 금고 또는 2천만원 이하의
+벌금에 처한다.”</p>
+</blockquote>
+<h3 id="교특법-12대-중과실-합의해도-형사처벌">🔥 교특법 12대 중과실 —
+합의해도 형사처벌</h3>
+<ol type="1">
+<li>신호·지시 위반</li>
+<li>중앙선 침범</li>
+<li>제한속도 +20km/h 초과</li>
+<li>앞지르기 방법 위반</li>
+<li>철길건널목 통과방법 위반</li>
+<li>횡단보도 보행자 보호 위반</li>
+<li>무면허 운전</li>
+<li>음주운전 / 약물운전</li>
+<li>보도 침범</li>
+<li>승객 추락방지 위반</li>
+<li>어린이보호구역 안전운전 의무 위반</li>
+<li>화물 고정조치 위반</li>
+</ol>
+<p>→ <strong>이 12개 중 하나라도 해당 = 보험 처리만으로 안
+끝남</strong></p>
+<h3 id="증거-체크리스트-1">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>블랙박스 영상</strong> — 본인 차량 + 상대방 + 주변 차량
+(가능하면 협조 요청)</li>
+<li><strong>사고 직후 사진</strong> — 충돌 위치·파손 부위·신호등</li>
+<li><strong>사고사실확인원</strong> (경찰서 발급)</li>
+<li><strong>진단서·통원확인서</strong> (상해 정도)</li>
+<li><strong>수리비 견적서·실제 수리비 영수증</strong></li>
+<li><strong>목격자 진술</strong> (사거리 보행자 등)</li>
+<li><strong>신호 주기 자료</strong> (도로교통공단 의뢰)</li>
+</ol>
+<h3 id="예방처신-1">🛡 예방·처신</h3>
+<ul>
+<li>사고 즉시 <strong>차에서 내리기 전 사진 5장 이상</strong>
+(전·후·좌·우·신호등)</li>
+<li><strong>상대방을 절대 보내지 않기</strong> — 인적사항·보험사 정보
+받기 전</li>
+<li><strong>블랙박스 메모리 즉시 분리·보관</strong> — 덮어쓰기 방지</li>
+<li>상대방의 “<strong>미안하다</strong>” 음성도 녹음 가능 (대화 당사자 →
+합법)</li>
+<li>합의 전에 <strong>진단·통원·후유증 평가까지 마치고</strong></li>
+<li><strong>12대 중과실 해당 여부 먼저 확인</strong> → 해당하면 합의해도
+형사절차 계속</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-12대-중과실-케이스">✍️ 고소장 핵심 문구
+예시 (12대 중과실 케이스)</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 교통사고처리 특례법 제3조 제2항 단서 제1호
+(신호위반), 형법 제268조 업무상과실치상죄로 처벌하여 주시기
+바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인은 2025. ○. ○. ○○:○○경 ○○시 ○○구 ○○사거리에서
+ 적색 신호임에도 정지하지 아니하고 진입하여, 정상 신호로 진행 중인
+ 고소인 차량 좌측면을 충돌하였습니다(증거 ① 블랙박스, ② 신호주기표).
+2. 위 사고로 고소인은 경추·요추 염좌 및 인대 손상 등 전치 4주의
+ 상해를 입었습니다(증거 ③ 진단서, ④ 통원기록).
+3. 피고소인의 행위는 교통사고처리 특례법 제3조 제2항 단서
+ 제1호(신호위반)에 해당하므로, 보험가입 여부와 무관하게 형사처벌
+ 대상입니다.</code></pre>
+<hr />
+<h1 id="보복운전-상대가-미쳐서-쫓아오고-가로막음">4️⃣ 보복운전 — 상대가
+미쳐서 쫓아오고 가로막음</h1>
+<h3 id="가명-사례-가상-3">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>재현</strong>(가명)이 1차로 주행 중 옆 차로의
+<strong>C</strong>(가명)에게 의도 없이 끼어들었다(혹은 C가 자기 운전
+트집을 잡았다고 주장). 이후 C는 약 5km에 걸쳐 <strong>앞에서 급정거
+반복, 차로 막기, 차선 사이 끼어들기</strong>를 하며 재현 차량을 위협.
+결국 갓길에 강제로 세우고 차에서 내려 재현 차량 보닛을 발로 차고
+욕설.</p>
+</blockquote>
+<h3 id="시간트리-3">⏰ 시간트리</h3>
+<pre><code>[T+0] 의도치 않은 끼어들기 또는 사소한 충돌 직전
+[T+30초] 상대 차량이 비상등 점멸하며 욕설·경적
+[T+1분] 앞으로 가로질러 와 급정거 반복 (1차)
+[T+2~5분] 차로 막기, 측면 위협, 갓길로 몰기
+[T+5분] 강제 정차 → 하차 → 차량 발길질 + 위협
+[T+10분] 112 신고, 블랙박스 메모리 분리
+[D+1일] 지구대 고소장 접수</code></pre>
+<h3 id="적용-죄목법조-3">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>특수상해</strong> (충돌·접촉 시)</td>
+<td>형법 제258조의2 ①</td>
+<td>1년 이상 10년 이하 징역</td>
+</tr>
+<tr>
+<td><strong>특수폭행</strong> (위협만 있어도)</td>
+<td>형법 제261조</td>
+<td>5년 이하 징역 또는 1천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>특수협박</strong></td>
+<td>형법 제284조</td>
+<td>7년 이하 징역, 1천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>난폭운전</strong></td>
+<td>도로교통법 제46조의3</td>
+<td>1년 이하 징역 또는 500만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>공동위험행위</strong></td>
+<td>도로교통법 제46조</td>
+<td>2년 이하 징역 또는 500만원 이하 벌금</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §258의2①</strong> “단체 또는 다중의 위력을 보이거나
+<strong>위험한 물건을 휴대</strong>하여 제257조제1항…의 죄를 범한 때에는
+1년 이상 10년 이하의 징역에 처한다.”</p>
+<p>💡 핵심: 차량은 판례상 “위험한 물건”으로 인정 → 차로 위협하면 단순
+폭행이 아니라 <strong>특수폭행·특수상해</strong>로 격상.</p>
+</blockquote>
+<h3 id="증거-체크리스트-블랙박스가-95">🔍 증거 체크리스트 (블랙박스가
+95%)</h3>
+<ol type="1">
+<li><strong>전방 블랙박스 영상</strong> — 상대 차량의 급정거·진로 방해
+전체 구간</li>
+<li><strong>후방 블랙박스</strong> — 미는 행위, 뒤에서 들이박을 듯한
+위협</li>
+<li><strong>충돌·접촉 흔적</strong> — 차량 사진 (페인트 묻은 부위,
+발자국 등)</li>
+<li><strong>상대 차량 번호판</strong> — 영상에서 캡처</li>
+<li><strong>하차 후 영상</strong> — 본인 휴대폰으로 도착 후 즉시
+녹화</li>
+<li><strong>본인 진단서</strong> — 놀라서 흉통·외상후스트레스도
+의학적으로 진단 가능</li>
+<li><strong>신고 녹취·시간기록</strong></li>
+</ol>
+<h3 id="예방처신-사고-자체보다-대응이-중요">🛡 예방·처신 — 사고 자체보다
+대응이 중요</h3>
+<ul>
+<li><strong>절대 같이 보복하지 말 것</strong> → 쌍방 사건 되면 처벌
+받음</li>
+<li>1차로에서 갓길로 빠지지 말고 <strong>속도 줄이고 비상등</strong> →
+영상에 본인의 방어적 운전 기록</li>
+<li>상대가 차에서 내려와도 <strong>차 문 잠그고 창문 닫고
+112</strong></li>
+<li>절대 차에서 내리지 말고 영상으로 위협 행위 녹화</li>
+<li>블랙박스 메모리 사고 후 <strong>즉시 분리 → 덮어쓰기
+방지</strong></li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-2">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 형법 제261조 특수폭행, 형법 제284조 특수협박,
+도로교통법 제46조의3 난폭운전죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인은 2025. ○. ○. ○○:○○경 ○○고속도로 상행 ○km 지점에서
+ 고소인 차량(차번 ○○가○○○○) 전방으로 무리하게 끼어든 후, 약 5km에
+ 걸쳐 ① 급정거를 5회 반복하며 ② 차로를 좌우로 변경하며 진로를
+ 방해하고 ③ 종국에는 고소인 차량을 갓길에 강제로 정차시켰습니다
+ (증거 ① 전방 블랙박스, ② 후방 블랙박스).
+2. 피고소인은 정차 직후 하차하여 고소인 차량 보닛을 수회 발로 차고,
+ &quot;차 문 열어 죽여버린다&quot;고 협박하였습니다(증거 ③ 휴대폰 영상).
+3. 피고소인의 차량은 판례상 위험한 물건에 해당하며, 이를 이용한 위
+ 행위는 형법 제261조 특수폭행 및 제284조 특수협박, 도로교통법
+ 제46조의3 난폭운전에 각 해당합니다.</code></pre>
+<blockquote>
+<p>💡 <strong>차량을 이용한 위협은 무조건 “특수” 죄목</strong> — 형
+가중. 단순 폭행으로 처리되면 안 됨.</p>
+</blockquote>
+<hr />
+<h1 id="당근마켓-사기-입금했는데-물건-안-오고-잠수">5️⃣ 당근마켓 사기 —
+입금했는데 물건 안 오고 잠수</h1>
+<h3 id="가명-사례-가상-4">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>준영</strong>(가명)이 당근마켓에서 <strong>갤럭시 S24 미개봉
+80만원</strong> 매물 발견. 판매자 <strong>D</strong>(가명)와 채팅으로
+“오늘 안에 보내준다”는 약속받고 계좌이체. 1시간 후 D는 채팅 차단·계정
+비활성화. 같은 계좌로 사기 신고가 5건 누적.</p>
+</blockquote>
+<h3 id="시간트리-4">⏰ 시간트리</h3>
+<pre><code>[T-1시간] 매물 등록, 첫 채팅
+[T-30분] &quot;사진 더 보내달라&quot; → 사진 응답 (도용 사진일 가능성)
+[T-15분] 거래 합의, 계좌 안내
+[T-0] 송금 80만원
+[T+30분] &quot;보낼 운송장 곧 알려준다&quot; 회신
+[T+1시간] 채팅 차단, 프로필 사라짐
+[T+1.5시간] 당근마켓 신고
+[D+1일] 사이버수사대 또는 관할 경찰서 접수</code></pre>
+<h3 id="적용-죄목법조-4">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>사기</strong></td>
+<td>형법 제347조 ①</td>
+<td>20년 이하 징역, 5천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>컴퓨터등 사용사기</strong> (가상자산 등)</td>
+<td>형법 제347조의2</td>
+<td>10년 이하 징역, 2천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>전기통신금융사기</strong></td>
+<td>통신사기특별법 — 보이스피싱 한정, 직거래는 ✗</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 당근마켓 직거래 사기는 <strong>일반 사기(§347)</strong>.
+보이스피싱이 아니므로 통신사기특별법은 적용 안 됨.</p>
+</blockquote>
+<h3 id="증거-체크리스트-골든타임-24시간">🔍 증거 체크리스트 — 골든타임
+24시간</h3>
+<ol type="1">
+<li><strong>거래 채팅 전체 캡처</strong> — 위/아래 스크롤로 빠짐없이,
+닉네임·시간 보이게</li>
+<li><strong>상품 게시글 캡처</strong> — URL 포함, 매물 ID 보이게</li>
+<li><strong>송금내역</strong> — 은행 앱에서 PDF 추출</li>
+<li><strong>상대방 계좌번호·예금주명</strong> — 송금 직전 화면 캡처
+권장</li>
+<li><strong>상대방 닉네임·매너온도·동네인증 캐시</strong> (당근에
+보존요청)</li>
+<li><strong>유사 피해 신고</strong> — 인터넷 검색으로 같은 계좌·닉네임
+피해자 확인</li>
+<li><strong>상대방의 휴대폰번호</strong> (안심번호여도 → 통신사 압수수색
+영장으로 추적)</li>
+</ol>
+<h3 id="예방처신-2">🛡 예방·처신</h3>
+<ul>
+<li><strong>직거래 우선</strong>, 비대면이라면
+<strong>에스크로</strong>(당근페이) 사용</li>
+<li>새 계정·매너온도 낮음·동네인증 X → 90% 사기 패턴</li>
+<li>시세 대비 -20% 이상 싸면 의심</li>
+<li>입금 직전 <strong>계좌번호 + 예금주명을 더치트(thecheat.co.kr)에
+조회</strong> — 신고 이력 즉시 확인</li>
+<li>입금 직후 <strong>타인 명의 계좌면 100% 사기</strong>
+(대포통장)</li>
+<li>사기 직후 송금 은행에 <strong>지급정지 요청</strong> (피해자가 직접
+가능, 단 보이스피싱 아니면 한계 있음)</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-3">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 (당근마켓 닉네임 &quot;○○○○&quot;, 계좌번호 ○○은행 ○○○-○○○-○○○)을
+형법 제347조 제1항 사기죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인은 2025. ○. ○. ○○:○○경 당근마켓에 &quot;갤럭시 S24 미개봉
+ 80만원&quot; 매물을 게시하였습니다(증거 ① 게시글 캡처, 매물ID ○○○○).
+2. 고소인은 같은 날 ○○:○○경 피고소인과 채팅하여 거래 합의에
+ 이르렀고(증거 ② 채팅 전문), ○○:○○ 피고소인이 지정한 계좌
+ (○○은행 ○○○-○○○-○○○, 예금주 ○○○)로 80만원을 송금하였습니다
+ (증거 ③ 송금내역).
+3. 송금 직후 피고소인은 채팅을 차단하고 계정을 비활성화하였으며,
+ 현재까지 물품을 발송하지 않았습니다(증거 ④ 채팅 차단 상태,
+ ⑤ 당근마켓 운영자 통보 메일).
+4. 위 계좌번호로 더치트 사이트에 동일 피해 신고가 5건 누적되어
+ 있어, 피고소인은 처음부터 물품 인도의 의사 없이 송금만 받을
+ 목적으로 매물을 게시한 것이 명백합니다(증거 ⑥ 더치트 조회 결과).</code></pre>
+<blockquote>
+<p>💡 <strong>여러 피해자가 같은 계좌면 → 같은 경찰서에 병합 수사
+요청</strong> 가능. 피해 합산되면 수사 속도 ↑.</p>
+</blockquote>
+<hr />
+<h1 id="스토킹-헤어진-사람낯선-사람이-계속-따라오고-연락">6️⃣ 스토킹 —
+헤어진 사람/낯선 사람이 계속 따라오고 연락</h1>
+<h3 id="가명-사례-가상-5">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>유진</strong>(가명)이 6개월 전 헤어진
+<strong>E</strong>(가명, 전 연인)에게서 매일 카톡·인스타DM·전화.
+차단하면 새 번호·새 계정으로 다시 연락. 회사 앞에서 “우연히” 만나는 일이
+3회 반복. SNS에는 유진 사진을 도용한 게시물 발견.</p>
+</blockquote>
+<h3 id="시간트리-5">⏰ 시간트리</h3>
+<pre><code>[T-6개월] 결별
+[T-5개월] 카톡·전화 시작
+[T-3개월] 차단 → 새 번호로 연락 반복
+[T-2개월] 회사 앞 &quot;우연한&quot; 마주침 1회
+[T-1개월] 마주침 2·3회 (반복성·지속성 입증)
+[T-2주] SNS에 본인 사진 도용 발견
+[T-0] 신변보호 신청 + 형사고소 + 잠정조치 신청</code></pre>
+<h3 id="적용-죄목법조-5">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>스토킹</strong></td>
+<td>스토킹처벌법 제18조 ①</td>
+<td><strong>3년 이하 징역 또는 3천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>흉기 휴대 스토킹</strong></td>
+<td>스토킹처벌법 제18조 ②</td>
+<td>5년 이하 징역 또는 5천만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>개인정보 도용 (사진 도용 SNS)</strong></td>
+<td>스토킹처벌법 §2① 사목 / 정통망법</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>협박</strong> (있을 시)</td>
+<td>형법 제283조</td>
+<td>3년 이하 징역</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>스토킹처벌법 §2</strong> “스토킹행위”란 상대방의 의사에
+반하여 정당한 이유 없이 ① 접근·따라다님·진로 차단 ② 주거·직장 부근
+기다림 ③ 우편·전화·정보통신망으로 글·말·물건 도달 ④ 직접/제3자 통해 물건
+도달 ⑤ 주거 부근 물건 훼손 ⑥ 개인정보·위치정보 게시 ⑦ <strong>사진·신분
+도용해 본인인 척 위장</strong> — 하여 불안감·공포심을 일으키는 것.</p>
+<p>📜 “스토킹범죄”란 위 행위를 <strong>지속적·반복적</strong>으로 하는
+것.</p>
+</blockquote>
+<h3 id="개정-반드시-알아야-할-변화">⚡ 2023.7.11 개정 — 반드시 알아야 할
+변화</h3>
+<ul>
+<li>과거: <strong>반의사불벌죄</strong> (피해자 처벌불원이면 공소
+X)</li>
+<li>현재: <strong>반의사불벌죄 폐지</strong> → 피해자 의사와 무관하게
+처벌 → 가해자가 합의 압박 못 함, 합의로 사건 안 끝남</li>
+</ul>
+<h3 id="잠정조치-긴급-보호-고소와-동시-신청">🚨 잠정조치 (긴급 보호) —
+고소와 동시 신청</h3>
+<table>
+<thead>
+<tr>
+<th>조치</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1호</td>
+<td>서면 경고</td>
+</tr>
+<tr>
+<td>2호</td>
+<td>100m 이내 접근금지</td>
+</tr>
+<tr>
+<td>3호</td>
+<td>전기통신 이용 접근금지</td>
+</tr>
+<tr>
+<td>4호</td>
+<td>유치장·구치소 유치 (최대 1개월)</td>
+</tr>
+</tbody>
+</table>
+<p>→ 위반 시 별도 형사처벌 (스토킹처벌법 제20조)</p>
+<h3 id="증거-체크리스트-반복성지속성이-핵심">🔍 증거 체크리스트 —
+반복성·지속성이 핵심</h3>
+<ol type="1">
+<li><strong>시간순 행위 로그</strong> (엑셀로) —
+날짜·시각·장소·행위·증거번호</li>
+<li><strong>메시지 캡처</strong> — 전체 대화·차단 후 새 계정 연락
+모두</li>
+<li><strong>통화기록</strong> — 통신사 발급 (3개월치)</li>
+<li><strong>CCTV 영상</strong> (회사 앞·집 앞)</li>
+<li><strong>목격자 진술</strong> (직장 동료, 가족)</li>
+<li><strong>본인의 정신과 진단</strong> (불안장애·PTSD 등) — 피해 입증
+강화</li>
+<li><strong>SNS 도용 게시물</strong> 캡처 + URL + 게시자 정보</li>
+</ol>
+<h3 id="예방처신-3">🛡 예방·처신</h3>
+<ul>
+<li><strong>차단·삭제 X. 모두 캡처·저장</strong> → 증거 우선</li>
+<li>가해자가 보낸 새 번호·새 계정도 <strong>차단 전에 캡처</strong></li>
+<li>사진·문서 도착 시 <strong>그대로 보존</strong> (포장지·우편 등
+그대로)</li>
+<li>회사·가족·친구에게 알려 <strong>목격자 풀 만들기</strong></li>
+<li><strong>여성긴급전화 1366</strong> / <strong>스마트워치
+신변보호</strong> 신청</li>
+<li>가해자와 <strong>단독 만남 절대 X</strong> (합의 명목 유인
+주의)</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-4">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 스토킹범죄의 처벌 등에 관한 법률 제18조 제1항
+스토킹범죄로 처벌하여 주시기 바랍니다.
+아울러 같은 법 제8조에 따른 잠정조치(2호 접근금지, 3호 전기통신
+접근금지)를 신청합니다.
+
+[고소이유 — 일부]
+1. 고소인과 피고소인은 2025. ○. ○. 결별하였으나, 피고소인은 2025.
+ ○. ○.부터 현재까지 약 5개월에 걸쳐 다음과 같이 지속적·반복적으로
+ 스토킹행위를 하였습니다(증거 ① 행위로그, ②~⑤ 메시지·통화기록).
+ - 카카오톡 ○○회, 문자 ○○회, 전화 ○○회 송신·시도 (차단 후 새
+ 계정 ○개로 재차 시도)
+ - 고소인 직장 ○○빌딩 출입구에서 ○회 마주침 (증거 ⑥ CCTV)
+ - 인스타그램에 고소인 사진을 도용하여 고소인을 사칭하는 게시물
+ 게시 (증거 ⑦ URL, 게시일자)
+2. 피고소인의 행위는 스토킹처벌법 제2조 제1호 다목·바목·사목에
+ 해당하는 행위를 동조 제2호의 지속성·반복성을 갖춰 행한 것으로
+ 같은 법 제18조 제1항 스토킹범죄에 해당합니다.
+3. 또한 고소인은 피고소인의 보복이 우려되어 같은 법 제8조에 따른
+ 잠정조치를 함께 신청합니다.</code></pre>
+<hr />
+<h1 id="댓글온라인-시비-익명-글이-나를-저격-단톡방에서-거짓-소문">7️⃣
+댓글·온라인 시비 — 익명 글이 나를 저격, 단톡방에서 거짓 소문</h1>
+<h3 id="가명-사례-가상-6">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>태우</strong>(가명)는 자영업 자영업자(카페).
+인스타그램·블로그 후기에 익명 <strong>F</strong>(가명)가 “<strong>위생
+엉망에 사장 손님한테 막말함</strong>”이라는 글을 반복 게시. 사실 무근.
+매출이 20% 감소. F의 계정은 익명이지만 작성 패턴 분석 시 인근 경쟁업체
+사장으로 추정.</p>
+</blockquote>
+<h3 id="시간트리-6">⏰ 시간트리</h3>
+<pre><code>[T-2주] 첫 비방글 게시 (블로그)
+[T-1주] 같은 내용 인스타·맘카페에 확산
+[T-0] 매출 20% 감소 확인
+[+1일] URL·캡처 확보, 댓글·공유 카운트
+[+2일] 플랫폼에 &quot;임시조치&quot; 신청 (게시중단·블라인드)
+[+3일] 경찰 사이버수사대에 고소장 + 작성자 정보 보전 요청
+[+30일] 경찰의 작성자 신원 확보 (IP·통신사 압수수색)
+[+60일] 피의자 특정 후 본격 수사</code></pre>
+<h3 id="적용-죄목법조-6">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>정통망법 명예훼손 (사실)</strong></td>
+<td>정통망법 제70조 ①</td>
+<td><strong>3년 이하 징역 또는 3천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>정통망법 명예훼손 (허위)</strong></td>
+<td>정통망법 제70조 ②</td>
+<td><strong>7년 이하 징역, 10년 이하 자격정지, 5천만원 이하
+벌금</strong></td>
+</tr>
+<tr>
+<td><strong>모욕</strong></td>
+<td>형법 제311조</td>
+<td>1년 이하 징역, 200만원 이하 벌금 (친고죄)</td>
+</tr>
+<tr>
+<td><strong>업무방해</strong></td>
+<td>형법 제314조</td>
+<td>5년 이하 징역, 1천500만원 이하 벌금</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>정통망법 §70②</strong> “사람을 비방할 목적으로
+정보통신망을 통하여 공공연하게 <strong>거짓의 사실</strong>을 드러내어
+다른 사람의 명예를 훼손한 자는 7년 이하의 징역, 10년 이하의 자격정지
+또는 5천만원 이하의 벌금에 처한다.” 📜 §70③ “제1항·제2항의 죄는 피해자가
+구체적으로 밝힌 의사에 반하여 공소를 제기할 수 없다.” →
+<strong>반의사불벌죄</strong></p>
+</blockquote>
+<h3 id="작성자-특정-익명도-추적-가능">🎯 작성자 특정 — 익명도 추적
+가능</h3>
+<ol type="1">
+<li><strong>임시조치 신청</strong> (정통망법 §44의2) → 플랫폼이 30일
+게시중단</li>
+<li><strong>방심위에 명예훼손 분쟁조정</strong> (선택)</li>
+<li><strong>고소장 + 신원공개 청구</strong> → 경찰이 통신사·플랫폼에
+압수수색</li>
+<li><strong>IP → 통신사 → 가입자 정보</strong> 순으로 추적</li>
+<li>카카오·네이버·인스타 등 주요 플랫폼은 <strong>수사기관 협조
+의무</strong></li>
+</ol>
+<h3 id="증거-체크리스트-2">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>URL 전체</strong> (단축 X) + 게시일자·게시자 닉네임</li>
+<li><strong>게시물 전체 캡처</strong> (스크롤 다 보이게, 댓글·공유 수
+포함)</li>
+<li><strong>확산 경로</strong> (다른 카페·블로그·SNS로 퍼진 자료)</li>
+<li><strong>매출 감소 자료</strong> (POS 매출·카드 매출 비교표)</li>
+<li><strong>본인의 영업 정상성 자료</strong> (위생 점검 결과·고객 정상
+리뷰)</li>
+<li><strong>글 작성 시간·문체 분석</strong> (경쟁사 의심 시)</li>
+</ol>
+<h3 id="예방처신-1일-지연이-추적-가능성-50-떨어뜨림">🛡 예방·처신 — 1일
+지연이 추적 가능성 50% 떨어뜨림</h3>
+<ul>
+<li>발견 즉시 <strong>캡처 + URL 저장 + 작성자 닉네임 기록</strong></li>
+<li>절대 <strong>본인 SNS에 반박 X</strong> — 새로운 명예훼손 시비
+유발</li>
+<li>플랫폼에 <strong>임시조치(블라인드) 우선</strong> 신청 → 사실/허위
+다툼 전 차단</li>
+<li><strong>삭제 요청만 하면 안 됨</strong> — 삭제되면 증거 사라짐 →
+<strong>공증·캡처 먼저</strong></li>
+<li>매출 감소가 있다면 <strong>POS 데이터 PDF 추출</strong> 즉시</li>
+<li>댓글 작성자 명단 확보 (소문 확산자도 별도 책임 가능)</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-5">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+성명불상의 피고소인(블로그 ID &quot;○○○○&quot;, URL ○○○○○)을
+정보통신망 이용촉진 및 정보보호 등에 관한 법률 제70조 제2항
+허위사실 적시 명예훼손, 형법 제314조 업무방해죄로 처벌하여
+주시기 바랍니다. 아울러 피고소인의 신원 확인을 위한 수사를
+요청합니다.
+
+[고소이유 — 일부]
+1. 성명불상의 피고소인은 2025. ○. ○. ○○:○○경 본인 블로그
+ (URL: ○○○)에 &quot;○○카페(고소인 운영) 위생 엉망, 사장이 손님에게
+ 막말함&quot;이라는 글을 게시하였습니다(증거 ① 게시물 캡처).
+2. 위 게시물은 동일자 ○:○○경 ○○맘카페에 동일 ID로 재게시
+ 되었고, 게시 일주일 만에 조회수 ○만회, 댓글 ○○회로 확산
+ 되었습니다(증거 ②③ 확산 자료).
+3. 그러나 고소인의 매장은 ○○구청 위생 점검 결과 적합 판정을 받은
+ 상태이며(증거 ④), 게시물이 지목한 일자의 매장 CCTV·POS 매출
+ 기록상 게시 내용은 모두 사실과 다릅니다(증거 ⑤⑥).
+4. 위 게시 이후 고소인 매장의 일일 매출은 게시 전 대비 평균
+ 20% 감소하여(증거 ⑦ 매출 비교표), 명백한 업무방해 결과가
+ 발생하였습니다.
+5. 따라서 피고소인의 행위는 정통망법 제70조 제2항(허위 명예훼손)
+ 및 형법 제314조 업무방해죄에 해당하며, 피고소인의 신원 확인을
+ 위한 수사가 필요합니다.</code></pre>
+<blockquote>
+<p>💡 정통망법 §70은 <strong>반의사불벌죄</strong> — 합의로 종결 가능,
+합의금이 강력한 카드.</p>
+</blockquote>
+<hr />
+<h1 id="임대차-분쟁-보증금-안-돌려준다-무단-진입-명도-협박">8️⃣ 임대차
+분쟁 — 보증금 안 돌려준다 / 무단 진입 / 명도 협박</h1>
+<h3 id="가명-사례-가상-7">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>현우</strong>(가명, 세입자)는 전세 2억원 계약 만기를 2개월
+앞두고 <strong>임대인 G</strong>(가명)에게 갱신 거절·이사 통보. 만기일이
+지났는데도 G는 “다음 세입자 들어와야 보증금 준다”며 차일피일. 이사 못
+가고 1개월 지체. 더 황당한 건 G가 임의로 <strong>마스터키로 집에
+들어와</strong> 짐을 확인하고, 카톡으로 “안 나가면 짐 빼겠다”고
+위협.</p>
+</blockquote>
+<h3 id="시간트리-7">⏰ 시간트리</h3>
+<pre><code>[T-2개월] 갱신거절·계약 종료 통보 (내용증명 발송)
+ ↓
+[T-1개월] 새 집 계약, 이사 일정 확정
+ ↓
+[T-0] 만기일 — 보증금 미반환
+ ↓
+[T+1일] G에게 반환 독촉 (카톡·문자 증거화)
+ ↓
+[T+7일] 임차권등기명령 신청 (법원)
+ ↓
+[T+10일] G가 무단 침입 + &quot;짐 빼겠다&quot; 협박
+ ↓
+[T+11일] 주거침입·재물손괴 협박 형사고소 + 보증금 반환 민사소송</code></pre>
+<h3 id="적용-죄목법조-형사-민사-동시-진행">⚖️ 적용 죄목·법조 — 형사 +
+민사 동시 진행</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>죄목</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>주거침입</strong></td>
+<td>형법 제319조 ①</td>
+<td>3년 이하 징역 또는 500만원 이하 벌금</td>
+</tr>
+<tr>
+<td><strong>재물손괴 협박</strong> (실제 손괴 시 §366)</td>
+<td>형법 제283조 협박 / 제366조 손괴</td>
+<td>협박: 3년 이하 / 손괴: 3년 이하</td>
+</tr>
+<tr>
+<td><strong>강요</strong> (퇴거·금전포기 강요)</td>
+<td>형법 제324조</td>
+<td>5년 이하 징역</td>
+</tr>
+<tr>
+<td>임차권등기명령 (민사)</td>
+<td>주택임대차보호법 제3조의3</td>
+<td>보증금 반환 + 대항력 유지</td>
+</tr>
+<tr>
+<td>보증금반환 청구의 소 (민사)</td>
+<td>민법 §618 등</td>
+<td>지연이자 연 5% (소 제기 후 12%)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §319①</strong> “사람의 주거… 점유하는 방실에 침입한
+자는 3년 이하의 징역 또는 500만원 이하의 벌금에 처한다.” →
+<strong>임대인도 임차인의 점유 중인 집에 무단 진입하면
+주거침입.</strong></p>
+<p>📜 <strong>주임법 §3의3①</strong> “임대차가 끝난 후 보증금이 반환되지
+아니한 경우 임차인은 임차주택 소재지 관할 법원에 임차권등기명령을 신청할
+수 있다.” → ⑤항: 등기 마치면 <strong>대항력·우선변제권 유지</strong> →
+이사 가도 보호. → ⑧항: <strong>임차권등기 비용도 임대인에게 청구
+가능.</strong></p>
+</blockquote>
+<h3 id="증거-체크리스트-3">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>임대차계약서</strong> + 계약갱신 거절
+<strong>내용증명</strong> (발송·수령 증명)</li>
+<li><strong>보증금 송금 내역</strong> (입주 당시)</li>
+<li><strong>이사 예정 입증</strong> — 새 집 계약서, 이삿짐센터
+견적·계약</li>
+<li><strong>반환 독촉</strong> — 카톡·문자·내용증명 (시점 명확하게)</li>
+<li><strong>현관 도어록 출입기록</strong> — 임대인 무단 진입 입증
+(디지털 도어록 로그)</li>
+<li><strong>CCTV</strong> (공동현관·복도)</li>
+<li><strong>협박 메시지·녹음</strong> (본인 통화 녹음은 합법)</li>
+<li><strong>임차권등기명령 신청서·등기부등본</strong> (민사 보호)</li>
+</ol>
+<h3 id="예방처신-4">🛡 예방·처신</h3>
+<ul>
+<li><strong>만기 2~3개월 전 갱신거절 내용증명</strong> 발송 — 묵시갱신
+차단</li>
+<li>만기 직전 <strong>새 집 계약 + 이사일 확정</strong> → 손해 입증
+강해짐</li>
+<li>보증금 미반환 시 <strong>즉시 임차권등기명령</strong> 신청 → 이사
+가도 권리 보호</li>
+<li><strong>이사 전 짐 빼면 위험</strong> — 대항력·우선변제권 상실 →
+등기 마친 후 이동</li>
+<li>임대인 무단 진입 우려 시 <strong>CCTV 설치</strong> (현관 안쪽) +
+디지털 도어록</li>
+<li>임대인과 <strong>단독 대면 X</strong> — 가족·친구 동석 또는
+카톡으로만</li>
+<li>“다음 세입자 와야 준다” 는 <strong>법적 근거 없음</strong> —
+임대인의 핑계일 뿐</li>
+</ul>
+<h3 id="보증금-반환-2트랙-동시-진행-필수">💰 보증금 반환 — 2트랙 동시
+진행 (필수)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>트랙</th>
+<th>절차</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>민사 1</strong></td>
+<td>임차권등기명령 (단독 신청, 1~2주)</td>
+<td>이사 가도 권리 유지</td>
+</tr>
+<tr>
+<td><strong>민사 2</strong></td>
+<td>보증금반환청구의 소</td>
+<td>판결 후 강제집행 (계좌·부동산 압류)</td>
+</tr>
+<tr>
+<td><strong>형사</strong></td>
+<td>주거침입·협박 고소</td>
+<td>압박 카드 (합의 시 보증금 동시 회수)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="고소장-핵심-문구-예시-6">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 형법 제319조 제1항 주거침입죄, 형법 제283조
+제1항 협박죄, 형법 제324조 강요죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2023. ○. ○. 피고소인과 ○○시 ○○구 ○○로 ○○아파트
+ ○동 ○○호에 관하여 보증금 2억원, 기간 2년의 주택임대차계약을
+ 체결하고 입주하여 점유 중인 임차인입니다(증거 ① 계약서, ② 전입신고).
+2. 고소인은 2025. ○. ○. 임대차계약 종료를 위한 갱신거절 내용증명을
+ 발송하였고(증거 ③), 만기일인 2025. ○. ○.이 지났음에도 피고소인은
+ 보증금을 반환하지 아니하였습니다.
+3. 그런데 피고소인은 2025. ○. ○. ○○:○○경 고소인의 부재 중에
+ 임대인 보관 마스터키를 사용하여 위 주택 내부에 무단 진입하였고
+ (증거 ④ 디지털 도어록 출입로그, ⑤ 공동현관 CCTV),
+4. 같은 날 ○○:○○경 카카오톡으로 &quot;안 나가면 짐을 빼겠다, 가만두지
+ 않겠다&quot;는 취지의 메시지를 발송하였습니다(증거 ⑥ 카톡 캡처).
+5. 피고소인의 행위는 ① 임차인의 점유 하에 있는 주거에 권한 없이
+ 침입한 것으로 형법 제319조 제1항 주거침입죄, ② 해악 고지로
+ 협박죄, ③ 보증금 반환 의무 회피·퇴거 강요를 위한 위력 행사로
+ 강요죄에 각 해당합니다.
+
+[별첨] 임차권등기명령 신청서 사본 (병행 진행 중)</code></pre>
+<blockquote>
+<p>💡 <strong>임차인의 점유 중인 집은 임차인의 “주거”</strong> —
+소유자(임대인)라도 동의 없이 들어오면 주거침입. 부동산 중개·수리 핑계도
+임차인 동의 없으면 불법.</p>
+</blockquote>
+<hr />
+<h1 id="직장-내-성희롱성추행-회식-자리-단둘이-출장-메신저">9️⃣ 직장 내
+성희롱·성추행 — 회식 자리, 단둘이 출장, 메신저</h1>
+<h3 id="가명-사례-가상-8">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>소영</strong>(가명, 입사 1년차)은 부서 회식에서 직속 상사
+<strong>H</strong>(가명, 팀장)에게 <strong>허리·어깨에 손이 닿는
+행위</strong>를 수회 당함. 회식 후 카톡으로 “둘이 한잔 더 하자”는
+메시지. 이후 사무실에서 단둘이 있는 상황을 만들려는 시도. 거절 후 평가
+점수가 갑자기 낮아지고 업무에서 배제.</p>
+</blockquote>
+<h3 id="시간트리-8">⏰ 시간트리</h3>
+<pre><code>[T+0] 회식 자리에서 신체접촉 (목격자 있음)
+[T+30분] 카톡 &quot;한잔 더&quot; / &quot;오늘 예쁘다&quot;
+[D+1일] 회사 단톡방·메일 보관 백업
+[D+3일] 단둘이 있는 상황 만들기 시도 → 거절
+[D+14일] 업무 배제·평가 점수 하락 (불리한 처우)
+[D+30일] 회사 고충처리·인사팀 신고 (남녀고용평등법 §14)
+[D+30일] 동시: 노동청 진정 / 형사고소 검토
+[D+60일] 조사 진행 / 잠정 조치 (가해자 분리)</code></pre>
+<h3 id="적용-죄목법조-형사노동민사-3트랙">⚖️ 적용 죄목·법조 —
+형사·노동·민사 3트랙</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위 유형</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>신체접촉 (허리·어깨)</td>
+<td><strong>성폭력처벌법 §10①</strong> 업무상 위력 추행</td>
+<td><strong>3년 이하 징역 또는 1,500만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td>폭행·협박 동반 추행</td>
+<td><strong>형법 §298</strong> 강제추행</td>
+<td>10년 이하 징역, 1,500만원 이하 벌금</td>
+</tr>
+<tr>
+<td>위력에 의한 간음</td>
+<td><strong>형법 §303①</strong> 업무상위력 등에 의한 간음</td>
+<td>7년 이하 징역, 3,000만원 이하 벌금</td>
+</tr>
+<tr>
+<td>통신망 성희롱 (카톡·메일)</td>
+<td>정통망법 §44의7 / §74</td>
+<td>1년 이하 / 1천만원</td>
+</tr>
+<tr>
+<td>회사 자체의 의무 위반</td>
+<td><strong>남녀고용평등법 §14</strong></td>
+<td>사업주에 과태료 등 행정조치</td>
+</tr>
+<tr>
+<td>보복성 인사 (감봉·해고)</td>
+<td>남녀고용평등법 §14⑥ + 근로기준법</td>
+<td><strong>형사처벌 별도</strong> (3년 이하 또는 3천만원)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>성폭력처벌법 §10①</strong> “업무, 고용이나 그 밖의 관계로
+인하여 자기의 보호, 감독을 받는 사람에 대하여 <strong>위계 또는
+위력</strong>으로 추행한 사람은 3년 이하의 징역 또는 1천500만원 이하의
+벌금에 처한다.”</p>
+<p>📜 <strong>형법 §298</strong> “폭행 또는 협박으로 사람에 대하여
+추행을 한 자는 10년 이하의 징역 또는 1천500만원 이하의 벌금에
+처한다.”</p>
+<p>📜 <strong>남녀고용평등법 §14⑥</strong> 사업주는 신고·피해 근로자에게
+<strong>파면·해고·징계·감봉·강등·승진 제한·불리한 평가·업무
+배제·따돌림</strong> 등 불리한 처우 금지.</p>
+</blockquote>
+<h3 id="단순-성희롱-vs-강제추행-경계가-모호하지만-다름">⚡ 단순 성희롱
+vs 강제추행 — 경계가 모호하지만 다름</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>구분</th>
+<th>적용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>언어·시선만</strong> (욕설·외모 평가 등)</td>
+<td>남녀고용평등법상 직장 내 성희롱 (회사·행정 대응)</td>
+</tr>
+<tr>
+<td><strong>신체접촉 — 위력 동원</strong> (상사·고용주)</td>
+<td><strong>성폭력처벌법 §10 업무상 위력 추행</strong> (형사)</td>
+</tr>
+<tr>
+<td><strong>폭행·협박 동반 신체접촉</strong></td>
+<td><strong>형법 §298 강제추행</strong> (형사, 형 가장 무거움)</td>
+</tr>
+<tr>
+<td><strong>위력에 의한 성관계</strong></td>
+<td>형법 §303 업무상위력 간음</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 회식·노래방·단둘 출장에서의 신체접촉은 <strong>위력 추행으로 인정
+가능성 높음</strong> — 거절하기 어려운 위치 관계 자체가 “위력”.</p>
+</blockquote>
+<h3 id="증거-체크리스트-즉시48시간1주">🔍 증거 체크리스트 —
+즉시·48시간·1주</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>시점</th>
+<th>해야 할 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>즉시</strong></td>
+<td>메신저·카톡·메일 <strong>캡처·백업</strong> (회사 메신저는 사측이
+삭제 가능)</td>
+</tr>
+<tr>
+<td></td>
+<td>신체접촉 부위 <strong>사진</strong> (멍·홍반 있으면 가치 ↑)</td>
+</tr>
+<tr>
+<td></td>
+<td>상황 <strong>기록 일기</strong> (시간·장소·행위·증인)</td>
+</tr>
+<tr>
+<td><strong>48시간</strong></td>
+<td>산부인과·정신과 진단 (성추행 시 무료 의료지원 —
+<strong>해바라기센터</strong>)</td>
+</tr>
+<tr>
+<td></td>
+<td>통화녹음 (본인 통화는 합법)</td>
+</tr>
+<tr>
+<td><strong>1주</strong></td>
+<td>회사 인사팀·고충처리 <strong>서면 신고</strong> (구두 X)</td>
+</tr>
+<tr>
+<td></td>
+<td>동료·목격자 진술서 (자필 서명·일자)</td>
+</tr>
+<tr>
+<td></td>
+<td>이메일·결재 기록 보존 요청 (회사에 서면)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="예방처신-가장-흔한-실수">🛡 예방·처신 — 가장 흔한 실수</h3>
+<ul>
+<li><strong>“좋게 넘기자” 침묵 X</strong> — 시간이 지나면 증거
+사라짐</li>
+<li>회사 내부 처리만 믿고 외부 신고 미루기 X → <strong>48시간 안에 외부
+채널 동시 진행</strong></li>
+<li>가해자와 <strong>1:1 대화 X</strong> — 합의·사과 명목 유인 시 녹음
+없으면 위험</li>
+<li><strong>공식 신고는 반드시 서면</strong> (이메일·고충처리시스템) —
+구두는 증거 X</li>
+<li>회사가 비밀유지 압박 → <strong>남녀고용평등법 §14⑦</strong> 위반
+(가해자 보호 X, 피해자 신원 비밀)</li>
+<li>피해자 모임·노조에 알리기 — 보복성 인사 방지</li>
+</ul>
+<h3 id="동시-진행-채널-5개-트랙">🏛 동시 진행 채널 (5개 트랙)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>트랙</th>
+<th>어디로</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 회사 고충처리</td>
+<td>사내 인사팀</td>
+<td>가해자 분리·징계 (남녀고용평등법 §14 의무)</td>
+</tr>
+<tr>
+<td>2. <strong>고용노동부 진정</strong></td>
+<td>관할 지방고용노동청</td>
+<td>사업주 의무 위반 조사·과태료</td>
+</tr>
+<tr>
+<td>3. <strong>국가인권위원회</strong></td>
+<td>진정서 접수</td>
+<td>차별·괴롭힘 조사·권고</td>
+</tr>
+<tr>
+<td>4. <strong>형사고소</strong></td>
+<td>경찰서 또는 여성·청소년계</td>
+<td>§10 위력 추행 / §298 강제추행</td>
+</tr>
+<tr>
+<td>5. <strong>민사 손해배상</strong></td>
+<td>가해자 + 사업주 공동책임</td>
+<td>위자료·일실손해 청구</td>
+</tr>
+</tbody>
+</table>
+<h3 id="고소장-핵심-문구-예시-7">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 성폭력범죄의 처벌 등에 관한 특례법 제10조
+제1항 업무상위력에 의한 추행죄로 처벌하여 주시기 바랍니다.
+[보충적으로 형법 제298조 강제추행죄 적용도 함께 검토하여 주시기
+바랍니다.]
+
+[고소이유 — 일부]
+1. 고소인은 2024. ○. ○.부터 ○○주식회사 ○○팀에 입사한 사원이며,
+ 피고소인은 같은 팀 팀장으로서 고소인의 직속 상급자로 인사평가·
+ 업무지시 권한을 가진 자입니다(증거 ① 인사기록, ② 조직도).
+2. 피고소인은 2025. ○. ○. ○○:○○경 ○○시 ○○구 ○○식당에서
+ 개최된 부서 회식 중, 고소인의 옆자리에 앉아 ① 좌측 어깨에 손을
+ 올린 채 약 5분간 유지하고, ② 일어서는 고소인의 허리를 감싸안는
+ 행위를 하였습니다(증거 ③ 동료 ○○○의 진술서, ④ 회식 사진).
+3. 회식 직후 ○○:○○경 피고소인은 카카오톡으로 &quot;둘이 한잔 더 하자&quot;,
+ &quot;오늘 정말 예쁘다&quot;는 메시지를 발송하였습니다(증거 ⑤ 카톡 캡처).
+4. 고소인은 위 행위를 거부하였고, 이후 2025. ○. ○.부터 ① 분기
+ 인사평가가 직전 분기 ○점에서 ○점으로 하락하였으며, ② 주요
+ 프로젝트 ○건에서 배제되었습니다(증거 ⑥ 인사평가 기록, ⑦ 업무
+ 분장표 변경 전후 비교).
+5. 피고소인은 고소인의 직속 상사로서 인사평가·업무배분 권한을
+ 가진 자로, 그 관계상 고소인은 거부 시 불이익을 우려하지 않을
+ 수 없는 위력 하에 있었습니다. 이에 피고소인의 행위는
+ 성폭력처벌법 제10조 제1항 업무상위력에 의한 추행죄에 해당하며,
+ 회식 자리에서의 신체접촉은 형법 제298조 강제추행에도 해당할
+ 여지가 있습니다.
+6. 아울러 피고소인의 행위는 남녀고용평등법 제14조 제6항이 금지하는
+ 불리한 처우(인사평가 하락·업무 배제)로 이어졌으므로, 관련 사업주의
+ 조치 의무 위반에 대해서도 별도로 노동부 진정을 병행합니다.
+
+[증거 목록]
+① 인사기록, ② 조직도, ③ 동료 진술서, ④ 회식 사진, ⑤ 카톡,
+⑥ 인사평가 기록 전후, ⑦ 업무분장표 변경 자료, ⑧ 신고 메일·답신</code></pre>
+<blockquote>
+<p>💡 <strong>위력은 “현재 행사 중”이 아니어도 인정</strong> — “거부하면
+불이익 입을 위치”라는 관계만으로 위력 인정 (판례). 💡 <strong>보복성
+인사는 별도 형사처벌</strong> — 남녀고용평등법 §37 (3년 이하 징역 또는
+3천만원).</p>
+</blockquote>
+<hr />
+<h1 id="채권추심-협박-야간-전화가족-직장-연락빚-공개">🔟 채권추심 협박 —
+야간 전화·가족 직장 연락·빚 공개</h1>
+<h3 id="가명-사례-가상-9">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>재훈</strong>(가명, 자영업)은 대부업체에서 300만원을 빌렸다가
+사업 부진으로 3개월 연체. <strong>추심원 J</strong>(가명)는 밤 11시
+이후에도 매일 5~10회 전화, 부모님·직장 동료에게 “재훈씨가 빚 안 갚는다,
+같이 연락 좀 해달라”고 연락. 직장 단톡방에까지 무관계 메시지를 보내
+망신.</p>
+</blockquote>
+<h3 id="시간트리-9">⏰ 시간트리</h3>
+<pre><code>[T-3개월] 변제기 도래, 1차 연체
+[T-1개월] 일반 추심 (낮 시간)
+[T-2주] 야간(21:00 이후) 전화 시작
+[T-1주] 부모님·동료에게 추심 전화
+[T-3일] 직장 단톡방에 채무 사실 공개
+[T-0] 공정거래위·금감원 민원 + 형사고소</code></pre>
+<h3 id="적용-죄목법조-채추법-형법-동시">⚖️ 적용 죄목·법조 — 채추법 +
+형법 동시</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>야간(21~익일 08시) 반복 추심</strong></td>
+<td><strong>채추법 §9 2호·3호</strong></td>
+<td>5년 이하 징역 또는 5천만원</td>
+</tr>
+<tr>
+<td><strong>가족·직장 등 제3자에 채무사실 알림</strong></td>
+<td><strong>채추법 §9 4호·7호</strong></td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>폭행·협박·위계·위력 추심</strong></td>
+<td><strong>채추법 §9 1호</strong></td>
+<td>〃</td>
+</tr>
+<tr>
+<td>협박 (별도 형사)</td>
+<td>형법 §283</td>
+<td>3년 이하</td>
+</tr>
+<tr>
+<td>명예훼손 (단톡방 공개)</td>
+<td>형법 §307 / 정통망법 §70</td>
+<td>5년 이하 / 7년 이하</td>
+</tr>
+<tr>
+<td>업무방해 (직장에 반복 연락)</td>
+<td>형법 §314</td>
+<td>5년 이하</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>채추법 §9</strong> 채권추심자는 다음 행위 금지: - 1호:
+폭행·협박·체포·감금·위계·위력 사용 - 2호: 정당한 사유 없이
+<strong>반복</strong> 또는 <strong>야간(21:00~08:00) 방문</strong> -
+3호: 정당한 사유 없이 <strong>반복</strong> 또는 <strong>야간
+전화·문자</strong> - 4호: 채무자 외의 사람에게 <strong>채무에 관한 거짓
+사실 알림</strong> - 7호: 직장 등 <strong>다수인 앞에서 채무사실 공연히
+알림</strong></p>
+</blockquote>
+<h3 id="증거-체크리스트-4">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>전화 발신 기록 + 시간</strong> (통신사 발급, 야간 21시 이후
+전화 표시)</li>
+<li><strong>녹음</strong> (본인 통화는 합법) — 채무사실 압박·욕설
+부분</li>
+<li><strong>카톡·문자 전체</strong> (캡처, 발신 시각·발신자)</li>
+<li><strong>가족·동료 진술서</strong> (자필 서명, “추심원이 ○○라고
+말했다” 인용)</li>
+<li><strong>단톡방 캡처</strong> (참여자·시각)</li>
+<li><strong>채권추심자 신원·소속 회사</strong> (법정 추심자만 적법)</li>
+<li><strong>추심 일지</strong> — 본인이 시간순으로 기록한 엑셀</li>
+</ol>
+<h3 id="예방처신-5">🛡 예방·처신</h3>
+<ul>
+<li>추심 전화 받으면 <strong>“근거 자료 서면 송부 요청”</strong> +
+<strong>녹음 시작</strong> 명시 (“녹음됩니다”)</li>
+<li>추심자 신원 확인 — <strong>본명·소속 회사명·등록번호</strong> 못
+알려주면 불법 추심원 가능성</li>
+<li>야간 전화 1회만 받아도 즉시 <strong>금융감독원 신고 (1332)</strong>
++ <strong>공정위 민원</strong></li>
+<li>가족·직장에 미리 알리고 “추심 전화 오면 끊지 말고 녹음하라”</li>
+<li>채무는 <strong>개인회생·파산 검토</strong> — 채무 자체를 줄이는 게
+근본 해결</li>
+<li><strong>불법 추심자에게 갚지 말기</strong> — 적법 채권자가 아닐 수
+있음</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-8">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(소속: ○○대부 추심팀)을 채권의 공정한 추심에
+관한 법률 제9조 제2호·제3호·제4호·제7호 위반죄, 형법 제283조
+협박, 형법 제314조 업무방해, 정보통신망법 제70조 제2항(허위
+사실에 따른 명예훼손)으로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인은 ○○대부 소속 추심자로, 고소인의 채무(원금 300만원,
+ 2025. ○. ○. 차용)와 관련하여 다음과 같이 추심하였습니다.
+2. ① 2025. ○. ○.부터 ○. ○.까지 약 2주간 매일 21시 이후 ○○:○○경
+ 고소인에게 1~5회씩 반복 전화하였고(증거 ① 통신사 발신기록),
+ ② 동일 기간 야간 카카오톡 ○○건을 발송하여 변제를 압박하였습니다
+ (증거 ② 카톡 캡처).
+3. 피고소인은 또한 ○. ○. 고소인의 부친 ○○○ 및 직장 동료 ○○○에게
+ 전화하여 &quot;재훈씨가 빚 안 갚는다, 압박해달라&quot;는 취지로 채무사실을
+ 알렸고(증거 ③ 부친 진술서, ④ 동료 진술서), 같은 달 ○. ○. 고소인의
+ 회사 단톡방(참여자 ○○명)에 채무사실을 게시하였습니다(증거 ⑤).
+4. 피고소인의 행위는 채추법 제9조 제2호·제3호(야간·반복 추심),
+ 제4호(제3자에 알림), 제7호(공연한 채무 알림)에 각 해당하며,
+ 직장 업무 평온을 침해한 점에서 형법 제314조 업무방해죄에도
+ 해당합니다.
+
+[병행 진행]
+- 금융감독원 민원 (1332)
+- 공정거래위 표시광고법 위반 신고 (해당 시)</code></pre>
+<blockquote>
+<p>💡 <strong>금감원 1332 신고는 형사보다 빠르고 효과 즉시</strong> —
+등록 대부업자는 영업정지·등록취소 압박이 크다.</p>
+</blockquote>
+<hr />
+<h1 id="층간소음-윗집-새벽-쿵쿵관리실-무용보복-손괴">1️⃣1️⃣ 층간소음 —
+윗집 새벽 쿵쿵·관리실 무용·보복 손괴</h1>
+<h3 id="가명-사례-가상-10">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>유나</strong>(가명)는 6개월 전부터 윗집
+<strong>R</strong>(가명)의 매일 23시~새벽 2시 발걸음·물건 끄는 소음으로
+수면 장애. 관리실·인터폰 항의 20회 이상, 환경분쟁조정 1회. 어느 날 본인
+차량에 의도적 흠집·복도에 쓰레기 투기 발견. R은 “그쪽이 너무 예민한
+거다”며 일관.</p>
+</blockquote>
+<h3 id="시간트리-10">⏰ 시간트리</h3>
+<pre><code>[T-6개월] 첫 소음 인지
+[T-5개월] 인터폰 항의 1회 → &quot;조심하겠다&quot;
+[T-3개월] 누적 20회 항의, 호전 X
+[T-2개월] 층간소음이웃사이센터 신고 (LH 산하 무료)
+[T-1개월] 환경분쟁조정위 신청
+[T-2주] 본인 차량 흠집 발견 (CCTV)
+[T-1주] 현관문 앞 쓰레기 투기
+[T-0] 소음·손괴·재물손괴 형사고소 + 민사 손해배상</code></pre>
+<h3 id="적용-죄목법조-7">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>인근 소란 (악기·발걸음·고함)</strong></td>
+<td><strong>경범죄처벌법 §3 21호 (인근소란)</strong></td>
+<td>10만원 이하 벌금·구류·과료</td>
+</tr>
+<tr>
+<td><strong>장난전화·반복 괴롭힘</strong></td>
+<td>경범죄처벌법 §3 40호</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>차량 흠집</strong></td>
+<td>형법 §366 재물손괴</td>
+<td>3년 이하 징역 또는 700만원</td>
+</tr>
+<tr>
+<td><strong>반복 괴롭힘으로 정신적 손해</strong></td>
+<td>형법 §314 업무방해 / 민사 위자료</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>공동주택 층간소음 기준 초과</strong></td>
+<td><strong>공동주택관리법 §20</strong> + 환경부 고시</td>
+<td>행정조치</td>
+</tr>
+<tr>
+<td><strong>고의 폭행성 소음 (망치질·확성기)</strong></td>
+<td>형법 §260 폭행 (소리도 폭행 인정)</td>
+<td>2년 이하</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>경범죄처벌법 §3 21호 (인근소란 등)</strong>
+“악기·라디오·텔레비전·전축·종·확성기·전동기 등의 소리를 지나치게 크게
+내거나 큰소리로 떠들거나 노래를 불러 이웃을 시끄럽게 한 사람” → 10만원
+이하 벌금·구류·과료.</p>
+<p>💡 발걸음·물건 끄는 소음은 §3 21호에 직접 안 들어가지만,
+<strong>고의성·반복성 입증되면 형법 §260 폭행</strong> 또는 §314
+업무방해로 가는 판례 있음.</p>
+</blockquote>
+<h3 id="층간소음-법적-기준-공동주택관리법환경부-고시">📏 층간소음 법적
+기준 (공동주택관리법·환경부 고시)</h3>
+<table>
+<thead>
+<tr>
+<th>시간</th>
+<th>직접충격 (1분간 등가)</th>
+<th>공기전달</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>주간 (06~22시)</td>
+<td>39 dB</td>
+<td>45 dB</td>
+</tr>
+<tr>
+<td>야간 (22~06시)</td>
+<td>34 dB</td>
+<td>40 dB</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>최고 소음도 (순간) 주간 57 dB / 야간 52 dB</li>
+<li>→ <strong>환경공단 측정 → 기준 초과 입증</strong> 시 강한 증거</li>
+</ul>
+<h3 id="증거-체크리스트-5">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>소음 측정 (앱·전문 측정기)</strong> — 일시·dB 기록</li>
+<li><strong>층간소음이웃사이센터</strong> (1661-2642, LH 무료)
+신고기록</li>
+<li><strong>환경분쟁조정위원회</strong> 신청·결정문</li>
+<li><strong>관리사무소 항의 기록</strong> (서면)</li>
+<li><strong>소음 녹음 파일</strong> (날짜·시각 별로)</li>
+<li><strong>수면장애 진단서·정신과 진료</strong> (피해 입증)</li>
+<li><strong>CCTV</strong> (보복성 손괴·쓰레기 입증)</li>
+</ol>
+<h3 id="예방처신-6">🛡 예방·처신</h3>
+<ul>
+<li><strong>인터폰·구두 항의는 증거 X</strong> → 무조건
+<strong>서면</strong>(관리사무소 경유)</li>
+<li>소음 측정은 <strong>본인 집 천장 아래 1.2m</strong>에서 (환경부 측정
+방법)</li>
+<li>즉시 보복(천장 두드리기·우퍼 가동) X → 본인이 가해자 됨</li>
+<li>갈등 격해지면 <strong>CCTV (현관 안쪽 + 외부 자기 영역)
+설치</strong></li>
+<li><strong>층간소음이웃사이센터</strong> 무료 중재 → 기록이 향후
+형사·민사 자료</li>
+<li>차량은 <strong>블랙박스 주차 모드 ON</strong> + 외부 주차 시 CCTV
+보이는 곳</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-보복-손괴-케이스">✍️ 고소장 핵심 문구 예시
+— 보복 손괴 케이스</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 형법 제366조 재물손괴죄로 처벌하여 주시기
+바랍니다. 아울러 경범죄처벌법 제3조 제21호(인근소란)에 따른
+조치도 함께 검토하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인과 피고소인은 ○○아파트 ○동 ○○○호(고소인 거주) 및
+ 같은 동 ○○○호(피고소인 거주, 직상층)에 거주하는 이웃입니다.
+2. 고소인은 2025. ○. ○.부터 약 6개월간 피고소인 세대로부터 야간
+ 소음 (발걸음·물건 끄는 소리, 평균 야간 측정치 ○○dB, 환경부 기준치
+ 초과)을 반복적으로 겪었고, 관리사무소를 통해 ○○회 서면 항의,
+ 층간소음이웃사이센터에 신고하였으나 호전되지 않았습니다
+ (증거 ①~⑤ 측정기록·신고기록·관리실 항의 기록·녹음).
+3. 그러던 중 피고소인은 2025. ○. ○. ○○:○○경 ○○아파트 지하주차장에
+ 주차된 고소인 차량(○○가○○○○) 좌측 도어에 의도적으로 흠집을
+ 내었습니다(증거 ⑥ CCTV 영상 캡처, ⑦ 차량 손괴 사진, ⑧ 수리
+ 견적 ○○만원).
+4. 동일 행위는 같은 달 ○. ○. ○○:○○경에도 반복되었고(증거 ⑨),
+ 같은 시기 고소인 세대 현관 앞에 쓰레기를 투기한 것이 CCTV에
+ 확인되었습니다(증거 ⑩).
+5. 피고소인의 행위는 고소인의 재물에 효용을 해치는 것으로 형법
+ 제366조 재물손괴죄에 해당하며, 이전 층간소음 분쟁의 보복성으로
+ 추인되어 그 죄질이 중합니다.</code></pre>
+<blockquote>
+<p>💡 <strong>소음 자체 형사고소는 한계</strong> — 입증·인과 어려움.
+<strong>층간소음→환경분쟁조정→민사</strong> 트랙이 본류, <strong>보복
+손괴는 형사</strong> 트랙.</p>
+</blockquote>
+<hr />
+<h1 id="가스라이팅교제폭력-정서학대휴대폰-검열이별-협박">1️⃣2️⃣
+가스라이팅·교제폭력 — 정서학대·휴대폰 검열·이별 협박</h1>
+<h3 id="가명-사례-가상-11">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>수아</strong>(가명)는 2년 사귄 <strong>S</strong>(가명, 동거
+X)에게 ① “너 때문에 내가 화났다” 식 책임 전가, ② 휴대폰 비밀번호
+강요·메시지 검열, ③ 친구와 가족 만남 차단, ④ 헤어지자 했더니 “사진 다
+뿌릴 거다”, “너 집에 찾아가 죽이겠다” 협박. 동거 사실 없어
+가정폭력처벌법은 적용 어려움.</p>
+</blockquote>
+<h3 id="시간트리-11">⏰ 시간트리</h3>
+<pre><code>[T-2년] 교제 시작
+[T-1년] 가스라이팅 시작 (정서적 학대)
+[T-6개월] 휴대폰 검열·친구 차단
+[T-3개월] 폭언, 1회 신체접촉 (멍)
+[T-1개월] 이별 통보 → 협박·위협
+[T-2주] &quot;사진 유포&quot; 협박 메시지
+[T-1주] 집 앞 잠복·연락 폭주
+[T-0] 형사고소 (협박+스토킹+촬영물 협박) + 신변보호</code></pre>
+<h3 id="적용-죄목법조-교제폭력은-복합-죄목-패키지">⚖️ 적용 죄목·법조 —
+교제폭력은 “복합 죄목 패키지”</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>이별 후 협박·잠복·연락 폭주</strong></td>
+<td><strong>스토킹처벌법 §18①</strong></td>
+<td>3년 이하 징역 또는 3천만원</td>
+</tr>
+<tr>
+<td><strong>“죽이겠다” 등 협박</strong></td>
+<td>형법 §283</td>
+<td>3년 이하</td>
+</tr>
+<tr>
+<td><strong>사진 유포 협박 (협박만)</strong></td>
+<td>형법 §283 + 성폭력처벌법 §14의3 (촬영물 협박)</td>
+<td>1년 이상</td>
+</tr>
+<tr>
+<td><strong>신체접촉·멍</strong></td>
+<td>형법 §257 상해 / §260 폭행</td>
+<td>7년/2년 이하</td>
+</tr>
+<tr>
+<td><strong>휴대폰 검열·친구 차단 강요</strong></td>
+<td>형법 §324 강요</td>
+<td>5년 이하</td>
+</tr>
+<tr>
+<td><strong>모욕·욕설</strong></td>
+<td>형법 §311</td>
+<td>1년 이하 (친고)</td>
+</tr>
+<tr>
+<td><strong>이미지 실제 유포 시</strong></td>
+<td>성폭력처벌법 §14 (카메라이용촬영)</td>
+<td>7년 이하 / 5천만원</td>
+</tr>
+<tr>
+<td><strong>사실혼·동거 시</strong></td>
+<td><strong>가정폭력처벌법 §2 가정구성원</strong>으로 적용 가능</td>
+<td>〃 + 보호처분</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>가정폭력처벌법 §2 2호</strong> “가정구성원”이란 ①
+<strong>배우자(사실상 혼인관계 포함) 또는 배우자였던 사람</strong>, ②
+직계존비속, ③ 계부모·자녀, ④ <strong>동거하는 친족</strong>. →
+<strong>단순 교제 (사실혼 X·동거 X) 연인은 가정폭력처벌법 적용
+X.</strong> 일반 형법 + 스토킹처벌법으로 처리.</p>
+</blockquote>
+<h3 id="가스라이팅-자체에는-단독-죄목-없음">⚠️ 가스라이팅 자체에는 단독
+죄목 없음</h3>
+<ul>
+<li><strong>가스라이팅 = 행위 유형</strong> (정서적 조작)</li>
+<li>법적으로는 <strong>개별 행위마다 다른 죄목으로 매칭</strong>:</li>
+<li>책임 전가·자존감 파괴 → 단독 형사 X (민사 위자료는 가능)</li>
+<li>휴대폰 검열 강요 → <strong>강요 §324</strong></li>
+<li>친구·가족 차단 → 강요 / 협박 동반 시 협박 §283</li>
+<li>폭언 반복 → 모욕 §311 / 협박 §283</li>
+<li>이별 후 행위 → <strong>스토킹처벌법 §18 메인</strong></li>
+</ul>
+<h3 id="증거-체크리스트-6">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>메시지 전체 백업</strong> (카톡·문자·DM) — 가스라이팅 패턴
+입증</li>
+<li><strong>녹음</strong> — 폭언·협박 (본인이 당사자 → 합법)</li>
+<li><strong>친구·가족 진술서</strong> — 변화·고립 과정</li>
+<li><strong>정신과 진료 기록</strong> — PTSD·우울·불안 진단</li>
+<li><strong>상해 사진·진단서</strong> (1회라도 있다면)</li>
+<li><strong>이별 후 잠복·연락 로그</strong> (스토킹 입증 핵심)</li>
+<li><strong>이미지·영상 협박 메시지</strong> (캡처·원본 보존)</li>
+</ol>
+<h3 id="예방처신-안전이-최우선">🛡 예방·처신 — 안전이 최우선</h3>
+<ul>
+<li><strong>이별 통보는 안전한 장소·제3자 동석 또는 문자</strong> — 대면
+X</li>
+<li>이별 직후 <strong>휴대폰 번호 변경 / SNS 비공개 / 주소 노출
+차단</strong></li>
+<li><strong>여성긴급전화 1366</strong> / <strong>여성폭력 사이버 상담
+1366</strong> 24시간</li>
+<li>사진·영상이 있다면 <strong>즉시 디지털성범죄피해자지원센터
+(02-735-8994)</strong> — 삭제 지원</li>
+<li>신변보호 신청: <strong>경찰서 + 스마트워치 + 잠정조치</strong>
+동시</li>
+<li><strong>단독 만남 절대 금지</strong> — “마지막 한 번만 보자” 위험
+신호</li>
+<li>동거 시작했었다면 <strong>사실혼 입증 자료</strong> 챙기기
+(가정폭력처벌법 적용 가능)</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-9">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 스토킹범죄의 처벌 등에 관한 법률 제18조 제1항,
+형법 제283조 협박죄, 형법 제324조 강요죄, 형법 제311조 모욕죄,
+성폭력처벌법 제14조의3 (촬영물 등을 이용한 협박) 위반죄로 처벌하여
+주시기 바랍니다. 아울러 스토킹처벌법 제8조에 따른 잠정조치 (2호
+접근금지, 3호 전기통신 접근금지)를 함께 신청합니다.
+
+[고소이유 — 일부]
+1. 고소인과 피고소인은 2023. ○. ○.경부터 2025. ○. ○.까지 약
+ 2년간 교제하였고, 2025. ○. ○. 고소인이 결별을 통보한 이래
+ 피고소인은 다음과 같이 지속적·반복적으로 스토킹·협박을 하였습니다.
+2. 교제 기간 중 피고소인은 ① 고소인의 휴대폰 비밀번호를 강요하여
+ 수시로 메시지를 검열하였고(증거 ① 카톡 대화, ② 친구 진술서),
+ ② 고소인의 친구·가족 만남을 차단하도록 압박하였으며(증거 ③),
+ ③ &quot;내가 화난 건 다 너 때문이다&quot;, &quot;넌 미친 X다&quot; 등의 폭언을
+ 반복하였습니다(증거 ④ 녹음).
+3. 결별 후인 2025. ○. ○.부터 현재까지 약 1개월간 피고소인은
+ 카톡 ○○회, 문자 ○○회, 전화 ○○회를 차단되면 새 번호로 재차
+ 시도하였고(증거 ⑤ 통신기록), 고소인의 거주지 부근에서 잠복 ○회가
+ CCTV로 확인되었습니다(증거 ⑥).
+4. 2025. ○. ○. 피고소인은 &quot;사진 다 뿌리겠다&quot;, &quot;집에 찾아가 죽이겠다&quot;는
+ 메시지를 발송하였습니다(증거 ⑦ 카톡 캡처). 위 사진은 교제 중 합의
+ 하에 촬영된 영상으로, 동의 없는 유포·유포 협박은 성폭력처벌법
+ 제14조의3에 해당합니다.
+5. 피고소인의 위 행위들은 ① 스토킹처벌법 §18①, ② 형법 §283 협박,
+ ③ 형법 §324 강요(휴대폰 검열·친구 차단), ④ 성폭력처벌법
+ §14의3(촬영물 협박)에 각 해당하며, 고소인의 안전을 위하여
+ 잠정조치를 시급히 명하여 주시기 바랍니다.</code></pre>
+<blockquote>
+<p>💡 <strong>2025년 국회 교제폭력처벌특별법 추진 중</strong> — 시행
+전까지는 위와 같이 <strong>개별 죄목 패키지 + 스토킹처벌법</strong>이
+현행 베스트.</p>
+</blockquote>
+<hr />
+<h1 id="개인정보-유출-내-번호주소가-광고에-도용">1️⃣3️⃣ 개인정보 유출 — 내
+번호·주소가 광고에 도용</h1>
+<h3 id="가명-사례-가상-12">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>민지</strong>(가명)는 작년에 다녔던 헬스장 트레이너
+<strong>T</strong>(가명)에게 자기 휴대폰번호·주소·결제정보를 제공. 1년
+후 새로 차린 T의 헬스장에서 광고 문자가 시작. 알아보니 T는 회원 명부
+전체를 <strong>친구 헬스장 사장 U</strong>(가명)에게도 넘김. 민지의 PT
+영상 일부가 T의 SNS 광고에 본인 동의 없이 사용.</p>
+</blockquote>
+<h3 id="시간트리-12">⏰ 시간트리</h3>
+<pre><code>[T-1년] 헬스장 가입, 개인정보 제공 (이용목적 한정 동의)
+[T-3개월] 헬스장 폐업, 트레이너 T 퇴사
+[T-1개월] 새 헬스장 광고 문자 수신 (동의한 적 없음)
+[T-2주] 친구 헬스장 U 광고도 수신
+[T-1주] T의 인스타에서 본인 PT 영상 발견
+[T-0] 개인정보보호위 신고 + 형사고소 + 민사 손해배상</code></pre>
+<h3 id="적용-죄목법조-8">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>동의 없는 제3자 제공</strong></td>
+<td><strong>개인정보보호법 §71 1호</strong> (§17 위반)</td>
+<td><strong>5년 이하 징역 또는 5천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>목적 외 이용·제공</strong></td>
+<td><strong>개인정보보호법 §71 2호</strong> (§18 위반)</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>업무상 알게 된 개인정보 누설</strong></td>
+<td><strong>개인정보보호법 §71 9호</strong> (§59 2호 위반)</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>타인의 개인정보 위조·유출·훼손</strong></td>
+<td><strong>개인정보보호법 §71 10호</strong> (§59 3호)</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>민감정보 처리</strong> (건강·신체 등)</td>
+<td>개인정보보호법 §71 4호 (§23 위반)</td>
+<td>〃</td>
+</tr>
+<tr>
+<td>영상 무단 이용 (초상권 침해)</td>
+<td>민사 위자료</td>
+<td>—</td>
+</tr>
+<tr>
+<td>광고 문자 (수신거부 의사 무시)</td>
+<td>정통망법 §50</td>
+<td>행정처분 (1천만 이하)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>개인정보보호법 §71</strong> 다음 자는 <strong>5년 이하
+징역 또는 5천만원 이하 벌금</strong>: - 1호: 정보주체 동의 없이
+개인정보를 <strong>제3자에 제공한 자</strong> (및 사정 알면서 받은 자) -
+2호: 수집 목적 외로 이용·제공한 자 - 9호: 업무상 알게 된 개인정보
+<strong>누설</strong>한 자 (및 영리·부정 목적으로 받은 자) - 10호: 다른
+사람의 개인정보를 <strong>이용·훼손·멸실·변경·위조·유출</strong>한
+자</p>
+</blockquote>
+<h3 id="핵심-그냥-넘긴-트레이너도-5년-징역-가능">🔥 핵심 — “그냥 넘긴”
+트레이너도 5년 징역 가능</h3>
+<ul>
+<li>회원이 동의한 건 <strong>그 헬스장의 회원관리 목적</strong>으로
+한정</li>
+<li>트레이너 개인이 다른 사업체에 넘기는 건 <strong>§17·§18
+위반</strong> = §71 형사처벌</li>
+<li>“친구가 부탁해서 그냥 줬다”도 정당화 X</li>
+<li>영업양도·합병으로 인한 이전은 별도 절차 필요 (§27)</li>
+</ul>
+<h3 id="증거-체크리스트-7">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>수신한 광고 문자·카톡</strong> (발신번호·시각·내용)</li>
+<li><strong>수신거부 의사 표시 기록</strong> — 그래도 계속 왔다면
+가중</li>
+<li><strong>원 헬스장 동의서 사본</strong> — 이용 목적·제3자 제공 동의
+여부</li>
+<li><strong>트레이너 T의 새 헬스장 명함·홍보물</strong> (인적사항
+확인)</li>
+<li><strong>친구 헬스장 U의 광고 발송 사실</strong> — 누설 입증</li>
+<li><strong>SNS 게시물 캡처</strong> — URL·게시일자·내용</li>
+<li><strong>PT 영상 원본 보유 증거</strong> — 본인 동의 없는 게시
+입증</li>
+</ol>
+<h3 id="예방처신-7">🛡 예방·처신</h3>
+<ul>
+<li>가입할 때 <strong>“제3자 제공 동의” 체크 박스 확인</strong> — 안
+해도 가입은 됨</li>
+<li>개인정보 제공 시 <strong>수기/전자 동의서 사본 1부
+보관</strong></li>
+<li>광고 문자 받으면 <strong>“수신거부 처리 부탁드립니다” 회신 +
+캡처</strong></li>
+<li>그래도 오면 <strong>개인정보보호위원회 (privacy.go.kr) 신고</strong>
++ <strong>KISA 118</strong></li>
+<li>회사·헬스장 폐업 시 <strong>고객정보 파기 통지서 요구</strong>
+(개인정보보호법 §21)</li>
+<li>본인 사진·영상 제공 시 <strong>이용 범위·기간 서면 합의</strong> (PT
+영상은 위험)</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-10">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(○○피트니스 前 트레이너)을 개인정보 보호법 제71조
+제1호(§17 위반, 동의 없는 제3자 제공), 제2호(§18 위반, 목적 외
+제공), 제9호(§59 2호 위반, 업무상 알게 된 개인정보 누설) 위반죄
+로 처벌하여 주시기 바랍니다. 피고소인 ○○○(피고소인2, ○○짐
+운영자, 정보 제공받은 자)도 동조 동호의 &quot;사정 알면서 받은 자&quot;
+로서 함께 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2024. ○. ○. ○○피트니스(소재: ○○시 ○○구)에 회원으로
+ 가입하면서 휴대폰번호·주소·결제정보·건강정보(체성분 등)를 제공
+ 하였고, 동의 범위는 &quot;해당 헬스장의 회원관리 목적&quot;으로 한정
+ 되었습니다(증거 ① 회원가입 동의서 사본).
+2. 피고소인은 위 헬스장 트레이너로서 회원 명부 및 PT 기록에 접근
+ 권한이 있었으며, 2025. ○. ○. 위 헬스장 폐업 후 같은 해 ○. ○.
+ 별개 사업체인 ○○짐을 개업하였습니다(증거 ② 사업자 등록 사실).
+3. 피고소인은 사전 동의 없이 고소인의 휴대폰번호로 신규 사업체의
+ 광고 문자를 발송하였고(증거 ③ 문자 캡처 ○건, 발신번호 ○○○),
+ 추가로 피고소인2 운영의 ○○짐에 고소인 포함 회원 명부를 제공한
+ 사실이 광고 문자 발송으로 확인됩니다(증거 ④).
+4. 또한 피고소인은 자신의 인스타그램 계정 (URL: ○○○)에 고소인의
+ PT 영상 ○건을 동의 없이 광고용으로 게시하였습니다(증거 ⑤
+ 게시물 캡처, ⑥ 원본 영상 보유 증거).
+5. 위 행위는 개인정보보호법 제17조(목적 외 제3자 제공)·제18조(목적
+ 외 이용)·제59조(업무상 누설)에 각 위반되며, 동법 제71조 제1호·
+ 제2호·제9호에 따라 형사처벌 대상입니다.
+
+[병행 진행]
+- 개인정보보호위원회 신고 (privacy.go.kr)
+- KISA 개인정보침해 신고센터 (118)
+- 민사: 위자료 청구 (대법원 판례상 30~100만원/건)</code></pre>
+<blockquote>
+<p>💡 <strong>개인정보 유출 민사 위자료</strong> — 단순 유출도 1인당
+10~100만원 인정 판례 다수. 다수 피해 시 집단소송 효율적.</p>
+</blockquote>
+<hr />
+<h1 id="불법-도청통화녹음-어디까지가-합법인가">1️⃣4️⃣ 불법 도청·통화녹음 —
+어디까지가 합법인가</h1>
+<h3 id="가명-사례-가상-13">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>A 사례</strong>: <strong>재호</strong>(가명)는 자기
+부부싸움을 녹음하려고 거실에 음성기록기를 설치. 본인이 자리 비운 사이
+배우자가 친정 어머니와 통화한 내용도 같이 녹음됨. 이후 이혼 소송에서
+증거로 제출.</p>
+<p><strong>B 사례</strong>: 회사 임원 <strong>B</strong>(가명)가
+회의실에 몰래 녹음기 설치, 노조 측 직원 ○○명의 비공개 대화를 녹음. 일부
+내용을 다른 임원과 공유.</p>
+<p>→ A 사례: <strong>본인이 자리 비운 상황 = 제3자 도청</strong> →
+통비법 위반. B 사례: <strong>타인간 대화 녹음</strong> → 통비법 위반 +
+유출까지.</p>
+</blockquote>
+<h3 id="시간트리-13">⏰ 시간트리</h3>
+<pre><code>[T-0] 녹음 설치·실행
+[T+1] 녹음 결과를 본인 외 사람에 공유 (가중 사유)
+[T+1주] 피해자가 녹음 사실 인지 (휴대폰·녹음기 발견)
+[T+1주] 통신비밀보호법 위반 형사고소 + 손해배상
+[T+1개월] 압수수색 영장 → 녹음기·저장매체 확보</code></pre>
+<h3 id="누가-어떻게-녹음했나-합법-불법-매트릭스-핵심">⚖️ 누가 어떻게
+녹음했나 — 합법 / 불법 매트릭스 (핵심)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>누가 녹음</th>
+<th>무엇을 녹음</th>
+<th>합·불</th>
+<th>근거</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>본인</strong></td>
+<td>본인이 참여한 통화·대화</td>
+<td>✅ <strong>합법</strong></td>
+<td>통비법 §3 “<strong>타인간</strong>” 대화 X</td>
+</tr>
+<tr>
+<td><strong>본인</strong></td>
+<td>본인이 자리 비운 사이 타인간 대화</td>
+<td>❌ <strong>불법</strong></td>
+<td>§3 위반</td>
+</tr>
+<tr>
+<td><strong>제3자</strong></td>
+<td>두 사람의 대화</td>
+<td>❌ <strong>불법</strong></td>
+<td>§3 위반</td>
+</tr>
+<tr>
+<td><strong>부모</strong></td>
+<td>미성년 자녀가 참여한 대화 (보호 목적)</td>
+<td>△ <strong>사안별</strong></td>
+<td>판례 갈림</td>
+</tr>
+<tr>
+<td>수사기관</td>
+<td>영장 없이 감청</td>
+<td>❌ 불법</td>
+<td>§3 위반</td>
+</tr>
+<tr>
+<td>수사기관</td>
+<td>영장 받아 감청</td>
+<td>✅ 합법</td>
+<td>§3 단서·§5</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>통비법 §3①</strong> “누구든지 이 법과 형사소송법 또는
+군사법원법의 규정에 의하지 아니하고는 우편물의 검열·전기통신의 감청 또는
+통신사실확인자료의 제공을 하거나 <strong>공개되지 아니한 타인간의
+대화</strong>를 녹음 또는 청취하지 못한다.”</p>
+<p>📜 <strong>통비법 §16① 벌칙</strong> “위반하여 우편물의 검열 또는
+전기통신의 감청을 하거나 공개되지 아니한 타인간의 대화를 녹음 또는
+청취한 자는 <strong>1년 이상 10년 이하의 징역과 5년 이하의
+자격정지</strong>에 처한다.”</p>
+<p>⚠️ <strong>벌금형 없음, 무조건 1년 이상 징역</strong>. 형사법상 가장
+강한 처벌 중 하나.</p>
+</blockquote>
+<h3 id="가장-흔한-오해-내-휴대폰이면-다-합법">📌 가장 흔한 오해 — “내
+휴대폰이면 다 합법”</h3>
+<ul>
+<li>❌ 내 휴대폰으로 녹음했으면 다 합법 → <strong>잘못</strong>.
+<strong>누구의 대화인지</strong>가 기준.</li>
+<li>✅ “본인이 대화 당사자”라면 상대방 동의 없어도 합법 (대화 양 당사자
+중 한쪽이 본인)</li>
+<li>❌ 본인이 자리 비운 사이 “내 폰” 거실에 두고 녹음 → 통비법 위반</li>
+<li>❌ 자녀의 휴대폰에 녹음 앱 깔아 학교생활 녹음 → 사안별, 위반 가능성
+↑</li>
+</ul>
+<h3 id="두-번째-흔한-오해-유출까지-가야-처벌">📌 두 번째 흔한 오해 —
+“유출까지 가야 처벌”</h3>
+<ul>
+<li>❌ 녹음만 하고 안 들켰으면 무죄 → <strong>잘못</strong>.
+<strong>녹음 자체로 §16① 1호 위반</strong>.</li>
+<li>유출·공개는 <strong>§16① 2호 별도 가중</strong>.</li>
+</ul>
+<h3 id="증거-체크리스트-피해자-입장">🔍 증거 체크리스트 — 피해자
+입장</h3>
+<ol type="1">
+<li><strong>녹음기·녹음 앱 발견 위치 사진</strong> (실제 발견 장소)</li>
+<li><strong>녹음 파일·메타데이터</strong> (날짜·시간·기기 정보)</li>
+<li><strong>가해자의 자백 메시지·인정 발언</strong> (있다면)</li>
+<li><strong>녹음 내용이 다른 사람에게 공유된 정황</strong>
+(메신저·이메일·법정 제출 등)</li>
+<li><strong>본인이 그 자리에 없었음</strong>을 입증 (출근기록·결제내역
+등)</li>
+<li><strong>피해 입증</strong> (정신과 진료, 인간관계 손상 등 → 위자료
+근거)</li>
+</ol>
+<h3 id="예방처신-8">🛡 예방·처신</h3>
+<ul>
+<li>회의·상담 시작 전 <strong>“녹음 양해 부탁드립니다” 한 마디</strong>
+— 합의 후 녹음은 무조건 합법</li>
+<li>본인 통화 녹음은 합법이니 부담 갖지 말 것 (상대방 동의 X)</li>
+<li><strong>다른 사람의 통화를 옆에서 녹음 X</strong> (그 통화는 “타인간
+대화”)</li>
+<li>가족용 거실 CCTV는 <strong>영상만 — 음성 OFF</strong> (영상은 §3
+적용 X, 음성은 적용)</li>
+<li>휴대폰을 회의실에 두고 자리 비우면 <strong>본인도 가해자</strong> 될
+수 있음</li>
+<li>도청 의심 시 <strong>전문 보안업체에 도청탐지(TSCM) 의뢰</strong> +
+사진·영상 기록</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-11">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○을 통신비밀보호법 제16조 제1항 제1호·제2호 위반죄
+(공개되지 아니한 타인간 대화의 녹음 및 유출)로 처벌하여 주시기
+바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2025. ○. ○. 자택 거실에서 친정 어머니와 약 ○분간 전화
+ 통화를 하였습니다. 당시 배우자인 피고소인은 외출 중으로 위 통화에
+ 참여하지 아니하였으며, 통화 내용은 공개되지 아니한 사적 대화였습니다.
+2. 고소인은 2025. ○. ○. 거실 책장 ○단 ○○뒤편에 설치된 소형 음성기록
+ 장치(○○○제, 시리얼번호 ○○○)를 발견하였고, 동 장치에는 위 ○. ○.자
+ 통화를 포함한 ○일분의 음성 파일이 저장되어 있었습니다(증거 ①
+ 장치 사진, ② 발견 위치 사진, ③ 저장 파일 메타데이터).
+3. 위 음성 파일 중 일부는 2025. ○. ○. 피고소인의 휴대폰 메신저
+ 대화 내역에서 다른 가족 ○○○에게 전송된 사실이 확인됩니다
+ (증거 ④ 메신저 캡처, ⑤ 전송 파일 동일성 확인 자료).
+4. 피고소인은 ○. ○. 출근 중이었음이 회사 출입기록·교통카드 사용
+ 기록으로 확인되며(증거 ⑥), 이는 피고소인이 통화 당시 그 자리에
+ 부재하였음을 입증합니다.
+5. 따라서 피고소인의 행위는 ① 공개되지 아니한 타인간 대화를 녹음
+ (§16① 1호), ② 이를 제3자에게 공개·누설(§16① 2호)한 것으로,
+ 두 행위 모두 1년 이상 10년 이하의 징역에 해당하는 중범죄입니다.
+
+[증거보전 신청]
+피고소인의 휴대폰·녹음기·노트북에 대한 압수·수색 영장 청구를 함께
+검토하여 주시기 바랍니다.</code></pre>
+<blockquote>
+<p>💡 <strong>불법녹음은 증거능력 X</strong> — 본인이 불법 녹음한 자료를
+법정에 내면, ① 증거 채택 거부 + ② 본인이 형사처벌 받음. 양날의 검.</p>
+</blockquote>
+<hr />
+<h1 id="의료사고-시술-후-마비진료기록-누락설명-거부">1️⃣5️⃣ 의료사고 —
+시술 후 마비·진료기록 누락·설명 거부</h1>
+<h3 id="가명-사례-가상-14">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>지은</strong>(가명)은 ○○병원에서 단순 척추 시술을 받았다.
+시술 후 좌측 다리 마비. 담당의 <strong>C</strong>(가명)는 “일시적 반응,
+곧 회복된다”고만 설명. 시술 동의서에는 부작용 ○○% 가능성 기재 X.
+진료기록 발급 요청에 1차 거부, 2차 일부 누락 발급. 보호자가 ○○일
+의식불명 상태로 입원.</p>
+</blockquote>
+<h3 id="시간트리-14">⏰ 시간트리</h3>
+<pre><code>[T-1주] 외래 진료, 시술 결정 (설명·동의 부족)
+[T-0] 시술, 사고 발생
+[T+0] 이상 증상 발현 — 의료진 &quot;일시적&quot;
+[T+3일] 진료기록 발급 요청 → 일부 거부
+[T+1주] 사설 영상 판독 의뢰, 다른 병원 2차 소견
+[T+2주] 의료분쟁조정중재원(K-Medi) 조정신청
+[T+1개월] 손해사정 + 민사 손해배상 검토
+[T+1개월] 형사 (업무상과실치상) 고소 — 사망·중증 시</code></pre>
+<h3 id="적용-죄목법조-형사조정민사-3트랙">⚖️ 적용 죄목·법조 —
+형사·조정·민사 3트랙</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량 / 효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>업무상 과실로 상해·사망</strong></td>
+<td><strong>형법 §268</strong> 업무상과실치사상</td>
+<td><strong>5년 이하 금고 또는 2천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>설명의무 위반</strong> (시술 위험성 미고지)</td>
+<td>의료법 §24의2</td>
+<td>행정처분 + 민사 위자료</td>
+</tr>
+<tr>
+<td><strong>진료기록 위·변조</strong></td>
+<td>의료법 §22·§88</td>
+<td>3년 이하 징역 또는 3천만원</td>
+</tr>
+<tr>
+<td><strong>진료기록 발급 거부</strong></td>
+<td>의료법 §21·§88</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>무면허 의료행위</strong></td>
+<td>의료법 §27·§87의2</td>
+<td><strong>5년 이하 징역, 5천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>의료분쟁조정</strong></td>
+<td>의료분쟁조정법 §27</td>
+<td>무료 / 사망·1개월 의식불명·중증장애 시
+<strong>자동개시</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>의료분쟁조정법 §27 ⑨항</strong> “사망 또는 ① 1개월 이상의
+의식불명, ② 「장애인복지법」 제2조에 따른 장애인 중 장애 정도가 중증에
+해당하는 경우… <strong>지체 없이 조정절차를 개시하여야 한다.</strong>”
+(= 피신청인 의사와 무관하게 조정 시작)</p>
+<p>📜 <strong>§27 ⑬항 신청기한</strong>: ① 의료사고 행위 종료일부터
+<strong>10년</strong>, ② 손해 및 가해자를 안 날부터
+<strong>3년</strong>.</p>
+</blockquote>
+<h3 id="의료사고-형사-어렵지만-가능한-케이스">🔥 의료사고 형사 —
+어렵지만 가능한 케이스</h3>
+<ul>
+<li>단순 결과 불량 → 의료의 본질상 형사 X</li>
+<li>그러나 다음이 입증되면 <strong>업상과치상</strong> 인정 판례
+많음:</li>
+<li>시술 표준(가이드라인)에서 명백히 벗어남</li>
+<li>충분한 설명·동의 없이 시술 강행</li>
+<li>응급 상황에서 적절한 조치 지연</li>
+<li>마취·수술 부위 오류 등 명백한 과오</li>
+<li><strong>사망·중증 결과</strong> 시 형사 적극 검토</li>
+</ul>
+<h3 id="증거-체크리스트-골든타임-1개월">🔍 증거 체크리스트 — 골든타임
+1개월</h3>
+<ol type="1">
+<li><strong>진료기록 전체 사본</strong> — 본인이 청구 시 의료법 §21로
+발급 의무</li>
+</ol>
+<ul>
+<li>외래·입원기록, 수술기록, 마취기록, 간호기록, <strong>CT·MRI 영상
+DICOM 파일</strong></li>
+<li>거부 시 <strong>의료법 §88 → 형사처벌 대상</strong></li>
+</ul>
+<ol start="2" type="1">
+<li><strong>시술 동의서 사본</strong> — 설명의무 입증</li>
+<li><strong>본인이 작성한 증상 일지</strong> (시각별·증상)</li>
+<li><strong>다른 병원 소견서 (2~3개)</strong> — 과오 입증의 핵심</li>
+<li><strong>CCTV</strong> (병원 내 — 보존요청서 즉시)</li>
+<li><strong>간호일지·인계기록</strong> (응급 대응 적절성)</li>
+<li><strong>약물·기구 로트번호</strong> (의료기기 결함 가능성)</li>
+<li><strong>본인 영상자료 백업</strong> (사설 영상의학과에 판독
+의뢰)</li>
+</ol>
+<h3 id="예방처신-9">🛡 예방·처신</h3>
+<ul>
+<li>시술·수술 전 <strong>동의서 사본 1부 챙기기</strong> + 설명자·시간
+메모</li>
+<li>동의서에 <strong>부작용·대안·예후가 구체적으로 적혀있는지
+확인</strong></li>
+<li>술기·집도의 이름 미리 확인 (다른 의사가 집도하면 §27의5 대리수술
+가능)</li>
+<li>이상 증상 발현 즉시 <strong>시각 메모 + 다른 의료진에게
+알림</strong> (인계기록 남기기)</li>
+<li><strong>퇴원·전원 전 진료기록·영상 전체 발급</strong> — 퇴원 후엔
+발급 지연 ↑</li>
+<li>의료진과 대화 시 <strong>본인 통화 녹음은 합법</strong> — 설명·합의
+내용 남기기</li>
+<li><strong>블랙리스트 의료기관</strong>: 의료광고 심의위반·의료법 위반
+처분 이력 검색</li>
+</ul>
+<h3 id="트랙-동시-진행-권장">🏛 5트랙 동시 진행 권장</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>트랙</th>
+<th>어디로</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 진료기록 확보</td>
+<td>병원 (의료법 §21)</td>
+<td>모든 절차의 기초</td>
+</tr>
+<tr>
+<td>2. <strong>의료분쟁조정중재원</strong> (K-Medi)</td>
+<td>medi.or.kr / 1670-2545</td>
+<td>무료·평균 90일·중립 감정</td>
+</tr>
+<tr>
+<td>3. <strong>소비자원 분쟁조정</strong></td>
+<td>1372</td>
+<td>보조 채널</td>
+</tr>
+<tr>
+<td>4. <strong>형사고소</strong></td>
+<td>경찰서</td>
+<td>사망·중증 시, 또는 진료기록 위변조 시</td>
+</tr>
+<tr>
+<td>5. <strong>민사 손해배상</strong></td>
+<td>법원</td>
+<td>위자료·치료비·일실수입</td>
+</tr>
+</tbody>
+</table>
+<h3 id="고소장-핵심-문구-예시-진료기록-일부-누락-결과-중대">✍️ 고소장
+핵심 문구 예시 — 진료기록 일부 누락 + 결과 중대</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(○○병원 의사)을 형법 제268조 업무상과실치상죄,
+의료법 제22조 위반(진료기록부 거짓 작성·누락)에 따른 같은 법
+제88조 위반죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2025. ○. ○. 피고소인이 운영하는 ○○병원에서 ○○시술
+ (병명: ○○○, 수술코드: ○○○○○)을 받았습니다(증거 ① 진료기록,
+ ② 수술동의서).
+2. 시술 직후 고소인은 좌측 하지에 운동·감각 저하 증상이 발현되었고,
+ 현재까지 ○○개월 동안 보행이 불가능한 상태입니다(증거 ③ 입퇴원
+ 기록, ④ 재활의학과 진단서 — 마비 잔존, ⑤ 영상의학과 판독 ○○병원
+ 소견서).
+3. ○○대학병원 ○○○ 교수의 2차 소견(증거 ⑥)에 따르면, 본 사건 시술
+ 은 ① 적응증이 명확하지 않았고, ② 시술 표준 절차상 사전 시행해야
+ 할 ○○ 검사가 누락되었으며, ③ 합병증 발현 시 즉각적인 조치가
+ 지연된 것으로 평가됩니다.
+4. 또한 피고소인은 2025. ○. ○. 고소인이 의료법 제21조에 따라 청구한
+ 진료기록 발급 시 ① 수술 중 ○○:○○~○○:○○ 사이의 마취기록을
+ 누락한 채 발급하였고(증거 ⑦ 1차 발급분), 추가 요청 후에야
+ 해당 시간대 기록을 제공한 사실이 있습니다(증거 ⑧ 2차 발급분 — 1차
+ 대비 추가된 페이지). 이는 의료법 제22조에 정한 진료기록부 작성
+ 의무 위반으로 같은 법 제88조의 형사처벌 대상에 해당합니다.
+5. 위 사실관계에 비추어 피고소인의 시술 및 시술 전후 처치에는
+ 업무상 과실이 있고, 그로 인해 고소인은 영구적 신체장해라는 상해를
+ 입었습니다(형법 §268).
+
+[병행 진행]
+- 의료분쟁조정중재원 조정신청 (사건번호 ○○○)
+- 민사: 손해배상청구의 소 (별도 진행)
+- 보건소·복지부 의료법 위반 행정신고</code></pre>
+<blockquote>
+<p>💡 <strong>사망·1개월 이상 의식불명·중증장애 시 조정
+자동개시</strong> (의료분쟁조정법 §27⑨) — 병원이 거부해도 강제 개시.
+신청기한 3년 (안 날부터) / 10년 (행위일부터) 주의.</p>
+</blockquote>
+<hr />
+<h1 id="노동사건-임금체불직장-내-괴롭힘부당해고">1️⃣6️⃣ 노동사건 —
+임금체불·직장 내 괴롭힘·부당해고</h1>
+<blockquote>
+<p><strong>결론 먼저</strong>: 노동법도 <strong>형사고소 가능</strong>.
+단, 죄목별로 트랙이 다름. - 임금체불·퇴직금 미지급 → <strong>형사고소
+O</strong> (반의사불벌) - 부당해고 → <strong>형사고소 X</strong>
+(노동위원회 구제) - 직장 내 괴롭힘 (행위자) → 사용자 책임은 형사 O,
+행위자 자체는 <strong>개별 형법(폭행·모욕·협박)</strong>으로 - 산재 —
+사용자 안전조치 위반 → <strong>중대재해처벌법</strong> + 산업안전보건법
+형사</p>
+</blockquote>
+<h3 id="가명-사례-가상-15">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>A 사례 — 임금체불</strong>: <strong>하늘</strong>(가명, 24세
+대학생)이 카페에서 5개월 알바. 시급 외 야간·주휴수당 미지급분 누적 약
+280만원. 마지막 달 임금도 “다음 달에 줄게” 반복. 퇴사 후 14일 지나도
+정산 X. 사장은 카톡 차단.</p>
+<p><strong>B 사례 — 직장 내 괴롭힘</strong>: <strong>수정</strong>(가명,
+입사 2년차)은 팀장 <strong>D</strong>(가명)의 1년간 인격모독·과도한
+업무지시·일부러 거짓 정보 전달로 평가 하락 유도. 회사 신고했더니 부서가
+분리되는 게 아니라 <strong>수정이 다른 부서로 좌천</strong>.</p>
+</blockquote>
+<h3 id="시간트리-임금체불-케이스">⏰ 시간트리 (임금체불 케이스)</h3>
+<pre><code>[T-5개월] 입사·근로계약 (서면 작성 — 필수)
+ ↓
+[T-1개월] 첫 미지급 (사장: &quot;다음 달에&quot;)
+ ↓
+[T-0] 퇴사·정산 약속 → 미정산
+ ↓
+[T+14일] 근기법 §36 위반 — 퇴직 후 14일 내 정산 의무
+ ↓
+[T+15일] **노동청 진정** (가장 빠른 1차 채널)
+ ↓
+[T+30일] 근로감독관 출석·조사
+ ↓
+[T+60일] 사장 자진 지급 OR **검찰 송치 (형사 진행)**
+ ↓
+[T+90일] 민사 소액심판(3,000만원 이하) — 동시 진행 가능</code></pre>
+<h3 id="적용-죄목법조-노동법-형사-트리">⚖️ 적용 죄목·법조 — 노동법 형사
+트리</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>임금 미지급</strong></td>
+<td><strong>근기법 §43 → §109①</strong></td>
+<td><strong>3년 이하 징역 또는 3천만원 이하 벌금</strong></td>
+<td>반의사불벌</td>
+</tr>
+<tr>
+<td><strong>퇴직금·정산 14일 위반</strong></td>
+<td><strong>근기법 §36 → §109①</strong></td>
+<td>〃</td>
+<td>반의사불벌</td>
+</tr>
+<tr>
+<td><strong>최저임금 미만 지급</strong></td>
+<td>최저임금법 §6 → §28</td>
+<td>3년 이하 또는 2천만원</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>연장·야간·휴일근로 가산 미지급</strong></td>
+<td>근기법 §56 → §109①</td>
+<td>3년 이하 또는 3천만원</td>
+<td>반의사불벌</td>
+</tr>
+<tr>
+<td><strong>명단 공개 체불사업주의 재위반</strong></td>
+<td><strong>근기법 §109② 단서</strong></td>
+<td>반의사불벌 <strong>적용 X</strong> = 합의해도 형사 진행</td>
+<td>2025.10.23 시행 강화</td>
+</tr>
+<tr>
+<td><strong>직장 내 괴롭힘 사용자 의무 위반</strong></td>
+<td>근기법 §76의3⑥ → §109①</td>
+<td>3년 이하 또는 3천만원</td>
+<td>신고자 불이익 처우 시</td>
+</tr>
+<tr>
+<td><strong>부당해고</strong></td>
+<td>근기법 §23</td>
+<td><strong>형사 X</strong>. 노동위 부당해고 구제명령</td>
+<td>30일 전 해고예고는 §26</td>
+</tr>
+<tr>
+<td><strong>직장 괴롭힘 행위자 자체</strong></td>
+<td>형법 §260 폭행 / §283 협박 / §311 모욕 등</td>
+<td>죄목별</td>
+<td>행위 유형 따라</td>
+</tr>
+<tr>
+<td><strong>산재 사망·중상</strong></td>
+<td><strong>중대재해처벌법</strong> / 산업안전보건법</td>
+<td>1년 이상 / 7년 이하 등</td>
+<td>사업주 형사책임</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>근기법 §109</strong> “① 제36조(퇴직 시 정산), 제43조(임금
+지급), 제44조, …, 제56조(연장·야간·휴일근로 수당), 제76조의3
+제6항(괴롭힘 신고자 불이익 처우)을 위반한 자는 <strong>3년 이하의 징역
+또는 3천만원 이하의 벌금</strong>에 처한다.”</p>
+<p>📜 “② 위 조항 위반자에 대해서는 <strong>피해자의 명시적 의사와 다르게
+공소를 제기할 수 없다.</strong> 다만, <strong>명단 공개된
+체불사업주</strong>가 명단 공개 기간 중 다시 위반한 경우는 그러하지
+아니하다.” → <strong>반의사불벌, 단 상습은 예외</strong></p>
+</blockquote>
+<h3 id="트랙-노동사건만의-특이한-구조">🔥 4트랙 — 노동사건만의 특이한
+구조</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>트랙</th>
+<th>어디로</th>
+<th>효과</th>
+<th>비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. 진정</strong></td>
+<td><strong>고용노동부 → 관할 지방노동청</strong> (1350)</td>
+<td>근로감독관이 조사·시정명령. <strong>80%는 여기서 끝남</strong></td>
+<td>무료</td>
+</tr>
+<tr>
+<td><strong>2. 형사고소</strong></td>
+<td>노동청 또는 경찰서</td>
+<td>검찰 송치 → 약식기소·벌금 또는 정식재판</td>
+<td>무료</td>
+</tr>
+<tr>
+<td><strong>3. 노동위 구제</strong></td>
+<td>지방노동위원회</td>
+<td>부당해고·부당전직 시 <strong>원직복귀 + 임금 지급명령</strong></td>
+<td>무료, 변호인 가능</td>
+</tr>
+<tr>
+<td><strong>4. 민사</strong></td>
+<td>법원 소액심판(3천만원 이하)</td>
+<td>체불금 + 지연이자(연 20%) 강제집행</td>
+<td>인지대(체불금 1% 내외)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>진정 vs 고소</strong> — 노동청에선 사실상 같이 처리되지만:
+- <strong>진정</strong>: 사용자에게 시정 기회 줌. “지급하라” 명령 따르면
+종결. - <strong>고소</strong>: 처음부터 처벌 의사 명확. 합의해도 형사
+진행될 수 있음(상습 시). - 실무 권장: <strong>진정 먼저 → 시정 안 되면
+고소로 전환</strong>.</p>
+</blockquote>
+<h3 id="증거-체크리스트-임금체불">🔍 증거 체크리스트 — 임금체불</h3>
+<ol type="1">
+<li><strong>근로계약서</strong> (서면 — 미작성 자체가 §17 위반)</li>
+<li><strong>급여명세서·송금내역</strong> (입금된 금액 vs 약속 금액)</li>
+<li><strong>출근부·근태기록</strong> (실 근로시간 입증)</li>
+<li><strong>연장·야간·휴일 근무 기록</strong> (가산수당 계산)</li>
+<li><strong>사장과의 카톡·문자</strong> (“다음 달에” 약속, 차단
+증거)</li>
+<li><strong>취업규칙·임금규정</strong> (회사 측 자료, 발급 청구
+가능)</li>
+<li><strong>본인이 작성한 근로일지</strong> (시간순·날짜별)</li>
+<li><strong>동료 진술서</strong> (다른 직원의 동일 패턴 — 상습
+입증)</li>
+</ol>
+<h3 id="증거-체크리스트-직장-내-괴롭힘">🔍 증거 체크리스트 — 직장 내
+괴롭힘</h3>
+<ol type="1">
+<li><strong>시간순 행위 일지</strong> (날짜·발언·증인·감정)</li>
+<li><strong>메신저·이메일·결재 기록</strong> — 본문 + 시각</li>
+<li><strong>녹음</strong> (본인 통화·대화 → 합법)</li>
+<li><strong>인사평가 변동·업무량 변동 기록</strong></li>
+<li><strong>신고 후 불이익 입증 자료</strong> (좌천·평가 하락)</li>
+<li><strong>회사 내부 신고 기록</strong> — <strong>반드시
+서면</strong></li>
+<li><strong>정신과 진료 기록</strong> (피해 입증)</li>
+<li><strong>동료 진술서</strong> (자필·날짜·서명)</li>
+</ol>
+<h3 id="예방처신-노동사건-핵심-5가지">🛡 예방·처신 — 노동사건 핵심
+5가지</h3>
+<ol type="1">
+<li><strong>근로계약서는 입사 첫날 무조건 서면</strong> — 안 주면 §17
+위반 (500만원 이하 벌금)</li>
+<li><strong>임금 약속은 카톡·문자로</strong> — 구두 약속은 증거
+약함</li>
+<li><strong>퇴사 통보는 서면</strong> — 카톡·이메일 OK, 30일 전 통보가
+안전</li>
+<li><strong>체불 발생 즉시 노동청 진정</strong> — 사장 회유 기다리지
+말기. <strong>임금채권 소멸시효 3년</strong></li>
+<li><strong>직장 내 괴롭힘 신고는 외부도 동시에</strong> — 회사 내부만
+믿지 말고 <strong>노동청·국가인권위</strong> 동시</li>
+</ol>
+<h3 id="임금체불-사장이-무서워하는-4가지">💰 임금체불 사장이 무서워하는
+4가지</h3>
+<ol type="1">
+<li><strong>명단 공개</strong> (체불사업주, 고용노동부 사이트) —
+신용·사업 타격 ↑↑</li>
+<li><strong>신용제재</strong> (체불사업주 → 신용정보기관 등록)</li>
+<li><strong>국가 공공입찰·정부지원 제한</strong></li>
+<li><strong>반의사불벌 예외 적용</strong> (명단공개 후 재위반 시) —
+합의해도 형사 처벌 진행</li>
+</ol>
+<h3 id="고소장-핵심-문구-예시-a-사례-임금체불">✍️ 고소장 핵심 문구 예시
+— A 사례 (임금체불)</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(상호: ○○카페, 사업자등록번호 ○○○-○○-○○○○○)을
+근로기준법 제43조(임금 지급) 및 제36조(금품 청산), 제56조(연장·
+야간·휴일근로 가산수당) 위반죄(같은 법 제109조 제1항)로 처벌하여
+주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2025. ○. ○.부터 2025. ○. ○.까지 피고소인이 운영하는
+ ○○카페에서 근로하였습니다(증거 ① 근로계약서, ② 4대보험 가입
+ 기록).
+2. 약정 시급은 ○○,○○○원(주휴수당 별도), 야간(22:00 이후)·휴일
+ 근로 가산은 50%로 명시되었으나(증거 ③ 근로계약서 제○조), 피고
+ 소인은 다음과 같이 임금을 미지급하였습니다.
+ - 2025년 ○월: 정상 임금 ○○○,○○○원 중 ○○○,○○○원만 지급, 차액
+ ○○○,○○○원 미지급
+ - 같은 기간 야간 근로 ○○시간, 휴일 근로 ○○시간에 대한 가산수당
+ ○○○,○○○원 미지급
+ - 퇴직일(○. ○.) 이후 14일이 경과한 ○. ○.까지 미정산 잔액
+ 2,800,○○○원 청산 X (증거 ④ 출근부, ⑤ 송금내역, ⑥ 미지급
+ 산정 내역서)
+3. 고소인은 ○. ○.~○. ○. 사이 카카오톡으로 ○회 정산을 독촉하였고
+ (증거 ⑦), 피고소인은 &quot;다음 달에 정산하겠다&quot;는 답변을 3회 한 뒤
+ ○. ○.부터 고소인을 차단하였습니다(증거 ⑧ 차단 화면).
+4. 피고소인의 행위는 근로기준법 제43조 제1항(매월 일정한 날 임금
+ 지급), 제36조(퇴직 후 14일 내 금품 청산), 제56조(가산수당 지급)을
+ 각 위반한 것으로 같은 법 제109조 제1항의 형사처벌 대상입니다.
+
+[병행 진행]
+- ○○지방고용노동청 진정 (사건번호 ○○○○) — 2025. ○. ○. 접수
+- 민사 소액심판(체불금 2,800,000원 + 지연이자) — 별도 검토</code></pre>
+<h3 id="고소장-핵심-문구-예시-b-사례-직장-내-괴롭힘-후-보복-인사">✍️
+고소장 핵심 문구 예시 — B 사례 (직장 내 괴롭힘 후 보복 인사)</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(○○주식회사 대표이사) 및 ○○○(같은 회사 ○○팀장)을
+근로기준법 제76조의3 제6항 위반(괴롭힘 신고자에 대한 불리한 처우)
+및 형법 제311조 모욕, 제283조 협박(해당 시)으로 처벌하여 주시기
+바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2023. ○. ○.부터 ○○주식회사 ○○팀에 근로하였고, 피고
+ 소인 ○○○(팀장)은 직속 상사입니다.
+2. 팀장 피고소인은 2024. ○. ○.부터 약 1년에 걸쳐 다음과 같은 직장
+ 내 괴롭힘을 하였습니다.
+ - 회의 중 ○회 &quot;이런 것도 모르냐, 머리가 빈 거 아니냐&quot; 등 인격모독
+ 발언 (증거 ① 회의 녹음, ② 동료 ○○○ 진술서)
+ - 업무에 필요한 정보를 의도적으로 누락하여 전달, 결재 직전 누락
+ 사실 발견으로 평가 하락 ○건 (증거 ③ 메일 비교, ④ 평가 기록)
+ - 단톡방에서 고소인 호칭을 비하 (증거 ⑤ 단톡 캡처)
+3. 고소인은 2025. ○. ○. 회사 인사팀(피고소인 대표이사 결재)에 위
+ 사실을 서면 신고하였으나(증거 ⑥ 신고 메일, ⑦ 접수 회신), 회사는
+ ① 조사 결과를 통보하지 아니하였고, ② 같은 해 ○. ○. 고소인을
+ ○○지점으로 일방적 인사이동하였으며(증거 ⑧ 인사발령), ③ 같은
+ 해 분기 평가가 직전 평균 ○점 → ○점으로 하락하였습니다(증거 ⑨
+ 평가 기록).
+4. 위 인사이동·평가 하락은 근로기준법 제76조의3 제6항 본문이 금지
+ 하는 &quot;신고를 한 근로자에 대한 불리한 처우&quot;에 해당하며, 같은 법
+ 제109조 제1항에 의해 3년 이하의 징역 또는 3천만원 이하의 벌금에
+ 처해질 사항입니다.
+
+[병행 진행]
+- 노동위원회 부당전직 구제신청
+- 국가인권위원회 진정 (괴롭힘·차별)
+- 회사 대표이사에 대한 사용자 책임 별도 검토</code></pre>
+<blockquote>
+<p>💡 <strong>부당해고는 형사 X, 노동위로</strong> — 30일 이내
+지방노동위 구제신청. 5인 이상 사업장 한정. 💡 <strong>5인 미만 사업장은
+근기법 일부만 적용</strong> — §76의2 괴롭힘 조항 등 일부 미적용. 그래도
+임금체불(§43)·퇴직금(§36)은 적용.</p>
+</blockquote>
+<hr />
+<h1 id="학교폭력-가해-학생의-부모를-어떻게-상대하나">1️⃣7️⃣ 학교폭력 —
+가해 학생의 부모를 어떻게 상대하나</h1>
+<h3 id="가명-사례-가상-16">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>민서</strong>(가명, 중학교 2학년)는 같은 반
+<strong>E</strong>(가명) 외 3명으로부터 <strong>3개월간 카톡 단톡방
+따돌림 + 체육시간 신체접촉 + 사물함에 메모 투기</strong>. 부모가 학교에
+알렸지만 담임은 “친구 사이 장난”이라며 미온적. 가해학생 부모는 “우리
+아이는 그런 애 아니다”며 부인.</p>
+</blockquote>
+<h3 id="시간트리-15">⏰ 시간트리</h3>
+<pre><code>[T-3개월] 첫 따돌림 (카톡 강퇴·차단)
+[T-2개월] 신체접촉·물건 훼손
+[T-1개월] 메모·욕설 누적
+[T-0] 부모 인지, 자녀 등교거부
+[+1일] **학교폭력 신고** (담임·학교폭력 책임교사)
+[+7일] **학교폭력대책심의위원회(학폭위)** 개시 의무
+[+30일] 심의·결정 → **가해학생 조치 §17**
+[+30일] 동시: 형사고소 (모욕·폭행·재물손괴), 민사 위자료</code></pre>
+<h3 id="적용-죄목법조-4트랙-동시-진행">⚖️ 적용 죄목·법조 — 4트랙 동시
+진행</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>학교폭력 그 자체</strong></td>
+<td><strong>학교폭력예방법 §17</strong> 가해학생 조치 9단계</td>
+<td>1호 서면사과 ~ 9호 퇴학</td>
+</tr>
+<tr>
+<td><strong>단톡방 욕설·따돌림</strong></td>
+<td>정통망법 §70 (사실/허위) / 형법 §311 모욕</td>
+<td>친고죄(모욕) 6개월</td>
+</tr>
+<tr>
+<td><strong>신체접촉·밀치기</strong></td>
+<td>형법 §260 폭행 / §257 상해</td>
+<td>만 10세 미만 형사 X (촉법소년)</td>
+</tr>
+<tr>
+<td><strong>물건 훼손</strong></td>
+<td>형법 §366 재물손괴</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>금품 갈취</strong></td>
+<td>형법 §350 공갈 / §347 사기</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>사이버 학폭</strong></td>
+<td>정통망법 §44의7 / §70</td>
+<td>캡처가 전부</td>
+</tr>
+<tr>
+<td><strong>사진·영상 유출</strong></td>
+<td>성폭력처벌법 §14 / §14의2 (딥페이크)</td>
+<td>미성년이라도 죄질 무거움</td>
+</tr>
+<tr>
+<td><strong>민사 손해배상</strong></td>
+<td>가해 학생 + <strong>부모의 감독의무 위반</strong></td>
+<td>부모 공동책임 가능</td>
+</tr>
+</tbody>
+</table>
+<h3 id="가해학생-조치-9단계-학폭법-17">🎯 가해학생 조치 9단계 (학폭법
+§17)</h3>
+<table>
+<thead>
+<tr>
+<th>호</th>
+<th>조치</th>
+<th>영향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1호</td>
+<td>서면사과</td>
+<td>가장 가벼움</td>
+</tr>
+<tr>
+<td>2호</td>
+<td>접촉·협박·보복 금지</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3호</td>
+<td>학교 봉사</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4호</td>
+<td>사회 봉사</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5호</td>
+<td>특별교육·심리치료</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6호</td>
+<td>출석정지</td>
+<td>학교생활기록부 기재</td>
+</tr>
+<tr>
+<td>7호</td>
+<td>학급교체</td>
+<td>〃</td>
+</tr>
+<tr>
+<td>8호</td>
+<td>전학</td>
+<td>〃</td>
+</tr>
+<tr>
+<td>9호</td>
+<td>퇴학</td>
+<td>의무교육과정은 미적용</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>6~9호는 학생부 기재</strong> = 대입·취업에 영향.
+2024년부터 기재 보존기간 4년.</p>
+</blockquote>
+<h3 id="증거-체크리스트-8">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>카톡·DM·게시판 전체 캡처</strong> (강퇴·욕설·따돌림
+패턴)</li>
+<li><strong>메모·낙서·사물함 사진</strong> (날짜 기록)</li>
+<li><strong>CCTV</strong> (학교 복도·체육관) — <strong>학교에 보존요청
+즉시</strong></li>
+<li><strong>목격자 진술</strong> (다른 학생·교사)</li>
+<li><strong>자녀의 증상 일지</strong> + <strong>소아청소년정신과
+진료</strong></li>
+<li><strong>담임·학교 측 연락 기록</strong> (학교 대응 미온 입증)</li>
+<li><strong>상해 사진·진단서</strong> (있다면)</li>
+</ol>
+<h3 id="예방처신-10">🛡 예방·처신</h3>
+<ul>
+<li>발견 즉시 <strong>신고는 서면</strong> (담임에 카톡·이메일도 OK,
+구두 X)</li>
+<li>자녀에게 “용서·화해” 강요 X → 회피로 보일 수 있음</li>
+<li>학폭위 출석 전 <strong>자녀와 사실관계 시간순 작성</strong></li>
+<li>가해 부모와 <strong>단독 대화 X</strong> — 합의 명목 회유, 압박
+가능</li>
+<li>학교의 “조용히 처리” 권유 거부 가능 — 학폭법상 신고는 강제 진행</li>
+<li>의무교육과정(초·중)이면 <strong>퇴학 처분 X</strong> — 다른 조치로
+압박</li>
+</ul>
+<h3 id="트랙-동시-진행">🏛 5트랙 동시 진행</h3>
+<table>
+<thead>
+<tr>
+<th>트랙</th>
+<th>어디</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 학폭 신고</td>
+<td>학교 / 117 학폭신고센터</td>
+<td>학폭위 강제 개시</td>
+</tr>
+<tr>
+<td>2. 학폭위 심의</td>
+<td>교육지원청</td>
+<td>가해학생 조치</td>
+</tr>
+<tr>
+<td>3. <strong>형사고소</strong></td>
+<td>경찰서 (만 10세 이상)</td>
+<td>모욕·폭행·손괴 등</td>
+</tr>
+<tr>
+<td>4. <strong>민사 손해배상</strong></td>
+<td>법원</td>
+<td>가해학생 + 부모</td>
+</tr>
+<tr>
+<td>5. 국가인권위·교육청 민원</td>
+<td>—</td>
+<td>학교 대응 부실 시</td>
+</tr>
+</tbody>
+</table>
+<h3 id="고소장-핵심-문구-예시-12">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○ 외 ○명을 정보통신망법 제70조 제2항(허위사실 명예
+훼손), 형법 제311조 모욕, 형법 제366조 재물손괴, 형법 제260조
+제1항 폭행죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인 ○○○(만 ○○세, ○○중학교 ○학년)는 2025. ○. ○.부터 약
+ 3개월에 걸쳐 같은 반 피고소인들로부터 다음과 같은 학교폭력
+ 행위를 당하였습니다.
+ - 단톡방 &quot;○○반 친목&quot; 등에서 ○○회 욕설·강퇴·고립 (증거 ① 캡처)
+ - 체육시간 ○회 신체접촉·밀치기 (증거 ② CCTV 영상)
+ - 사물함에 욕설 메모 ○매 투기 (증거 ③ 사진)
+2. 위 행위로 고소인은 적응장애·외상후 스트레스 증상을 진단받았
+ 습니다(증거 ④ 진료기록).
+3. 2025. ○. ○. 학교폭력대책심의위원회는 피고소인들에 대해 §17
+ ○호 처분을 의결하였으나(증거 ⑤), 형사적 책임은 별도이므로
+ 본 고소를 제기합니다.
+
+[병행 진행]
+- 학폭위 심의 결과 통보됨
+- 민사: 위자료 + 부모 공동책임 (가해학생별 ○○○만원 청구)</code></pre>
+<blockquote>
+<p>💡 <strong>만 14세 미만 = 형사미성년자</strong> — 형사처벌 X,
+보호처분 (소년법). 만 10~14세는 “촉법소년” — 형사 미성년이지만 보호처분
+가능.</p>
+</blockquote>
+<hr />
+<h1 id="교권-침해-학부모-갑질학생-폭언교사-보호">1️⃣8️⃣ 교권 침해 — 학부모
+갑질·학생 폭언·교사 보호</h1>
+<h3 id="가명-사례-가상-17">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>선생님 정훈</strong>(가명, 초등교사)은 학생
+<strong>F</strong>(가명, 6학년)의 지속적 수업 방해·욕설로 지도했더니,
+F의 학부모 <strong>G</strong>(가명)가 ① 카톡으로 새벽 1시까지 80건
+항의·욕설 ② 교실로 찾아와 동료 교사 앞에서 위협 ③ SNS에 “이 교사는
+아동학대범”이라는 허위글 게시. 교사 정훈은 정신과 진료 시작.</p>
+</blockquote>
+<h3 id="시간트리-16">⏰ 시간트리</h3>
+<pre><code>[T-1개월] 학생 F 수업 방해 지도 시작
+[T-2주] 학부모 G의 야간 카톡·전화 폭주
+[T-1주] 교실 무단 진입·동료 교사 앞에서 위협
+[T-3일] SNS에 허위 아동학대 글 게시
+[T-0] **교권보호위원회** 소집 신청 + 형사고소
+[+1주] 교권보호위 심의 → 교원지위법 §15 조치
+[+1개월] 교사 직위 보호 + 가해자 형사 진행</code></pre>
+<h3 id="적용-죄목법조-9">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>수업 중 폭언·방해</strong></td>
+<td><strong>교원지위법 §15</strong> 교육활동 침해 행위</td>
+<td>학생·학부모 모두 적용</td>
+</tr>
+<tr>
+<td><strong>교실 무단 진입</strong></td>
+<td>형법 §319 주거침입 (학교 점유 공간)</td>
+<td>3년 이하</td>
+</tr>
+<tr>
+<td><strong>모욕·폭언</strong></td>
+<td>형법 §311 모욕 (친고)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>야간 카톡·전화 폭주</strong></td>
+<td>정통망법 §74 / 경범죄 §3 40호 (장난전화)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>SNS 허위 아동학대 글</strong></td>
+<td><strong>정통망법 §70②</strong> 허위 명예훼손</td>
+<td>7년 이하</td>
+</tr>
+<tr>
+<td><strong>공무집행방해</strong> (국공립 교사)</td>
+<td>형법 §136</td>
+<td>5년 이하</td>
+</tr>
+<tr>
+<td><strong>업무방해</strong> (사립 교사)</td>
+<td>형법 §314</td>
+<td>5년 이하</td>
+</tr>
+<tr>
+<td><strong>무고죄</strong></td>
+<td>형법 §156</td>
+<td>10년 이하 — 허위 아동학대 신고 시</td>
+</tr>
+</tbody>
+</table>
+<h3 id="시행-교원지위법-강화-핵심">🎯 2023.9.27 시행 — 교원지위법 강화
+핵심</h3>
+<ul>
+<li><strong>교사의 정당한 생활지도는 아동학대 X</strong> (교원지위법
+§17, 아동학대처벌법 §17의3)</li>
+<li><strong>학부모 악성 민원 차단</strong> — 통화녹음 합법, 응대
+거부권</li>
+<li><strong>교권보호위원회 (교보위)</strong> — 시·도교육청 → 가해자 조치
+결정</li>
+<li><strong>교원배상책임보험</strong> — 무고성 아동학대 신고에 대한
+변호인비 지원</li>
+</ul>
+<h3 id="증거-체크리스트-9">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>카톡·문자 전체 캡처</strong> (시간·횟수 명확)</li>
+<li><strong>통화 녹음</strong> (본인 통화 합법)</li>
+<li><strong>수업 영상</strong> (수업 방해 입증) — 사전 양해·교육
+목적</li>
+<li><strong>동료 교사·학생 진술서</strong> (목격자)</li>
+<li><strong>SNS 글·URL·확산 자료</strong> (공유·댓글 수)</li>
+<li><strong>본인의 정신과 진료 기록</strong> (피해)</li>
+<li><strong>학교의 대응 기록</strong> (교장 보고·교보위 신청서)</li>
+</ol>
+<h3 id="예방처신-11">🛡 예방·처신</h3>
+<ul>
+<li>학부모 응대는 <strong>공식 채널만</strong> (학교 이메일·정해진 시간)
+— 개인 카톡 X</li>
+<li>야간·휴일 메시지는 <strong>다음날 답신 + 시간 명시</strong> (“야간
+응대는 어렵습니다”)</li>
+<li>학생 지도 시 <strong>사실 위주의 기록</strong> (감정 X, 행동 위주) —
+교무수첩</li>
+<li>무고성 아동학대 신고 우려 시 <strong>즉시 교원노조·교총 신고 +
+변호인 선임</strong></li>
+<li>교사도 <strong>녹음·녹화는 본인 참여 대화만</strong> — 다른 학생
+사이 대화 녹음 위법</li>
+<li><strong>단독 학부모 면담 X</strong> — 공개된 장소·동료 동석</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-13">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○(○○초등학교 ○학년 학부모)을 형법 제319조 제1항
+주거침입, 형법 제311조 모욕, 정보통신망법 제70조 제2항 허위
+사실 명예훼손, 형법 제156조 무고죄로 처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 ○○초등학교 ○학년 담임교사이며, 피고소인은 같은 학년
+ 학생 ○○○의 모친입니다.
+2. 피고소인은 2025. ○. ○.~○. ○. 사이 약 ○주에 걸쳐 야간(21:00
+ 이후) 카카오톡 ○○○건, 전화 ○○회를 발신하여 고소인의 생활 평온을
+ 심하게 침해하였습니다(증거 ① 카톡 전체 캡처, ② 통신사 발신기록).
+3. 같은 기간 ○. ○. ○○:○○경 피고소인은 ○○초등학교 ○학년 ○반
+ 교실에 사전 양해 없이 무단 진입하여, 수업 중이던 고소인 및 학생
+ ○○명 앞에서 &quot;당장 사과해라, 가만두지 않겠다&quot;는 취지로 위협하였
+ 습니다(증거 ③ 동료 ○○○ 진술서, ④ 학생 ○○○ 진술서).
+4. 피고소인은 같은 달 ○. ○. 본인 인스타그램(URL: ○○)에 &quot;○○초
+ ○○○ 교사는 아동학대를 했다, 아이를 망치는 사람&quot;이라는 게시물을
+ 업로드하였으나(증거 ⑤), 이는 사실과 다른 내용이며 ○○지방경찰청
+ 아동학대 신고에 대해 ○. ○. 불송치 결정이 내려졌습니다(증거 ⑥
+ 불송치 결정문).
+
+[병행 진행]
+- 교권보호위원회 (교원지위법 §15) 소집 신청
+- 교원배상책임보험 지원 신청
+- 민사 위자료</code></pre>
+<blockquote>
+<p>💡 <strong>2023년 서이초 사건 이후</strong> 교사 보호 제도 대폭 강화.
+더 이상 “참고 넘기는” 시대 아님.</p>
+</blockquote>
+<hr />
+<h1 id="보이스피싱-검찰금감원-사칭-대출-사기-송금형">1️⃣9️⃣ 보이스피싱 —
+검찰·금감원 사칭, 대출 사기, 송금형</h1>
+<h3 id="가명-사례-가상-18">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>현수</strong>(가명, 30대)는 발신번호
+02-3480-XXXX(서울중앙지검 표시)로 전화. “본인 명의로 대포통장이
+개설됐고, 자산 보호를 위해 우리가 알려주는 계좌로 일시 보관하라”는 안내.
+검사 명함 사진, 가짜 공문(URL)까지 받음. <strong>2,800만원
+송금</strong>. 1시간 후 카톡 차단.</p>
+</blockquote>
+<h3 id="시간트리-피해-발생-후-골든타임-30분">⏰ 시간트리 (피해 발생 후
+골든타임 30분)</h3>
+<pre><code>[T-0] 송금 완료
+ ↓
+[+5분] &quot;어? 왜 카톡이 차단됐지?&quot; 의심
+ ↓
+[+15분] 은행 콜센터 → **지급정지 요청** (가장 중요)
+ ↓
+[+30분] 관할 경찰서 / **112** 신고
+ ↓
+[+1시간] 송금 은행 영업점 방문, **피해사실확인원** 발급
+ ↓
+[+1일] 금감원 1332 / **사이버수사대** 정식 고소
+ ↓
+[+1주] 피해금 환급 절차 (특별법 §13) 검토</code></pre>
+<h3 id="적용-죄목법조-10">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>전기통신금융사기 (보이스피싱)</strong></td>
+<td><strong>통신사기특별법 §15의2</strong></td>
+<td><strong>1년 이상의 유기징역 + 범죄수익 3~5배 벌금</strong></td>
+</tr>
+<tr>
+<td>미수범</td>
+<td>같은 법 §15의2 ②</td>
+<td>처벌</td>
+</tr>
+<tr>
+<td>상습</td>
+<td>같은 법 §15의2 ③</td>
+<td><strong>2분의 1 가중</strong></td>
+</tr>
+<tr>
+<td>단순 사기 (대면 송금)</td>
+<td>형법 §347</td>
+<td>20년 이하</td>
+</tr>
+<tr>
+<td>컴퓨터 등 사용사기</td>
+<td>형법 §347의2</td>
+<td>10년 이하</td>
+</tr>
+<tr>
+<td>명의대여(대포통장)</td>
+<td>전자금융거래법 §6</td>
+<td>5년 이하 / 3천만원</td>
+</tr>
+<tr>
+<td>사칭 (검사·금감원)</td>
+<td>공무원자격사칭(형법 §118)</td>
+<td>3년 이하</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>통신사기특별법 §15의2</strong> “전기통신금융사기를 행한
+자는 <strong>1년 이상의 유기징역</strong> 또는 <strong>범죄수익의 3배
+이상 5배 이하</strong>에 상당하는 벌금에 처하거나 이를 병과할 수 있다.”
+→ 일반 사기(형법 §347)보다 <strong>하한이 무거움</strong> (1년 이상 vs
+벌금형 가능).</p>
+</blockquote>
+<h3 id="피해금-환급-통신사기특별법-3413">🎯 피해금 환급 — 통신사기특별법
+§3·§4·§13</h3>
+<ul>
+<li><strong>지급정지</strong> = 신고 즉시 은행이 받는 계좌 동결
+가능</li>
+<li><strong>피해금 환급</strong> = 동결된 계좌 잔액 → 채권 소멸 절차 후
+피해자에게 환급</li>
+<li><strong>골든타임 30분</strong> — 받는 계좌가 비어버리면 환급 X</li>
+</ul>
+<h3 id="증거-체크리스트-10">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>통화 녹음</strong> (의심 단계에서 즉시) — 본인 통화
+합법</li>
+<li><strong>발신번호 + 시각</strong> (통신사 발신기록 청구)</li>
+<li><strong>공문·명함 사진</strong> (가짜 자료)</li>
+<li><strong>송금내역 PDF</strong> (은행 앱 추출)</li>
+<li><strong>카톡·문자 전체</strong> (수신·발신 기록 보존)</li>
+<li><strong>URL 캡처</strong> (피싱 사이트)</li>
+<li><strong>본인 계좌 거래내역</strong> (출금 시각 기준)</li>
+</ol>
+<h3 id="예방처신-보이스피싱-7대-원칙">🛡 예방·처신 — 보이스피싱 7대
+원칙</h3>
+<ol type="1">
+<li><strong>검찰·금감원·경찰은 절대 송금·자산 보호 안내 안 함</strong> —
+100% 사기</li>
+<li>발신번호가 <strong>02-3480-XXXX</strong> (검찰),
+<strong>1332</strong>(금감원) 라도 의심 — 발신번호 <strong>변조
+가능</strong></li>
+<li>“원격 앱(Anydesk·TeamViewer) 설치” 요구 → 100% 사기</li>
+<li><strong>URL은 절대 클릭 X</strong> — 피싱 앱 설치 위험</li>
+<li><strong>녹음 시작 후 시간 끌기</strong> — “잠시만요” 반복</li>
+<li>의심되면 <strong>112</strong> 즉시 (수사기관이 직접 보이스피싱 의심
+사건 처리)</li>
+<li>가족·친구에 <strong>“검찰 전화 왔다”고 즉시 공유</strong> — 혼자
+결정 X</li>
+</ol>
+<h3 id="통화-중-의심-시-행동지침">📞 통화 중 의심 시 — 행동지침</h3>
+<pre><code>1. &quot;잠시만요, 가족과 통화하고 다시 걸어드릴게요&quot;
+2. 전화 끊고 → 가족 또는 112 또는 1332(금감원)에 직접 확인
+3. 절대 그쪽이 알려준 번호로 다시 걸지 말 것 (같은 조직)
+4. 송금 요구·계좌 알려주는 순간 → 100% 사기</code></pre>
+<h3 id="고소장-핵심-문구-예시-14">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+성명불상의 피고소인을 전기통신금융사기 피해 방지 및 피해금 환급에
+관한 특별법 제15조의2 제1항(전기통신금융사기), 형법 제118조(공무원
+자격사칭)로 처벌하여 주시기 바랍니다. 아울러 같은 특별법 제3조에
+따른 지급정지·피해금 환급 절차를 함께 진행하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 성명불상의 피고소인은 2025. ○. ○. ○○:○○경 발신번호 02-3480-
+ ○○○○으로 고소인에게 전화하여, &quot;서울중앙지방검찰청 ○○부 수사관&quot;
+ 임을 사칭하고 &quot;본인 명의 대포통장 개설 사실이 확인되어 자산 보호
+ 를 위해 안내하는 계좌로 일시 송금해야 한다&quot;는 내용을 안내하였습
+ 니다(증거 ① 통화녹음, ② 통신사 발신기록).
+2. 피고소인은 카카오톡 ID &quot;○○○&quot;으로 ① 검사 명함 사진, ② 사건번호
+ 2025-수사-○○○○가 적힌 가짜 공문(증거 ③), ③ &quot;재산보전명령&quot;이라
+ 기재된 PDF(증거 ④)를 송부하였습니다.
+3. 고소인은 2025. ○. ○. ○○:○○ ○○은행 계좌(○○○-○○-○○○○○○, 예금주
+ &quot;○○○&quot;)로 28,000,000원을 송금하였고(증거 ⑤ 송금내역), 송금 직후
+ 피고소인은 카카오톡을 차단하였습니다(증거 ⑥).
+4. 위 행위는 전기통신금융사기에 해당하며, 검사를 사칭하여 위계를
+ 사용한 점에서 공무원자격사칭에도 해당합니다.
+
+[병행 진행]
+- ○○은행 지급정지 신청 (2025. ○. ○. ○○:○○ 접수, 접수번호 ○○○)
+- 금융감독원 보이스피싱 피해 신고 (1332)
+- 사이버수사대 사건 (사건번호 ○○○)</code></pre>
+<blockquote>
+<p>💡 <strong>30분 안에 지급정지 되면 환급률 70%↑</strong>. 1시간 지나면
+50% 이하. 즉시·즉시·즉시.</p>
+</blockquote>
+<hr />
+<h1 id="도박-본인도-처벌받는다-도박장-개설은-더-무겁다">2️⃣0️⃣ 도박 —
+본인도 처벌받는다 / 도박장 개설은 더 무겁다</h1>
+<h3 id="가명-사례-가상-19">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>재훈</strong>(가명, 30대 직장인)은 친구 H(가명)의 권유로
+<strong>사설 온라인 도박 사이트</strong>(스포츠토토 외 미인가)에 매주
+○○만원 베팅. 6개월 누적 손실 1,500만원. H는 사이트 운영진과 연결된
+“총판”으로 가입자 모집 수당을 받는 구조. 재훈은 잃은 돈을 H에게 사기로
+돌릴 수 있는지 고민.</p>
+</blockquote>
+<h3 id="적용-죄목법조-도박은-본인도-처벌-주의">⚖️ 적용 죄목·법조 —
+도박은 <strong>본인도 처벌</strong> 주의!</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>단순 도박 (참여자)</strong></td>
+<td><strong>형법 §246 ①</strong></td>
+<td><strong>1천만원 이하 벌금</strong> (일시오락 제외)</td>
+</tr>
+<tr>
+<td><strong>상습 도박</strong></td>
+<td>형법 §246 ②</td>
+<td><strong>3년 이하 징역 또는 2천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>도박장 개설</strong></td>
+<td>형법 §247</td>
+<td>5년 이하 또는 3천만원</td>
+</tr>
+<tr>
+<td><strong>상습 도박장 개설</strong></td>
+<td>형법 §247 + 가중</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>사설 토토·온라인 도박장 운영</strong></td>
+<td>국민체육진흥법 §47 / §48</td>
+<td><strong>7년 이하 또는 7천만원</strong></td>
+</tr>
+<tr>
+<td><strong>사설 도박 광고·총판</strong></td>
+<td>국민체육진흥법 §53의2</td>
+<td>7년 이하</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>형법 §246</strong> “① 도박을 한 사람은 1천만원 이하의
+벌금에 처한다. 다만, <strong>일시오락 정도에 불과한 경우는
+예외</strong>로 한다. ② 상습으로 제1항의 죄를 범한 사람은 3년 이하의
+징역 또는 2천만원 이하의 벌금에 처한다.”</p>
+</blockquote>
+<h3 id="핵심-내가-잃은-돈을-사기로-고소할-수-있나">⚠️ 핵심 — “내가 잃은
+돈”을 사기로 고소할 수 있나?</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>상황</th>
+<th>답</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>적법 도박장(강원랜드 등)에서 잃음</td>
+<td>❌ 사기 X. 자기 책임.</td>
+</tr>
+<tr>
+<td>불법 사설 도박장에서 정상적으로 잃음</td>
+<td>❌ 사기로 보기 어려움. 본인도 §246 처벌 대상.</td>
+</tr>
+<tr>
+<td><strong>운영진이 조작 (확률·결과 조작)</strong></td>
+<td>✅ <strong>사기 §347 + 본인 §246 동시 처벌 가능</strong></td>
+</tr>
+<tr>
+<td>친구가 도박 권유 + 자기는 총판 수당 받음</td>
+<td>△ 도박방조·국민체육진흥법 §47 (운영자 처벌)</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>결론: 잃은 돈은 돌려받기 어려움. 본인도 처벌 받음. 도박
+사기 고소는 양날의 검.</strong></p>
+<h3 id="예방처신-12">🛡 예방·처신</h3>
+<ul>
+<li>사설 토토·해외 카지노 사이트 = <strong>국민체육진흥법 §48</strong>
+위반 → 본인 처벌</li>
+<li>“초보자 보너스”, “확실한 픽” 광고 = 도박 권유 = 같이 처벌</li>
+<li>자수·자진신고 시 감경 가능 — 변호인과 협의</li>
+<li><strong>도박 중독 → 한국도박문제예방치유원</strong> (1336) 무료
+상담</li>
+<li>잃은 돈 회수: <strong>본인 처벌 감수</strong>하고 운영진 사기 고소 →
+운영진 압수수색 → 환급 받을 수도 있음</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-조작-의심-운영진">✍️ 고소장 핵심 문구 예시
+(조작 의심 운영진)</h3>
+<pre><code>[고소취지]
+성명불상의 피고소인(사이트 &quot;○○○○&quot; 운영진)을 형법 제347조 제1항
+사기죄 및 국민체육진흥법 제47조·제48조 위반죄로 처벌하여 주시기
+바랍니다.
+
+[고소이유 — 일부]
+1. 피고소인이 운영하는 인터넷 사이트 &quot;○○○○&quot; (URL: ○○○)은 미인가
+ 사설 스포츠 베팅·카지노 게임을 제공하는 곳입니다.
+2. 고소인은 2025. ○. ○.~○. ○. 사이 위 사이트에 ○회에 걸쳐 합계
+ ○○○만원을 베팅하였고, 그 중 다음 회차에서 베팅 종료 후 결과가
+ 임의로 변경된 정황이 확인됩니다(증거 ① 베팅 화면 캡처, ② 결과
+ 변경 전후 비교, ③ 동일 시점 외부 스포츠 결과와의 불일치).
+3. 위 사이트는 국민체육진흥법상 정식 사행산업 아닌 무허가 운영
+ 사이트로 같은 법 제47조·제48조 위반에 해당하며, 운영진의 결과
+ 조작은 형법 제347조 제1항 사기죄에 해당합니다.
+
+[고소인 자진신고]
+고소인은 위 도박 행위에 참여한 사실 자체에 대하여 형법 제246조
+제1항 위반 가능성을 인정하고, 자수 의사를 함께 표시합니다.</code></pre>
+<blockquote>
+<p>💡 <strong>자수는 양형 감경 + 자진신고는 사회·심리적 부담
+축소</strong>. 변호인 상담 먼저.</p>
+</blockquote>
+<hr />
+<h1 id="게임아이템-사기-메이플롤중고나라-게임계정-거래">2️⃣1️⃣ 게임·아이템
+사기 — 메이플·롤·중고나라 게임계정 거래</h1>
+<h3 id="가명-사례-가상-20">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>승현</strong>(가명, 대학생)은 게임 내 채팅으로
+<strong>I</strong>(가명)에게 희귀 아이템(시세 50만원) 거래 제안받음.
+외부 송금 (계좌이체) 후 거래소에서 아이템 전달 약속. 송금 후 I는 게임
+캐릭터 삭제·접속 끊김. 게임사에 신고했더니 “외부 거래는 게임사 책임
+아님” 답변.</p>
+</blockquote>
+<h3 id="적용-죄목법조-11">⚖️ 적용 죄목·법조</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>아이템 사기 (외부 송금형)</strong></td>
+<td><strong>형법 §347</strong> 사기</td>
+<td>20년 이하 또는 5천만원</td>
+</tr>
+<tr>
+<td><strong>계정 해킹·도용</strong></td>
+<td><strong>형법 §347의2</strong> 컴퓨터 등 사용사기</td>
+<td>10년 이하 또는 2천만원</td>
+</tr>
+<tr>
+<td><strong>부정 프로그램(핵·매크로) 판매</strong></td>
+<td><strong>게임산업법 §32·§44</strong></td>
+<td>5년 이하 또는 5천만원</td>
+</tr>
+<tr>
+<td><strong>계정 거래 자체</strong> (게임사 약관 위반)</td>
+<td>민사적 계정 정지</td>
+<td>형사 X (단순 거래는)</td>
+</tr>
+<tr>
+<td><strong>계정 도용 후 환금</strong></td>
+<td>형법 §347의2 + §347</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="게임-사기-특이점">🎯 게임 사기 — 특이점</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>점</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>계정 자체는 게임사 소유</strong></td>
+<td>약관상 계정은 빌려쓰는 것. 도난·해킹은 게임사가 1차 책임 X</td>
+</tr>
+<tr>
+<td><strong>아이템은 재산상 이익</strong></td>
+<td>외부 거래 송금 시 <strong>돈은 진짜</strong> → 사기죄 성립</td>
+</tr>
+<tr>
+<td><strong>닉네임만으론 추적 어려움</strong></td>
+<td>게임사가 수사기관에 협조해야 IP 추적</td>
+</tr>
+<tr>
+<td><strong>해외 서버 운영 사이트</strong></td>
+<td>한국 수사권 한계 — 환급 어려움</td>
+</tr>
+</tbody>
+</table>
+<h3 id="증거-체크리스트-11">🔍 증거 체크리스트</h3>
+<ol type="1">
+<li><strong>게임 내 채팅 캡처</strong> (시각·닉네임·서버명)</li>
+<li><strong>외부 거래 채팅</strong> (카톡·디스코드 등 — 본명·계좌)</li>
+<li><strong>송금내역 PDF</strong></li>
+<li><strong>게임사 신고 접수 번호</strong></li>
+<li><strong>상대 닉네임의 게임 활동 로그</strong> (게임사 발급
+요청)</li>
+<li><strong>거래 시세 자료</strong> (인벤·디스이즈게임 가격표)</li>
+<li><strong>본인 캐릭터·계정 정보</strong> (사건 발생 시각 기준)</li>
+</ol>
+<h3 id="예방처신-13">🛡 예방·처신</h3>
+<ul>
+<li><strong>외부 송금 거래 X</strong> — 게임 내 거래소·NEXON
+안전거래만</li>
+<li><strong>계정 거래는 게임사 약관 위반</strong> — 양쪽 다 계정 정지
+위험</li>
+<li>채팅 캡처 시 <strong>닉네임·서버·시각 표시</strong></li>
+<li>게임사에 <strong>수사기관 협조 요청서</strong> 발급 부탁 — 형사고소
+시 IP 추적</li>
+<li>송금 받은 계좌가 <strong>타인 명의</strong> 면 대포통장 → 환급
+가능성 ↑</li>
+<li>의심되면 <strong>더치트(thecheat.co.kr)</strong> 즉시 조회</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-15">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+성명불상의 피고소인(게임 &quot;○○○○&quot; 내 닉네임 &quot;○○○○○&quot;, ○○서버,
+계좌번호 ○○은행 ○○○-○○○-○○○)을 형법 제347조 제1항 사기죄로
+처벌하여 주시기 바랍니다.
+
+[고소이유 — 일부]
+1. 고소인은 2025. ○. ○. ○○:○○경 게임 &quot;○○○○&quot; 내 채팅을 통해 피고
+ 소인 닉네임 &quot;○○○○○&quot;으로부터 희귀 아이템 &quot;○○○○&quot;(시세 50만원)의
+ 거래 제안을 받았습니다(증거 ① 게임 내 채팅 캡처).
+2. 외부 카카오톡으로 거래 합의(증거 ② 카톡 전문) 후 같은 날 ○○:○○
+ 고소인은 피고소인이 지정한 계좌(○○은행 ○○○, 예금주 ○○○)로
+ 500,000원을 송금하였습니다(증거 ③ 송금내역).
+3. 송금 후 피고소인은 ① 게임 내 캐릭터를 삭제하고, ② 카카오톡을
+ 차단한 채 약속한 아이템을 전달하지 아니하였습니다(증거 ④ 게임 내
+ 캐릭터 부재, ⑤ 카톡 차단 화면).
+4. 위 계좌로 더치트 사이트 동일 피해 신고 ○건이 누적되어 있어(증거
+ ⑥), 피고소인은 처음부터 아이템 전달 의사 없이 송금만 받을 목적
+ 이었음이 명백합니다.
+
+[수사 협조 요청]
+- 게임사 &quot;○○○○&quot; 운영사에 대한 피고소인 IP·접속로그·결제정보 요청
+- 위 계좌 동결·환급 절차 검토</code></pre>
+<blockquote>
+<p>💡 <strong>소액 다수 피해 합산 = 사기 가중</strong> — 같은 사람에게
+당한 다수 피해자가 공동 고소하면 수사 우선순위 ↑.</p>
+</blockquote>
+<hr />
+<h1 id="사이버스토킹딥페이크-합성물sns-사칭반복-메시지">2️⃣2️⃣
+사이버스토킹·딥페이크 — 합성물·SNS 사칭·반복 메시지</h1>
+<h3 id="가명-사례-가상-21">🎭 가명 사례 (가상)</h3>
+<blockquote>
+<p><strong>하영</strong>(가명, 20대)은 헤어진 사람
+<strong>J</strong>(가명)가 본인의 SNS 사진을 가져다 <strong>음란
+합성물(딥페이크)</strong>을 만들어 <strong>익명 텔레그램
+채널·디시인사이드 갤러리</strong>에 유포. 동시에 본인 인스타 사진을
+도용한 사칭 계정 ○○개로 가족·지인에게 메시지 발송. 협박 메시지도 새
+번호로 반복.</p>
+</blockquote>
+<h3 id="적용-죄목법조-가장-무거운-죄목-패키지">⚖️ 적용 죄목·법조 — 가장
+무거운 죄목 패키지</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>행위</th>
+<th>법조</th>
+<th>형량</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>딥페이크 합성·편집</strong></td>
+<td><strong>성폭법 §14의2 ①</strong></td>
+<td><strong>7년 이하 징역 또는 5천만원 이하 벌금</strong></td>
+</tr>
+<tr>
+<td><strong>딥페이크 유포(반포)</strong></td>
+<td><strong>성폭법 §14의2 ②</strong></td>
+<td>7년 이하</td>
+</tr>
+<tr>
+<td><strong>영리목적 정보통신망 유포</strong></td>
+<td><strong>성폭법 §14의2 ③</strong></td>
+<td><strong>3년 이상 유기징역</strong> (벌금 없음)</td>
+</tr>
+<tr>
+<td><strong>소지·구입·저장·시청</strong></td>
+<td><strong>성폭법 §14의2 ④</strong></td>
+<td><strong>3년 이하 또는 3천만원</strong></td>
+</tr>
+<tr>
+<td>상습</td>
+<td>§14의2 ⑤</td>
+<td><strong>2분의 1 가중</strong></td>
+</tr>
+<tr>
+<td><strong>SNS 사칭 계정</strong></td>
+<td>정통망법 §44의7 / 스토킹처벌법 §2① 사목</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>반복 메시지·차단 후 새 계정</strong></td>
+<td><strong>스토킹처벌법 §18 ①</strong></td>
+<td>3년 이하 또는 3천만원</td>
+</tr>
+<tr>
+<td><strong>위협·해악 고지</strong></td>
+<td>형법 §283 협박</td>
+<td>3년 이하</td>
+</tr>
+<tr>
+<td><strong>개인정보 게시</strong></td>
+<td>스토킹처벌법 §2① 바목 / 개인정보보호법 §71</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📜 <strong>성폭법 §14의2 ①</strong> “사람의 얼굴·신체 또는 음성을
+대상으로 한 촬영물·영상물 또는 음성물… 영상물등의 대상자의 의사에 반하여
+성적 욕망 또는 수치심을 유발할 수 있는 형태로 편집·합성 또는 가공한 자는
+<strong>7년 이하의 징역 또는 5천만원 이하의 벌금</strong>에 처한다.”</p>
+<p>📜 §14의2 ④ “편집물 등 또는 복제물을 <strong>소지·구입·저장 또는
+시청</strong>한 자는 <strong>3년 이하 또는 3천만원</strong>” →
+<strong>보기만 해도 처벌</strong>.</p>
+</blockquote>
+<h3 id="시행-딥페이크-처벌-강화-핵심">🚨 2024.10.16 시행 — 딥페이크 처벌
+강화 핵심</h3>
+<ul>
+<li>과거: 유포만 처벌</li>
+<li><strong>현재: 제작·편집·소지·구매·저장·시청 모두 처벌</strong></li>
+<li>영리 유포는 <strong>최저 3년 유기징역</strong> (벌금 없음) — 매우
+무거움</li>
+</ul>
+<h3 id="증거-체크리스트-24시간-골든타임">🔍 증거 체크리스트 — 24시간
+골든타임</h3>
+<ol type="1">
+<li><strong>합성물 원본·URL·게시일자 캡처</strong> — 삭제 전에 즉시</li>
+<li><strong>게시 플랫폼명·게시자 닉네임</strong></li>
+<li><strong>확산 자료</strong> (공유·다운로드 수·다른 사이트
+재게시)</li>
+<li><strong>가해자 신원 단서</strong> (이전 대화·이메일·결제 흔적)</li>
+<li><strong>피해 영향</strong> (정신과 진료·SNS 계정 폐쇄·사회적
+피해)</li>
+<li><strong>반복 메시지·새 번호 통신 로그</strong></li>
+<li><strong>사칭 계정 URL·캡처</strong></li>
+</ol>
+<h3 id="예방처신-절대-혼자-끙끙대지-마세요">🛡 예방·처신 — 절대 혼자
+끙끙대지 마세요</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>채널</th>
+<th>무엇을</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>디지털성범죄피해자지원센터</strong> (02-735-8994 /
+d4u.stop.or.kr)</td>
+<td><strong>무료 삭제 지원</strong> 24시간</td>
+</tr>
+<tr>
+<td><strong>방심위 디지털성범죄심의지원단</strong></td>
+<td>긴급 차단 의뢰</td>
+</tr>
+<tr>
+<td><strong>여성긴급전화 1366</strong></td>
+<td>심리·법률 상담 24시간</td>
+</tr>
+<tr>
+<td><strong>사이버수사대 117</strong> (스쿨/사이버 폭력)</td>
+<td>즉시 신고</td>
+</tr>
+<tr>
+<td><strong>국가인권위·청소년사이버상담 1388</strong></td>
+<td>미성년이라면</td>
+</tr>
+</tbody>
+</table>
+<h3 id="절대-하지-말-것">⚠️ 절대 하지 말 것</h3>
+<ul>
+<li>합성물 다운로드 → <strong>본인이 §14의2 ④ 위반</strong>될 수 있음
+(저장죄)</li>
+<li>다른 사람에게 “이거 봐”라며 공유 → 본인이 유포자</li>
+<li>가해자와 직접 협상 X — 합의 명목 추가 피해 위험</li>
+<li>댓글·해명 게시 X — 확산 가속</li>
+</ul>
+<h3 id="고소장-핵심-문구-예시-16">✍️ 고소장 핵심 문구 예시</h3>
+<pre><code>[고소취지]
+피고소인 ○○○ (또는 성명불상)을 성폭력범죄의 처벌 등에 관한
+특례법 제14조의2 제1항(편집·합성), 제2항(반포), 형법 제283조
+협박, 스토킹범죄의 처벌 등에 관한 법률 제18조 제1항, 정보통신망법
+제44조의7 (불법정보 유통)으로 처벌하여 주시기 바랍니다.
+아울러 스토킹처벌법 제8조에 따른 잠정조치 (2호 접근금지, 3호 전기
+통신 접근금지)를 함께 신청합니다.
+
+[고소이유 — 일부]
+1. 고소인은 2025. ○. ○. 본인의 인스타그램에 게재된 사진(증거 ①
+ 원본)이 ○○텔레그램 채널 &quot;○○○○&quot;(URL: ○○○) 및 ○○갤러리(URL:
+ ○○○)에 ① 고소인의 얼굴을 합성한 음란 합성물 형태로 ○매 게시
+ 되어 있는 사실을 확인하였습니다(증거 ②~④ 게시물 캡처, 게시
+ 일자·URL·게시자 닉네임 포함).
+2. 동일 기간 인스타그램·페이스북에 고소인의 사진·이름·신분을 도용
+ 한 사칭 계정 ○개가 운영되고 있으며, 위 계정으로부터 고소인의
+ 가족·지인 ○○명에게 메시지가 발송된 사실이 확인됩니다(증거 ⑤
+ 사칭 계정 URL, ⑥ 가족·지인 진술서 및 캡처).
+3. 또한 피고소인은 ○. ○.부터 차단된 후에도 새 번호 ○개를 이용하여
+ 카카오톡 ○○회, 문자 ○○회를 발송하였고, 일부 메시지에는 &quot;더
+ 퍼뜨리겠다&quot;, &quot;집 알고 있다&quot; 등 협박성 내용이 포함되어 있습니다
+ (증거 ⑦ 통신기록, ⑧ 메시지 캡처).
+4. 피고소인의 행위는 ① 성폭법 §14의2 ①·② (편집 및 반포), ②
+ 스토킹처벌법 §18 ① (지속적·반복적 스토킹), ③ 형법 §283 협박,
+ ④ 사칭 계정을 통한 스토킹처벌법 §2① 사목 위반에 각 해당합니다.
+
+[병행 진행]
+- 디지털성범죄피해자지원센터 (02-735-8994) 삭제 지원 신청
+- 방심위 디지털성범죄심의지원단 긴급차단 요청
+- 플랫폼별 게시중단 신청</code></pre>
+<blockquote>
+<p>💡 <strong>소지·저장·시청도 처벌</strong> — “그냥 봤다”고 변명 불가.
+우연히 받은 영상은 <strong>즉시 삭제 + 신고</strong>.</p>
+</blockquote>
+<hr />
+<h1 id="가지-상황-공통-시니어-변호사의-5가지-마인드">📌 7가지 상황 공통
+— 시니어 변호사의 5가지 마인드</h1>
+<h3 id="고소장-30초-안에-수사관-설득">1. “고소장 = 30초 안에 수사관
+설득”</h3>
+<ul>
+<li>수사관이 들고 있는 사건 수십 건 중 우리 사건이 우선순위가 되도록
+설계</li>
+<li>시간순·죄목 명확·증거 5종 이상 = 우선처리 사건</li>
+</ul>
+<h3 id="증거의-골든타임은-2472시간">2. “증거의 골든타임은
+24~72시간”</h3>
+<ul>
+<li>CCTV·로그·계정·게시물은 <strong>시간이 지나면 사라짐</strong></li>
+<li>사건 인지 즉시 <strong>보존요청서</strong> 서면으로 제출</li>
+</ul>
+<h3 id="감정을-빼고-사실만">3. “감정을 빼고 사실만”</h3>
+<ul>
+<li>“괘씸하다”, “참을 수 없다” → 빼라</li>
+<li>“2025. ○. ○. ○○:○○경, 피고소인은 …” → 이걸로 일관</li>
+</ul>
+<h3 id="친고반의사-vs-일반범죄-구별">4. “친고·반의사 vs 일반범죄
+구별”</h3>
+<ul>
+<li>친고죄(모욕): 고소기간 6개월, 고소 없으면 처벌 X</li>
+<li>반의사불벌(폭행·협박·정통망법 명예훼손): 처벌불원 시 종결</li>
+<li>일반범죄(사기·스토킹): 합의해도 처벌 가능 → 양형 참작만</li>
+</ul>
+<h3 id="민사와-형사를-같이-설계">5. “민사와 형사를 같이 설계”</h3>
+<ul>
+<li>형사 = 처벌, 민사 = 돈 받기</li>
+<li><strong>가압류는 형사 진행 중에도 가능</strong> — 도주·은닉 전에
+잡아두기</li>
+</ul>
+<hr />
+<h1 id="빠른-매칭표-상황이-닥치면-이-표부터">🧰 빠른 매칭표 — 상황이
+닥치면 이 표부터</h1>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>발생 즉시 (당일)</th>
+<th>24시간 안</th>
+<th>1주 안</th>
+<th>1개월 안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사진·영상·캡처</td>
+<td>CCTV 보존요청서</td>
+<td>고소장 초안</td>
+<td>변호사 1회 상담</td>
+</tr>
+<tr>
+<td>112/119 신고</td>
+<td>진단서 발급</td>
+<td>증거 ⑤종 모으기</td>
+<td>정식 고소</td>
+</tr>
+<tr>
+<td>인적사항·연락처 확보</td>
+<td>송금·계좌 출력</td>
+<td>작성자 임시조치</td>
+<td>합의 협상 / 잠정조치</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="심화-팁-실전-고소장-완성본-변호사-상담-체크리스트">심화 팁 +
+실전 고소장 완성본 + 변호사 상담 체크리스트</h1>
+<blockquote>
+<p>4부 구성: - <strong>Part 1</strong> — 실전 고소장 1편
+<strong>완성본</strong> (9블록 다 채운 사기 케이스) - <strong>Part
+2</strong> — 변호사 상담 전 <strong>10분 체크리스트</strong> -
+<strong>Part 3</strong> — 추가로 정리한 <strong>+α 꿀팁</strong> (04에
+빠진 것들) - <strong>Part 4</strong> — 인터넷 팩트체크 추가 팁 (출처
+표시)</p>
+</blockquote>
+<hr />
+<h1 id="part-1-실전-고소장-1편-완성본-사기-민호-vs-준석">📑 Part 1 —
+실전 고소장 1편 완성본 (사기 — 민호 vs 준석)</h1>
+<blockquote>
+<p>가상 사건을 9블록 양식으로 모두 채운 완성본. 본인 사건에 맞춰
+인적사항·날짜·금액만 바꿔도 90% 활용 가능한 골격.</p>
+</blockquote>
+<pre><code>═════════════════════════════════════════════════
+ 고 소 장
+═════════════════════════════════════════════════
+
+[1] 고소인
+ 성 명: 김민호 (金民浩)
+ 주민등록번호: 89****-1******
+ 주 소: 서울특별시 ○○구 ○○로 123, 4동 506호
+ 전 화: 010-1234-5678
+ 직 업: 식자재 도매업 (○○식자재, 사업자등록번호 123-45-67890)
+
+[2] 피고소인
+ 성 명: 박준석 (朴俊錫)
+ 주민등록번호: 87****-1****** (확인 가능한 범위)
+ 주 소: 서울특별시 ○○구 ○○대로 456, 1101호
+ 전 화: 010-9876-5432
+ 직 업: ○○식당 운영자 (영업장: 서울 ○○구 ○○동 78번지)
+
+[3] 고소취지
+ 피고소인 박준석을 형법 제347조 제1항 사기죄로 처벌하여 주시기
+ 바랍니다.
+
+[4] 고소이유 (범죄사실)
+
+ 1. 거래의 시작
+ 고소인은 식자재 도매업을 영위하는 자로, 2024. 11. 15.경 피고
+ 소인이 운영하는 ○○식당과 다음과 같이 식자재 외상 거래를
+ 개시하였습니다.
+ - 거래 조건: 매월 말 정산
+ - 결제 방식: 다음달 15일 이내 송금
+ - 거래 개시일: 2024. 11. 15.
+ (증거 1호 거래개시 카카오톡, 2호 거래 약정서)
+
+ 2. 미지급 발생
+ 거래 개시 후 2024. 11. ~ 2025. 5.까지 7개월간 매월 외상 거래가
+ 이루어졌습니다. 이 중 2024. 11.~12. 2개월분은 정상 결제되었으나,
+ 2025. 1.부터 미지급이 시작되어 미수금은 다음과 같이 누적되었
+ 습니다.
+
+ | 거래월 | 거래금액 | 입금액 | 미수금 |
+ | 2025.01 | 280만원 | 0 | 280만원 |
+ | 2025.02 | 310만원 | 50만원 | 260만원 |
+ | 2025.03 | 340만원 | 0 | 340만원 |
+ | 2025.04 | 320만원 | 0 | 320만원 |
+ | 2025.05 | 300만원 | 0 | 300만원 |
+ | 2025.06 | 300만원 | 0 | 300만원 |
+ | 합계 | | | 1,800만원 |
+
+ (증거 3호 거래명세서 6장, 4호 송금내역 — 결제분만)
+
+ 3. 피고소인의 변제 의사·능력 부재
+ 고소인이 2025. 8.경 식자재 업계 거래처를 통해 확인한 바에 따
+ 르면, 피고소인은 다음과 같이 처음부터 변제 의사·능력이 없는
+ 상태에서 외상 거래를 계속한 사실이 확인되었습니다.
+
+ 가. ○○식당은 2025. 6. 20. 사실상 폐업 상태이며, 같은 날
+ 기준으로 사업자등록은 유지되어 있으나 실제 영업은 중단된
+ 것으로 확인됩니다 (증거 5호 ○○구청 위생점검 부재 확인서,
+ 6호 폐업 확인 현장 사진).
+
+ 나. 피고소인은 2024. 12.경부터 도박 채무 약 4,000만원 누적
+ 상태였으며 (증거 7호 ○○지방법원 가압류 결정 등기부, 8호
+ 금융신용정보 — 공개 가능 범위), 2025. 2. 기준 본인 명의
+ 은행계좌가 모두 압류된 상태였습니다 (증거 9호 압류 결정
+ 등본).
+
+ 다. 피고소인은 같은 시기 ○○도매, ○○유통 등 거래처 3곳에
+ 대해서도 동일한 패턴으로 외상 누적 후 미지급 상태이며
+ (증거 10호 ○○도매 진술서, 11호 ○○유통 진술서),
+ 그 중 ○○도매는 2025. 7. 별건 사기 고소를 제기한 상태
+ 입니다 (증거 12호 ○○도매 사건번호 ○○○○).
+
+ 라. 이러한 사정에도 피고소인은 2025. 5.~6.경 고소인에게 추가
+ 외상 발주를 요청하면서 &quot;다음 달에 반드시 정산하겠다&quot;고
+ 반복 답변하였습니다 (증거 13호 2025. 5.~6. 카카오톡).
+
+ 4. 결론
+ 위와 같이 피고소인은 변제 의사·능력이 없음에도 외상 거래의
+ 외관을 유지하여 고소인으로 하여금 식자재를 계속 납품하게
+ 함으로써, 재산상의 이익(미수금 1,800만원에 상당하는 식자재)
+ 을 편취하였습니다. 따라서 형법 제347조 제1항 사기죄에 해당
+ 합니다.
+
+[5] 적용 법조
+ - 주위적: 형법 제347조 제1항 (사기)
+ - 적용 형량: 20년 이하의 징역 또는 5천만원 이하의 벌금
+
+[6] 입증방법 (증거 목록)
+ 증거 1호 거래개시 카카오톡 캡처 (2024.11.15., 3매)
+ 증거 2호 거래 약정서 사본 (2024.11.15. 작성, 양 당사자 서명)
+ 증거 3호 거래명세서 사본 (2024.11.~2025.6., 6매)
+ 증거 4호 송금내역 PDF (○○은행, 2024.11.~2025.6.)
+ 증거 5호 ○○구청 위생점검 부재 확인서 (1매)
+ 증거 6호 폐업 추정 현장 사진 (2025.7., 3매)
+ 증거 7호 피고소인 명의 부동산 등기부등본 (가압류 등재)
+ 증거 8호 공개 가능 신용정보 (해당 범위)
+ 증거 9호 계좌 압류 결정등본
+ 증거 10호 ○○도매 대표 ○○○ 진술서 (자필, 2025.8.10.)
+ 증거 11호 ○○유통 대표 ○○○ 진술서 (자필, 2025.8.10.)
+ 증거 12호 ○○도매 별건 고소 사건번호 확인서
+ 증거 13호 2025. 5.~6. 카카오톡 캡처 (외상 요청·답변, 12매)
+
+[7] 관할
+ ○○경찰서 형사과 (피고소인 주소지 관할)
+ * 동일 사안 다중 피해자가 있으므로 ○○도매 별건과 병합 수사를
+ 요청합니다.
+
+[8] 작성일·서명
+ 2025년 8월 25일
+ 고소인 김 민 호 (서명 또는 인)
+
+[9] 첨부서류
+ - 위 증거 1호~13호 사본 각 1부
+ - 고소인 사업자등록증 사본
+ - 피고소인 사업자등록 공개정보 출력본
+ - 위임장 (변호인 선임 시)
+
+═════════════════════════════════════════════════</code></pre>
+<h3 id="이-고소장이-잘-쓰여진-5가지-이유">📌 이 고소장이 잘 쓰여진 5가지
+이유</h3>
+<ol type="1">
+<li><strong>시간순 사실관계</strong> — 거래개시 → 미지급 발생 → 변제의사
+부재 → 결론 4단계</li>
+<li><strong>금액·시점 명확</strong> — 미수금 표로 시각화 (수사관이 30초
+안에 파악)</li>
+<li><strong>변제의사 부재 입증을 4중으로</strong> —
+폐업·도박빚·계좌압류·다른 피해자</li>
+<li><strong>증거 13종을 본문 번호와 1:1 매칭</strong> — 추적 가능</li>
+<li><strong>감정 표현 0개</strong> — “괘씸하다”, “도저히” 등 없음,
+사실만</li>
+</ol>
+<hr />
+<h1 id="part-2-변호사-상담-전-10분-체크리스트">📑 Part 2 — 변호사 상담
+전 10분 체크리스트</h1>
+<blockquote>
+<p>변호사 1회 상담은 보통 30분~1시간. 그 중 <strong>10분 안에 사건
+핵심을 전달</strong>할 수 있어야 변호사가 의미 있는 조언을 줄 수 있음.
+이 체크리스트를 채워서 변호사 상담실 가져가세요.</p>
+</blockquote>
+<h2 id="상담-가기-전-종이-1장-정리">✅ 상담 가기 전 — 종이 1장 정리</h2>
+<pre><code>═══════════════════════════════════════════════
+변호사 상담용 1장 요약 (A4 1장)
+═══════════════════════════════════════════════
+
+[A] 내가 누구인가
+ - 본인 또는 가족 사건? (이해관계 확인용)
+ - 본인 직업·연령·거주지 (관할 판단)
+
+[B] 무슨 일이 있었나 (5W1H 1줄씩)
+ - 언제 (날짜·시간):
+ - 어디서:
+ - 누가 (피의자/피고소인):
+ - 누구에게 (피해자):
+ - 무엇을 (행위):
+ - 어떻게 (수단·방법):
+
+[C] 내가 원하는 결과
+ □ 형사처벌 (감옥·벌금)
+ □ 합의금·손해배상 (돈)
+ □ 명예회복·삭제
+ □ 잠정조치·접근금지 (안전)
+ □ 단순 자문 (당장 행동 X)
+
+[D] 현재 단계
+ □ 사건 발생 직후 — 아직 신고·고소 안 함
+ □ 고소장 제출함 (날짜: )
+ □ 경찰 조사 받음 (담당 수사관: )
+ □ 송치/불송치 결정 받음 (결정일: )
+ □ 검찰 처분 받음 (기소/불기소: )
+ □ 재판 진행 중 (1심/2심/3심: 심, 다음 기일: )
+
+[E] 가지고 있는 증거 (체크하고 개수)
+ □ 통신기록 (카톡·문자·이메일) — 약 건
+ □ 사진·영상 — 약 건
+ □ CCTV — 확보 여부 (□확보 □보존요청만 □미확보)
+ □ 진단서·의무기록 — 있음/없음
+ □ 송금내역·계약서 — 있음/없음
+ □ 목격자 — 명, 연락처 (□확보 □미확보)
+ □ 녹음 — 본인 통화 합법녹음 □있음 □없음
+ □ 공문·등기부·관공서 확인서 — 있음/없음
+
+[F] 상대방 정보
+ - 이름 (별명·닉네임만 알아도):
+ - 연락처 (있는 것):
+ - 주소·근무지:
+ - 관계 (지인/거래처/타인):
+
+[G] 무엇을 모르는지 (변호사에 가장 묻고 싶은 것 3개)
+ 1.
+ 2.
+ 3.
+
+[H] 예산·기간
+ - 변호인 선임 가능 예산: 약 만원
+ - 사건 종결 목표 기간: 개월
+
+═══════════════════════════════════════════════</code></pre>
+<h3 id="상담-진행-흐름-10분-20분">⏱ 상담 진행 흐름 (10분 + 20분)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>시간</th>
+<th>누가</th>
+<th>무엇</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0~3분</td>
+<td><strong>본인</strong></td>
+<td>[B] 5W1H를 한 호흡으로 (감정 X, 사실 위주)</td>
+</tr>
+<tr>
+<td>3~5분</td>
+<td>본인</td>
+<td>[C] 원하는 결과 + [D] 현재 단계</td>
+</tr>
+<tr>
+<td>5~7분</td>
+<td>본인</td>
+<td>[E] 증거 현황</td>
+</tr>
+<tr>
+<td>7~10분</td>
+<td>본인</td>
+<td>[F] 상대방 정보 + [G] 질문 3개</td>
+</tr>
+<tr>
+<td>10~30분</td>
+<td><strong>변호사</strong></td>
+<td>죄목 검토 / 승소 가능성 / 절차 / 예상 비용·기간</td>
+</tr>
+</tbody>
+</table>
+<h3 id="상담-중-반드시-확인할-7가지-변호사가-답해야-할-것">🚩 상담 중
+반드시 확인할 7가지 (변호사가 답해야 할 것)</h3>
+<ol type="1">
+<li><strong>이 사건의 적용 법조는 무엇인가?</strong> (예: 형법 §347
+사기)</li>
+<li><strong>승소 가능성은? 핵심 약점은?</strong></li>
+<li><strong>공소시효·고소기간은 안 지났나?</strong></li>
+<li><strong>합의·취하의 효과는?</strong> (반의사불벌·친고 여부)</li>
+<li><strong>변호인 선임 시 예상 비용·기간?</strong></li>
+<li><strong>다음 단계에 내가 해야 할 일은?</strong> (다음 1주 내
+행동지침)</li>
+<li><strong>위임 안 할 경우 본인이 셀프로 할 수 있는
+부분은?</strong></li>
+</ol>
+<h3 id="상담에서-절대-하지-말-것">🚫 상담에서 절대 하지 말 것</h3>
+<ul>
+<li>감정 토로 — “정말 억울해요” 5분 이상 X</li>
+<li>본인 입장에서 유리한 사실만 골라 말하기 — 변호사가 약점 찾는 게 더
+빠름</li>
+<li>다른 변호사·인터넷 의견 들먹이기 — “○○ 변호사는 다르게 말했는데”
+비교는 신뢰 깨뜨림</li>
+<li>비용부터 묻기 — 핵심 사실 파악 후에</li>
+<li>녹음 몰래 하기 — 본인 참여 대화면 합법이지만 신뢰 깨짐</li>
+</ul>
+<h3 id="변호사-비용-상식-2026-기준-시장-평균">💰 변호사 비용 상식 (2026
+기준 시장 평균)</h3>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>형사</th>
+<th>민사</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>상담 1회 (30분~1시간)</strong></td>
+<td>5~15만원 (무료 상담도 있음)</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>고소장 작성 대행</strong></td>
+<td>50~150만원</td>
+<td>(소장: 청구액 따라)</td>
+</tr>
+<tr>
+<td><strong>경찰·검찰 단계 변호</strong></td>
+<td>300~700만원</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>1심 재판</strong></td>
+<td>500~1,500만원</td>
+<td>청구액의 5~10% (착수금)</td>
+</tr>
+<tr>
+<td><strong>2심·3심</strong></td>
+<td>300~700만원/심급</td>
+<td>〃</td>
+</tr>
+<tr>
+<td><strong>성공보수</strong></td>
+<td>무죄·약식 등 결과 따라 별도</td>
+<td>인용액의 10~20%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>국선변호인</strong> — 형사 사건만, 일정 소득 기준 또는
+사건 종류(중대범죄 등)에 따라 무료 💡 <strong>법률구조공단</strong>
+(132) — 무료 상담 + 일정 사건 무료 대리 💡 <strong>마을변호사</strong> —
+자치단체별 무료 상담 (예: 서울시 마을변호사)</p>
+</blockquote>
+<hr />
+<h1 id="part-3-추가로-정리한-α-꿀팁-04에-빠진-것들">📑 Part 3 — 추가로
+정리한 +α 꿀팁 (04에 빠진 것들)</h1>
+<blockquote>
+<p>191장 OCR에서 발견된 추가 팁들을 변환·재구성. 04 고소장 작성법에 없던
+부분만 모음.</p>
+</blockquote>
+<h2 id="나의-사건-검색-재판-단계-셀프-추적">🔍 ① “나의 사건 검색” — 재판
+단계 셀프 추적</h2>
+<p>법원 사이트(또는 포털에서 <strong>“나의 사건 검색”</strong> 입력)에서
+사건번호·당사자명 조회 가능: - <strong>조회 가능</strong>: 다음 기일
+일시·법정 호실·재판부·진행 내용 - <strong>조회 못함</strong>: 판결문
+본문(별도 신청) - 활용: 변호인 없이 진행할 때 <strong>기일 놓침
+방지</strong>, 검사 의견서 제출 여부 등 추적</p>
+<p><strong>대법원 종합법률정보</strong> (<code>glaw.scourt.go.kr</code>)
+→ 사건번호로 판결 검색.</p>
+<h2 id="법원-민원실-개인-셀프-진행-시-동맹">🏛 ② 법원 민원실 — 개인 셀프
+진행 시 동맹</h2>
+<p>변호사 없이 셀프 진행 시 <strong>법원 민원실</strong>이 가장 큰 동맹:
+- 절차상 질문(서류 양식·제출 기한)에 친절하게 답변 - 양식 서류 무료 제공
+- 인지대·송달료 계산 도움 - 단, <strong>법률적 판단은 안 해줌</strong>
+(변호사·법률구조공단)</p>
+<h2 id="진술-시-묻는-것에-맞게-답하라">🗣 ③ 진술 시 — “묻는 것에 맞게”
+답하라</h2>
+<p>수사관 질문에 <strong>동문서답하지 말 것</strong>: - 질문: “그날 몇
+시에 만났습니까?” - 좋은 답: “오후 7시 30분경 만났습니다.” - 나쁜 답:
+“그날은 정말 화가 났던 게요…” (불필요한 배경)</p>
+<p>→ 수사관에 <strong>“성격 산만/말이 다른 사람”</strong> 인상 X →
+진술의 신뢰성 ↓</p>
+<h2 id="양형자료-변호인이-가장-공들이는-부분">📊 ④ 양형자료 — 변호인이
+가장 공들이는 부분</h2>
+<p>형 선고 직전 단계에서 양형자료를 변호인이 정리해 제출. 일반인은
+모르는 경우 많음. - <strong>감경 요소</strong>: 초범, 반성, 합의, 피해
+회복, 사회유대(가족·직업), 봉사·기부, 정신적 압박 상황 등 - <strong>가중
+요소</strong>: 누범, 반복, 피해 큼, 합의 거절, 죄질 흉포 - 제출 자료
+예시: 합의서·반성문·기부 영수증·사회유대 자료(재직증명·가족관계증명) -
+<strong>양형위원회 양형기준</strong> (sentencing.scourt.go.kr) — 죄목별
+양형 범위 공개</p>
+<h2 id="수사관-전화-받았을-때-첫-1분이-중요">📞 ⑤ 수사관 전화 받았을 때
+— 첫 1분이 중요</h2>
+<p>“수사관”이라며 출석 요구 전화 시: 1. <strong>본인 직책·소속
+확인</strong> (“○○경찰서 ○○과 ○○수사관 맞으십니까?”) 2. <strong>연락
+사실 메모</strong> (날짜·시간·번호·내용) 3. <strong>즉시 출석 X</strong>
+— “일정 확인 후 연락드리겠다” 답변, 1~2일 시간 확보 4. 그 동안
+<strong>고소장 정보공개청구</strong> (정통망법 §44 또는 정보공개법) —
+어떤 사건인지 파악</p>
+<h2 id="고소장-정보공개청구-피의자가-자기-사건-파악하는-법">📰 ⑥ 고소장
+정보공개청구 — 피의자가 자기 사건 파악하는 법</h2>
+<p>피의자(피고소인)는 본인 사건의 고소장 사본을
+<strong>정보공개청구</strong>로 요청 가능: - 신청처: 해당 경찰서·검찰청
+- 신청 방법: <strong>정보공개포털</strong> (open.go.kr) 또는 서면 - 처리
+기간: 10일 (최대 20일) - 부분공개·비공개 가능 (사건관계인 명예·증거인멸
+우려 등 사유) - <strong>반드시 첫 조사 전 신청</strong> — 무엇으로
+고소당했는지 모르면 방어 불가</p>
+<h2 id="합의의-4가지-종류-효과가-다-다름">🤝 ⑦ 합의의 4가지 종류 —
+효과가 다 다름</h2>
+<table>
+<thead>
+<tr>
+<th>합의 종류</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>단순 합의서</strong></td>
+<td>양형 참작만 (가벼움)</td>
+</tr>
+<tr>
+<td><strong>합의서 + 처벌불원서</strong></td>
+<td>반의사불벌죄에서 종결</td>
+</tr>
+<tr>
+<td><strong>합의서 + 고소취소</strong></td>
+<td>친고죄에서 종결 (1심 판결 전까지)</td>
+</tr>
+<tr>
+<td><strong>공탁</strong></td>
+<td>합의 거부 시 일방적으로 법원에 돈 맡김 (양형 참작)</td>
+</tr>
+</tbody>
+</table>
+<p>→ 가해자 입장에선 <strong>공탁이 강력한 카드</strong> — 피해자가
+합의금 거부해도 양형 감경 효과.</p>
+<h2 id="시효-한눈-표-절대-놓치면-안-됨">⏰ ⑧ 시효 한눈 표 — 절대 놓치면
+안 됨</h2>
+<table>
+<thead>
+<tr>
+<th>시효 종류</th>
+<th>기간</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>친고죄 고소기간</strong></td>
+<td>범인을 안 날부터 <strong>6개월</strong></td>
+</tr>
+<tr>
+<td><strong>공소시효 (사기 §347)</strong></td>
+<td><strong>10년</strong></td>
+</tr>
+<tr>
+<td><strong>공소시효 (명예훼손 §307)</strong></td>
+<td>5년</td>
+</tr>
+<tr>
+<td><strong>공소시효 (폭행 §260)</strong></td>
+<td>5년</td>
+</tr>
+<tr>
+<td><strong>공소시효 (스토킹법 §18①)</strong></td>
+<td>7년</td>
+</tr>
+<tr>
+<td><strong>공소시효 (살인)</strong></td>
+<td>폐지 (2015년)</td>
+</tr>
+<tr>
+<td><strong>임금채권 소멸시효</strong></td>
+<td>3년</td>
+</tr>
+<tr>
+<td><strong>민사 손해배상 소멸시효</strong></td>
+<td>안 날부터 3년 / 행위일부터 10년</td>
+</tr>
+<tr>
+<td><strong>의료사고 조정 신청</strong></td>
+<td>안 날부터 3년 / 행위일부터 10년</td>
+</tr>
+</tbody>
+</table>
+<h2 id="피의자-신문조서-내용-인정-도장-신중">🛡 ⑨ 피의자 신문조서 — “내용
+인정” 도장 신중</h2>
+<p>조서 작성 마지막에 <strong>“열람·날인”</strong> 절차. 여기서 “내용
+인정”하면 <strong>재판에서 핵심 증거</strong>가 됨: - 한 줄 한 줄 다시
+읽기 (수사관이 본인 진술을 압축·요약하면서 뉘앙스 바뀜 가능) - 사실과
+다르면 <strong>수정 요청</strong> (“이 부분은 다음과 같이 수정해
+주세요”) - 수정 안 해주면 <strong>날인 거부 가능</strong> — 부동의 표시
+- 다만 부동의해도 조서는 작성됨, 단지 증거능력 약해질 뿐</p>
+<h2 id="무료-법률상담-채널-시도청기관별">🆘 ⑩ 무료 법률상담 채널
+(시·도청·기관별)</h2>
+<table>
+<thead>
+<tr>
+<th>기관</th>
+<th>전화</th>
+<th>대상</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>대한법률구조공단</strong></td>
+<td>132</td>
+<td>일정 소득 이하 무료</td>
+</tr>
+<tr>
+<td><strong>법률홈닥터</strong></td>
+<td>132</td>
+<td>사회취약계층</td>
+</tr>
+<tr>
+<td><strong>마을변호사</strong></td>
+<td>자치구별</td>
+<td>주민 무료</td>
+</tr>
+<tr>
+<td><strong>검찰청 형사사법포털</strong></td>
+<td>1301</td>
+<td>안내·민원</td>
+</tr>
+<tr>
+<td><strong>여성긴급전화</strong></td>
+<td>1366</td>
+<td>성·가정폭력 24시간</td>
+</tr>
+<tr>
+<td><strong>디지털성범죄피해자지원센터</strong></td>
+<td>02-735-8994</td>
+<td>24시간</td>
+</tr>
+<tr>
+<td><strong>117</strong></td>
+<td>117</td>
+<td>학교폭력·아동학대</td>
+</tr>
+<tr>
+<td><strong>국가인권위</strong></td>
+<td>1331</td>
+<td>차별·괴롭힘</td>
+</tr>
+<tr>
+<td><strong>금감원</strong></td>
+<td>1332</td>
+<td>금융·보이스피싱</td>
+</tr>
+<tr>
+<td><strong>개인정보침해 신고센터</strong></td>
+<td>118</td>
+<td>개인정보</td>
+</tr>
+</tbody>
+</table>
+<h2 id="무료-법률상담-시-주의-한정된-시간">📂 ⑪ 무료 법률상담 시 주의 —
+한정된 시간</h2>
+<p>무료 상담 = 시간 짧음 (15~30분). 효과 보려면: - <strong>Part 2의 1장
+요약</strong> 들고 가기 - 변호사가 <strong>위임 권유</strong>하는 게
+일반적 — 비교를 위해 2~3곳 상담 후 결정 - 무료 상담에서 받은 의견은
+<strong>참고용</strong>, 사건 진행은 신중히</p>
+<h2 id="진술서-vs-진정서-vs-사실확인서-다른-문서">🧾 ⑫ 진술서 vs 진정서
+vs 사실확인서 — 다른 문서</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>문서</th>
+<th>작성자</th>
+<th>용도</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>진술서</strong></td>
+<td>본인 또는 목격자</td>
+<td>“내가/내가 본 사실은 이렇다”</td>
+</tr>
+<tr>
+<td><strong>진정서</strong></td>
+<td>피해자</td>
+<td>수사기관에 수사 요청 (고소보다 약함)</td>
+</tr>
+<tr>
+<td><strong>사실확인서</strong></td>
+<td>관공서·은행·회사</td>
+<td>“○○일에 ○○했음을 확인함” 객관 자료</td>
+</tr>
+<tr>
+<td><strong>고소장</strong></td>
+<td>피해자</td>
+<td>처벌 의사가 핵심</td>
+</tr>
+</tbody>
+</table>
+<p>→ 사건마다 <strong>3가지 문서 조합</strong>으로 증거 패키지 강화.</p>
+<hr />
+<h1 id="part-4-인터넷-팩트체크-추가-팁">📑 Part 4 — 인터넷 팩트체크 추가
+팁</h1>
+<blockquote>
+<p>기존 정리 + 인터넷 변호사 자료 교차 검증. 출처는 마지막에.</p>
+</blockquote>
+<h2 id="검증-①-고소장은-짧게-진술은-길게">✔ 검증 ① — “고소장은 짧게,
+진술은 길게”</h2>
+<p><strong>기존 정리 강조</strong>: 고소장 10페이지 이내 권장
+<strong>인터넷 변호사 의견</strong>: <strong>“고소장은 최대한 간단하게,
+고소인 진술은 최대한 구체적으로”</strong> — 고소장에 모든 걸 담을 필요
+없고, 고소인 조사(진술) 단계에서 보완하는 것이 정석</p>
+<p>→ <strong>사실 일치</strong>. 04 파일에 “10페이지 이내”만 있고
+<strong>“진술 단계에서 보완”</strong> 부분이 빠져 있었음. → <strong>보강
+결론</strong>: 고소장 = 핵심 사실관계 + 죄목 + 증거목록(요지만).
+<strong>세부 진술은 고소인 조사에서</strong>.</p>
+<h2 id="검증-②-범죄사실은-사실-위주-의견감정-x">✔ 검증 ② — “범죄사실은
+사실 위주, 의견·감정 X”</h2>
+<p>여러 변호사 사이트가 일관되게 강조: - “피고소인의 행위가
+<strong>언제·어디서·어떤 방식</strong>으로 이루어졌는지” - “고소인의
+<strong>의견·감정보다 사실 위주</strong>” - “수사관이 객관적으로 판단할
+수 있는 자료”</p>
+<p>→ <strong>사실 일치</strong>. 04에 반영됨. 추가로 <strong>“감정
+표현이 들어가는 순간 고소장 신뢰성이 떨어진다”</strong> 는 점 명시.</p>
+<h2 id="검증-③-증거는-자세히-정리해서-제출">✔ 검증 ③ — “증거는 자세히
+정리해서 제출”</h2>
+<p>변호사 사이트 강조: 증거는 따로 정리해서, <strong>각 증거가 어떤
+사실을 입증하는지 1줄씩</strong> 설명 첨부.</p>
+<p>→ <strong>사실 일치</strong>. 04 파일에 “증거 1, 2, 3 본문 매칭”
+들어가 있음. → <strong>보강</strong>: “각 증거 1줄 입증취지” 명시
+권장.</p>
+<h2 id="검증-④-변호사-사전-상담-권장">✔ 검증 ④ — “변호사 사전 상담
+권장”</h2>
+<p>다수 변호사 사이트: <strong>고소장 접수 이전 변호사 상담</strong> —
+죄목 특정·증거 부족 점검·무고 위험 차단</p>
+<p>→ <strong>사실 일치</strong>. Part 2의 변호사 상담 체크리스트가 이를
+뒷받침.</p>
+<h2 id="검증-⑤-인터넷에-잘못된-정보도-있다">✔ 검증 ⑤ — 인터넷에 잘못된
+정보도 있다</h2>
+<p>확인된 잘못된 정보 (인터넷에서 자주 보이지만 틀린 것): - ❌ “고소만
+하면 무조건 수사한다” → 각하 가능 - ❌ “고소장 한 번 내면 취소 못 한다”
+→ 1심 판결 전 취소 가능 (단, 친고죄는 취소 후 재고소 불가) - ❌ “민사
+합의하면 형사도 끝난다” → 일반범죄(사기·횡령)는 양형 참작만,
+반의사불벌·친고죄만 종결 가능 - ❌ “고소장은 무조건 검찰에 내라” →
+일반적으론 경찰서가 표준 (검찰에 내도 경찰로 이송) - ❌ “본인 통화
+녹음은 불법” → <strong>본인이 참여한 대화는 합법</strong> (통비법 §3
+“타인간” 대화만 금지)</p>
+<hr />
+<h1 id="마무리-이-파일을-가장-잘-쓰는-법">📌 마무리 — 이 파일을 가장 잘
+쓰는 법</h1>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>상황</th>
+<th>어느 Part 펴세요</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>본인이 직접 고소장 써야 함</td>
+<td><strong>Part 1</strong> 완성본을 그대로 베껴 인적사항·금액·날짜만
+교체</td>
+</tr>
+<tr>
+<td>변호사 만나러 가기 전</td>
+<td><strong>Part 2</strong> 종이 1장 출력해서 채우고 가져가기</td>
+</tr>
+<tr>
+<td>“이런 팁도 있을까?” 궁금할 때</td>
+<td><strong>Part 3</strong> 12개 팁 빠르게 정독</td>
+</tr>
+<tr>
+<td>인터넷 정보 의심스러울 때</td>
+<td><strong>Part 4</strong> 검증 결과 + ❌ 잘못된 정보 5가지</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="sources-인터넷-팩트체크-출처">Sources (인터넷 팩트체크
+출처)</h2>
+<ul>
+<li><a href="https://namu.wiki/w/%EA%B3%A0%EC%86%8C%EC%9E%A5">고소장 -
+나무위키</a></li>
+<li><a
+href="https://www.susa.co.kr/news/articleView.html?idxno=654">고소인
+고발인 진술조서 작성시 유의사항 - 수사연구</a></li>
+<li><a
+href="https://www.daeryunlaw-consulting.com/lawInfo_new/4461">고소장작성법
+및 접수, 비용 - 법무법인 대륜</a></li>
+<li><a href="https://lawform.io/magazine/556">고소장 접수 방법 - 고소장
+쓰는 법, 양식, 등기 - 로폼</a></li>
+<li><a
+href="https://namu.wiki/w/%EA%B3%A0%EC%86%8C(%EB%B2%95%EB%A5%A0)">고소(법률)
+- 나무위키</a></li>
+<li><a href="https://www.ytn.co.kr/_ln/0103_202301301753358346">고소장
+작성 꿀팁! 눈에 띄는 고소장 작성하는 법 - YTN</a></li>
+<li><a href="https://www.lawtalk.co.kr/posts/85934">변호사가 알려주는
+고소장 작성 방법 - 로톡</a></li>
+<li><a
+href="https://www.yklawfirm.co.kr/blog/detective/12423">고소장작성방법
+가이드 - 법무법인 YK</a></li>
+</ul>
+<hr />
+<h1 id="주요-죄목별-실제-판례집">주요 죄목별 실제 판례집</h1>
+<blockquote>
+<p>법제처 Open API에서 <strong>실시간 검색한 대법원·고등법원·지방법원
+판례</strong>. 사건번호와 핵심 쟁점만 정리 (판결문 전문은 본 파일에
+포함하지 않음). 전체 판결문은 법제처 사이트에서 사건번호로 조회
+가능.</p>
+</blockquote>
+<hr />
+<h2 id="어떻게-활용하나">📌 어떻게 활용하나</h2>
+<ol type="1">
+<li>본인 상황과 비슷한 사건번호 발견 → 법제처 사이트 검색 → 전문
+읽기</li>
+<li>고소장 작성 시 <strong>“대법원 ○○○○도○○○○ 판결” 인용</strong> →
+수사관·검사 설득력 ↑</li>
+<li>변호인과 상담 전 <strong>판례 ID 알아두면</strong> 상담 효율 ↑↑</li>
+</ol>
+<hr />
+<h2 id="사기죄-형법-347-기망의-성립-범위">1. 사기죄 (형법 §347) — 기망의
+성립 범위</h2>
+<h3 id="대법원-2022도1862-선고-2026.01.29">🏛 대법원 2022도1862 (선고
+2026.01.29)</h3>
+<p><strong>사건명</strong>: 업무방해·컴퓨터등사용사기 (인정된 죄명:
+사기) <strong>핵심 쟁점</strong>: 컴퓨터에 정보를 입력하는 행위가
+<strong>사람을 직접 기망한 것이 아니어도</strong> 사기죄·업무방해죄의
+기망/위계에 해당하는지</p>
+<blockquote>
+<p>💡 <strong>실무 의미</strong>: 시스템 조작·자동화 거래에서도 사기죄
+성립 가능. 게임·당근 사기에 활용.</p>
+</blockquote>
+<h3 id="대법원-2024도18441-선고-2025.03.27">🏛 대법원 2024도18441 (선고
+2025.03.27)</h3>
+<p><strong>사건명</strong>: 사기 <strong>핵심 쟁점</strong>: 카드론
+대출에서 사기죄의 <strong>기망행위 성립 여부</strong></p>
+<blockquote>
+<p>💡 실무 활용: 대출 사기·신용한도 부풀리기 사건에서 기망 입증의
+기준선.</p>
+</blockquote>
+<h3 id="대법원-2024도13139-선고-2025.06.12">🏛 대법원 2024도13139 (선고
+2025.06.12)</h3>
+<p><strong>사건명</strong>: 사기 (회생절차 관련) <strong>핵심
+쟁점</strong>: 회생채무자가 <strong>재산·수입을 허위로 신고</strong>해
+법원을 기망하여 회생계획 인가받은 행위 → 사기죄 성립 여부</p>
+<blockquote>
+<p>💡 법원도 기망의 대상이 될 수 있음. OEM 거래·B2B 분쟁 입증 논리에
+응용.</p>
+</blockquote>
+<h3 id="대법원-2019도2003-선고-2019.12.24">🏛 대법원 2019도2003 (선고
+2019.12.24)</h3>
+<p><strong>사건명</strong>: 사기 (담당 공무원 기망) <strong>핵심
+쟁점</strong>: 농지보전부담금 면제 신청에서 담당 공무원을 기망 →
+사기죄</p>
+<blockquote>
+<p>💡 공무원도 기망 대상. 관공서 서류 위조·허위 신고 사건의 기준
+판례.</p>
+</blockquote>
+<hr />
+<h2 id="보이스피싱-전기통신금융사기-최신-강화-흐름">2. 보이스피싱
+(전기통신금융사기) — 최신 강화 흐름</h2>
+<h3 id="대법원-2025도14142-선고-2026.01.15">🏛 대법원 2025도14142 (선고
+2026.01.15)</h3>
+<p><strong>사건명</strong>: 폭력행위처벌법
+위반(단체등의구성·활동)·공갈미수·<strong>전기통신금융사기특별법
+위반방조</strong> <strong>핵심 쟁점</strong>: 보이스피싱 조직을
+<strong>단체로 보아 폭처법 적용</strong> + 포괄일죄에서 공소장 변경이
+있는 경우 공소시효</p>
+<blockquote>
+<p>💡 보이스피싱 조직은 단체로 보아 가중처벌. 콜센터 운영진·중간책 모두
+영향.</p>
+</blockquote>
+<h3 id="대법원-2025도8460-선고-2025.12.11">🏛 대법원 2025도8460 (선고
+2025.12.11)</h3>
+<p><strong>사건명</strong>: 전기통신금융사기특별법
+위반·범죄수익은닉규제법 위반 <strong>핵심 쟁점</strong>: 항소심 심판
+범위</p>
+<blockquote>
+<p>💡 송금·환전·인출 단계별로 별도 죄책 적용 가능.</p>
+</blockquote>
+<h3 id="대법원-2025도7814-선고-2025.09.04">🏛 대법원 2025도7814 (선고
+2025.09.04)</h3>
+<p><strong>사건명</strong>: 범죄단체가입·범죄단체활동·<strong>특경법
+사기</strong>·전기통신금융사기·범죄수익은닉 <strong>핵심 쟁점</strong>:
+보이스피싱 가담자에 대한 범죄단체 적용</p>
+<blockquote>
+<p>💡 단순 송금 심부름(인출책)도 단체 가입으로 의율 가능. 알바로라도
+가담 X.</p>
+</blockquote>
+<h3 id="광주고등법원-전주재판부-2025노42-1-선고-2025.08.18">🏛
+광주고등법원 전주재판부 2025노42-1 (선고 2025.08.18)</h3>
+<p><strong>사건명</strong>: 폭력행위처벌법·공갈미수·전기통신금융사기
+위반방조</p>
+<blockquote>
+<p>💡 지방·고등법원 단위 처벌 사례 — 형량 감각 잡기에 유용.</p>
+</blockquote>
+<hr />
+<h2 id="스토킹범죄-스토킹처벌법-18-인정-범위-확장-흐름">3. 스토킹범죄
+(스토킹처벌법 §18) — 인정 범위 확장 흐름</h2>
+<h3 id="대법원-2025도36-선고-2025.10.30">🏛 대법원 2025도36 (선고
+2025.10.30)</h3>
+<p><strong>사건명</strong>: 스토킹범죄의처벌등에관한법률위반
+<strong>핵심 쟁점</strong>: <strong>피해자의 현실적인 인식이 없었던
+경우</strong> 스토킹행위 해당 여부</p>
+<blockquote>
+<p>💡 매우 중요. 피해자가 당시에 못 알아챘어도, 객관적으로 불안감·공포심
+유발 행위면 스토킹 인정 가능 → 인정 범위 확장.</p>
+</blockquote>
+<h3 id="대법원-2025모3144-선고-2025.12.11">🏛 대법원 2025모3144 (선고
+2025.12.11)</h3>
+<p><strong>사건명</strong>: 잠정조치연장결정에 대한 재항고 <strong>핵심
+쟁점</strong>: 스토킹처벌법상 <strong>잠정조치 연장</strong>의 다툼
+기준</p>
+<blockquote>
+<p>💡 잠정조치(접근금지)는 가해자가 다툴 수 있지만, 법원은 피해자 보호를
+우선.</p>
+</blockquote>
+<h3 id="대법원-2025도9717-선고-2025.11.06">🏛 대법원 2025도9717 (선고
+2025.11.06)</h3>
+<p><strong>사건명</strong>:
+재물손괴·폭행·상해·<strong>스토킹범죄</strong>·성폭력처벌법(통매음)·음주운전
+(복합 사건) <strong>핵심 쟁점</strong>: 양형 과중 항소심에서 동일 형
+선고 시 판결 모순 / 확정판결 전후 범죄 심판 방법</p>
+<blockquote>
+<p>💡 스토킹은 단독으로 오지 않는다 — 폭행·재물손괴·통매음과 함께
+의율되는 패턴.</p>
+</blockquote>
+<h3 id="대법원-2025도3487-선고-2025.06.12">🏛 대법원 2025도3487 (선고
+2025.06.12)</h3>
+<p><strong>사건명</strong>: 스토킹범죄의처벌등에관한법률위반</p>
+<blockquote>
+<p>💡 최근 1심·2심 사례 — 형량 감각.</p>
+</blockquote>
+<h3 id="대법원-2025도6707-선고-2025.09.25">🏛 대법원 2025도6707 (선고
+2025.09.25)</h3>
+<p><strong>사건명</strong>: 친족관계
+강간/준강간/강제추행·<strong>보복협박</strong>·특수폭행·스토킹
+<strong>핵심 쟁점</strong>: 검사의 수사개시 및 공소 제기 가능 범위</p>
+<blockquote>
+<p>💡 스토킹이 다른 성범죄와 함께 의율될 때 절차 쟁점.</p>
+</blockquote>
+<hr />
+<h2 id="딥페이크허위영상물-성폭법-14의2-처벌-가속화">4.
+딥페이크·허위영상물 (성폭법 §14의2) — 처벌 가속화</h2>
+<h3 id="대법원-2024도17801-선고-2025.08.14">🏛 대법원 2024도17801 (선고
+2025.08.14)</h3>
+<p><strong>사건명</strong>: 아청법
+위반(성착취물제작·배포)·<strong>성폭법
+위반(허위영상물편집·반포)</strong>·아청법 위반(성착취물소지)·통매음
+<strong>핵심 쟁점</strong>: <strong>아동·청소년의 얼굴 사진을 이용한
+불법 성적 합성물</strong> 제작 사건</p>
+<blockquote>
+<p>💡 매우 중요. 미성년자 사진을 이용한 딥페이크는 <strong>아청법 +
+성폭법 §14의2 중복 적용</strong> → 형량 대폭 가중. 2024.10.16 처벌 강화
+흐름과 결.</p>
+</blockquote>
+<h3 id="대법원-2024도5566-선고-2024.07.11">🏛 대법원 2024도5566 (선고
+2024.07.11)</h3>
+<p><strong>사건명</strong>: 성폭법 위반(허위영상물편집·반포)·성폭법
+위반(비밀준수) <strong>핵심 쟁점</strong>: 딥페이크 제작·반포 + 피해자
+신원 누설 결합</p>
+<blockquote>
+<p>💡 비밀준수의무 위반(피해자 신원 누설)도 별도 가중.</p>
+</blockquote>
+<h3 id="서울중앙지방법원-2024노3404-선고-2025.04.29">🏛 서울중앙지방법원
+2024노3404 (선고 2025.04.29)</h3>
+<p><strong>사건명</strong>: 성폭법
+위반(카메라등이용촬영·반포)·<strong>허위영상물편집·반포</strong>·비밀준수</p>
+<blockquote>
+<p>💡 디지털 성범죄는 카촬법(§14) + 딥페이크(§14의2) <strong>병합
+의율</strong> 패턴.</p>
+</blockquote>
+<h3 id="서울고등법원-2024노1823-선고-2024.11.01">🏛 서울고등법원
+2024노1823 (선고 2024.11.01)</h3>
+<p><strong>사건명</strong>: 아청법(성착취물제작) → 인정 죄명: 성폭법
+§14의2 허위영상물편집·반포</p>
+<blockquote>
+<p>💡 검사가 더 무거운 죄로 기소했지만 법원이 §14의2로 인정한 사례 —
+<strong>죄목 인정의 경계</strong> 파악에 유용.</p>
+</blockquote>
+<hr />
+<h2 id="특수폭행특수상해-위험한-물건-휴대의-의미">5. 특수폭행·특수상해 —
+“위험한 물건 휴대”의 의미</h2>
+<h3 id="대법원-2023도18812-선고-2024.06.13">🏛 대법원 2023도18812 (선고
+2024.06.13)</h3>
+<p><strong>사건명</strong>: 폭행·<strong>특수상해</strong>(인정 죄명:
+상해)·<strong>특수협박</strong>(인정 죄명: 협박)·감금 <strong>핵심
+쟁점</strong>: 피고인이 <strong>위험한 물건을 ‘휴대하여’</strong>
+협박·상해 가하였는지</p>
+<blockquote>
+<p>💡 매우 중요. “휴대”의 의미를 좁히는 흐름 — 단순히 들고 있었던
+것만으론 부족, <strong>사용 의사</strong>가 있어야 특수죄 성립. 보복운전
+사건에서 차량을 “위험한 물건”으로 의율할 때 본질적 쟁점.</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>실무 응용</strong>: - 차량을 위험한 물건으로 본 다수 판례
+— 운전 중 직접적 위협 행위 있어야 인정 - 단순히 차를 운전했다고 무조건
+특수폭행 X - 보복운전 고소 시 <strong>차로 막기·급정거·갓길로
+몰기</strong> 등 적극적 위협 행위 명시 필요</p>
+</blockquote>
+<hr />
+<h2 id="정보통신망-명예훼손-정통망법-70-활용도-높은-죄목">6. 정보통신망
+명예훼손 (정통망법 §70) — 활용도 높은 죄목</h2>
+<h3 id="대법원-2022도699-선고-2024.01.04">🏛 대법원 2022도699 (선고
+2024.01.04)</h3>
+<p><strong>사건명</strong>: 정보통신망법 위반(명예훼손)</p>
+<blockquote>
+<p>💡 최근 인터넷 명예훼손 인정 기준 — 공연성·비방목적·사실성/허위성
+판단.</p>
+</blockquote>
+<h3 id="대법원-2020도1669-선고-2023.12.14">🏛 대법원 2020도1669 (선고
+2023.12.14)</h3>
+<p><strong>사건명</strong>:
+정통망법(명예훼손)·<strong>성폭법(카메라등이용촬영)</strong>·음화제조교사
+<strong>핵심 쟁점</strong>: 음란합성사진 파일의 음화 해당 여부 /
+휴대전화 전자정보의 <strong>증거능력</strong></p>
+<blockquote>
+<p>💡 매우 중요. 휴대폰 압수·전자증거의 증거능력 기준 — 디지털 사건
+전반에 영향.</p>
+</blockquote>
+<h3 id="대법원-2023도6355-선고-2023.08.31">🏛 대법원 2023도6355 (선고
+2023.08.31)</h3>
+<p><strong>사건명</strong>: 폭처법(공동폭행)·정통망법(명예훼손)·공갈미수
+<strong>핵심 쟁점</strong>: 1인이 폭행하고 나머지는
+<strong>촬영·관망</strong>한 행위 → 공동폭행 해당 여부</p>
+<blockquote>
+<p>💡 회식·집단 폭행 사건에서 “지켜본 사람도 공범인가” 판단 기준.
+학교폭력에도 응용.</p>
+</blockquote>
+<h3 id="부산지방법원-2025고단949-선고-2025.08.20">🏛 부산지방법원
+2025고단949 (선고 2025.08.20)</h3>
+<p><strong>사건명</strong>: 정통망법(명예훼손)·전기통신기본법</p>
+<blockquote>
+<p>💡 지방법원 단위 1심 형량 사례 — 인터넷 비방글 일반 처벌 수준
+감각.</p>
+</blockquote>
+<hr />
+<h2 id="디지털복합-범죄-추세-최근-패턴">7. 디지털·복합 범죄 추세 — 최근
+패턴</h2>
+<p>판례에서 일관되게 보이는 흐름:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>흐름</th>
+<th>판례 근거</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>복합 의율 증가</strong></td>
+<td>2025도9717 (스토킹+폭행+재물손괴+성범죄+음주운전 6개 죄목 동시)</td>
+<td>스토킹·교제 폭력 사건은 단일 죄목으로 오지 않음</td>
+</tr>
+<tr>
+<td><strong>온라인 공범 인정</strong></td>
+<td>2023도6355 (촬영·관망도 공동폭행)</td>
+<td>SNS 시대 “지켜보거나 공유한 사람”도 공범 가능</td>
+</tr>
+<tr>
+<td><strong>위험한 물건 해석 엄격</strong></td>
+<td>2023도18812</td>
+<td>단순 소지 X, 사용 의사 있어야 특수죄</td>
+</tr>
+<tr>
+<td><strong>전자증거 적법성 강화</strong></td>
+<td>2020도1669</td>
+<td>휴대폰 압수는 영장 + 적법 절차 — 본인 휴대폰 자료 제출 시도
+참고</td>
+</tr>
+<tr>
+<td><strong>피해자 인식 없어도 스토킹 인정</strong></td>
+<td>2025도36</td>
+<td>객관적으로 공포·불안 유발이면 OK — 입증 부담 ↓</td>
+</tr>
+<tr>
+<td><strong>보이스피싱 = 범죄단체</strong></td>
+<td>2025도14142, 2025도7814</td>
+<td>가담만 해도 가중처벌</td>
+</tr>
+<tr>
+<td><strong>아동·청소년 딥페이크 중복 가중</strong></td>
+<td>2024도17801</td>
+<td>아청법 + 성폭법 §14의2 동시</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="판례-빠른-인덱스-상황별">📂 판례 빠른 인덱스 — 상황별</h2>
+<table>
+<thead>
+<tr>
+<th>본인 상황 (07 파일 번호)</th>
+<th>우선 볼 판례</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OEM·B2B 분쟁 (1)</td>
+<td>2024도13139 (법원 기망), 2022도1862 (시스템 기망)</td>
+</tr>
+<tr>
+<td>길거리 시비·폭행 (2)</td>
+<td>2023도6355 (공동폭행)</td>
+</tr>
+<tr>
+<td>차량 사고 (3)</td>
+<td>— (대부분 약식·민사)</td>
+</tr>
+<tr>
+<td>보복운전 (4)</td>
+<td><strong>2023도18812 (위험한 물건 휴대)</strong></td>
+</tr>
+<tr>
+<td>당근·게임 사기 (5, 21)</td>
+<td>2022도1862, 2024도18441</td>
+</tr>
+<tr>
+<td>스토킹 (6)</td>
+<td><strong>2025도36 (피해자 인식 불요)</strong>, 2025모3144
+(잠정조치)</td>
+</tr>
+<tr>
+<td>온라인 시비 (7)</td>
+<td>2022도699, 2023도6355</td>
+</tr>
+<tr>
+<td>임대차 (8)</td>
+<td>— (대부분 민사)</td>
+</tr>
+<tr>
+<td>직장 성희롱 (9)</td>
+<td>(별도 검색 필요)</td>
+</tr>
+<tr>
+<td>채권추심 (10)</td>
+<td>(별도 검색 필요)</td>
+</tr>
+<tr>
+<td>사이버스토킹·딥페이크 (22)</td>
+<td><strong>2024도17801</strong>, 2024도5566, 2020도1669</td>
+</tr>
+<tr>
+<td>보이스피싱 (19)</td>
+<td><strong>2025도14142</strong>, 2025도7814</td>
+</tr>
+<tr>
+<td>노동 (16)</td>
+<td>(별도 검색 필요 — 검색어 “임금체불”)</td>
+</tr>
+<tr>
+<td>의료사고 (15)</td>
+<td>(별도 검색 필요 — 검색어 “업무상과실치상”)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="판례-활용-시-주의">⚠️ 판례 활용 시 주의</h2>
+<ol type="1">
+<li><strong>판결문 원문은 사건번호로 법제처 또는 대법원
+종합법률정보(glaw.scourt.go.kr) 검색</strong></li>
+<li><strong>하급심(지방·고등) 판례는 사실관계 비슷할 때만 활용</strong>
+— 법리적으로는 대법원이 기준</li>
+<li><strong>선고일 확인</strong> — 법령 개정 전 판례는 적용 안 될 수
+있음 (예: 스토킹법 2023.7.11 개정)</li>
+<li><strong>본인 사건과 사실관계가 90% 같아야 인용 효과</strong> —
+단순히 “비슷한 사건이 유죄” 라고 인용해도 의미 X</li>
+<li><strong>변호인 상담 시</strong> 판례 ID(2025도36 등) 알려주면 빠르게
+검토 가능</li>
+</ol>
+<hr />
+<h2 id="직접-검색하는-방법">🔍 직접 검색하는 방법</h2>
+<ol type="1">
+<li><strong>법제처</strong>: https://www.law.go.kr → 판례 → 사건번호
+입력</li>
+<li><strong>대법원 종합법률정보</strong>: https://glaw.scourt.go.kr →
+무료, 본문 전체 열람 가능</li>
+<li>위 파일에 있는 판례 사건번호 그대로 검색하면 전문 판결문 표시됨</li>
+</ol>
+<hr />
+<h2 id="마무리">마무리</h2>
+<p>이 문서는 형사절차를 빠르게 익히기 위한 학습용 자료입니다. 실제 사건
+처리 시에는 반드시 변호사와 상담하세요.</p>
+<ul>
+<li><strong>무료 법률상담</strong>: 대한법률구조공단 132</li>
+<li><strong>여성긴급전화</strong>: 1366</li>
+<li><strong>사이버수사대</strong>: 117</li>
+<li><strong>금감원 보이스피싱</strong>: 1332</li>
+<li><strong>디지털성범죄피해자지원센터</strong>: 02-735-8994</li>
+<li><strong>층간소음이웃사이센터</strong>: 1661-2642</li>
+<li><strong>117 학교폭력신고센터</strong>: 117</li>
+<li><strong>노동부</strong>: 1350</li>
+<li><strong>개인정보침해 신고센터</strong>: 118</li>
+</ul>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: document.body.dataset.theme === "dark" ? "dark" : "default",
+  flowchart: { useMaxWidth: true, htmlLabels: true }
+});
+
+function toggleTheme() {
+  const body = document.body;
+  const next = body.dataset.theme === "light" ? "dark" : "light";
+  body.dataset.theme = next;
+  localStorage.setItem("theme", next);
+  // mermaid 재렌더링
+  document.querySelectorAll("pre.mermaid").forEach(el => {
+    if (!el.dataset.original) el.dataset.original = el.textContent;
+    el.removeAttribute("data-processed");
+    el.innerHTML = el.dataset.original;
+  });
+  mermaid.initialize({ startOnLoad: false, theme: next === "dark" ? "dark" : "default" });
+  mermaid.run();
+}
+function cycleFont() {
+  const order = ["normal", "large", "xlarge"];
+  const cur = document.body.dataset.fontsize;
+  const next = order[(order.indexOf(cur) + 1) % order.length];
+  document.body.dataset.fontsize = next;
+  localStorage.setItem("fontsize", next);
+}
+// 복원
+(function() {
+  const t = localStorage.getItem("theme");
+  if (t) document.body.dataset.theme = t;
+  const f = localStorage.getItem("fontsize");
+  if (f) document.body.dataset.fontsize = f;
+})();
+// 모바일에서 링크 클릭 시 사이드바 닫기
+document.querySelectorAll("#sidebar a").forEach(a => {
+  a.addEventListener("click", () => {
+    if (window.innerWidth <= 900) document.getElementById("sidebar").classList.remove("open");
+  });
+});
+</script>
+</body>
+</html>
