@@ -120,24 +120,34 @@ p { margin: 0.8em 0; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* 표 */
+/* 표 — PC에서는 자동 레이아웃, 모바일에서만 가로 스크롤 */
 table {
   border-collapse: collapse;
   margin: 1em 0;
   width: 100%;
   font-size: 0.95em;
   box-shadow: var(--shadow);
-  display: block;
-  overflow-x: auto;
+  table-layout: auto;
 }
 th, td {
   border: 1px solid var(--border);
   padding: 8px 12px;
   text-align: left;
   vertical-align: top;
+  word-break: keep-all;
 }
 th { background: var(--accent-soft); font-weight: 600; }
 tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* 첫 컬럼이 짧은 라벨(#·번호·단계·구분 등)일 때 자동 압축 */
+th:first-child, td:first-child {
+  white-space: nowrap;
+  width: 1%;
+}
+/* 단, 본문이 풍부한 표(상황별 가이드 등)는 첫 컬럼이 길어도 OK — auto 유지 */
+th:first-child:empty + th, td:first-child:empty + td {
+  width: auto;
+}
 
 /* 코드·인용 */
 code {
@@ -226,7 +236,7 @@ pre.mermaid {
   #menu-toggle { display: block; }
   #controls { top: 16px; right: 16px; }
   #controls button { padding: 8px 10px; font-size: 13px; }
-  table { font-size: 0.88em; }
+  table { font-size: 0.88em; display: block; overflow-x: auto; }
   h1 { font-size: 1.6em; }
   h2 { font-size: 1.3em; }
 }
