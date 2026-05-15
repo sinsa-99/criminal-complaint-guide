@@ -1,6 +1,6 @@
-# 고소의 기술 — 통합 정리집
+# 고소·피소 가이드
 
-> 한국 형사절차 학습용 자료 패키지. 용어 사전 → 절차 그래프 → 죄목 매칭 → 고소장 작성법 → 피의자 방어 → 22개 실전 상황 → 심화 팁 → 실제 판례까지.
+> 한국 형사절차 학습용 자료 패키지. 고소하는 쪽과 고소당한 쪽 양면. 용어 사전 → 절차 그래프 → 죄목 매칭 → 고소장 작성법 → 피의자 방어 → 22개 실전 상황 → 심화 팁 → 실제 판례까지.
 
 📖 **라이브 보기**: https://sinsa-99.github.io/criminal-complaint-guide/
 
@@ -11,52 +11,51 @@ by Kim Donghyeon
 ## ✨ 특징
 
 - 🌳 **Mermaid 절차 그래프** + 단계별 누적 시간 표
-- ⚖️ **법제처 Open API** 실시간 조회 법령 조문 (형법·정통망법·스토킹법 등 15개+)
+- ⚖️ **법제처 Open API** 조회 결과 기반 법령 조문 (형법·정통망법·스토킹법 등 15개+)
 - 📚 **대법원·고등법원 실제 판례** (사건번호·핵심 쟁점)
 - 🎭 **22개 실전 상황** 시나리오 (모두 가상·가명)
 - 📋 **실전 고소장 완성본** + **변호사 상담 10분 체크리스트**
 - 🛡 **피의자 방어 8단계 매뉴얼** (고소당했을 때)
-- 🌓 다크모드·반응형·인쇄/PDF 변환 지원
+- 🔍 **풀텍스트 검색** (Pagefind) · 🌓 다크모드 · 글자크기 조정 · 반응형
 
 ---
 
 ## 📁 파일 구성
 
-| 파일 | 내용 |
+| 항목 | 내용 |
 |---|---|
-| `index.html` | **통합 HTML** (모든 자료 한 파일, 290KB) |
-| `01_절차_플로우차트.md` | Mermaid 절차 그래프 + 시간선 |
-| `02_용어사전.md` | 50+ 핵심 용어 (고소·송치·기소·무죄) |
-| `03_상황별_고소가능_죄목.md` | 죄목별 법조 매칭 (법제처 직접 조회) |
-| `04_고소장_작성법.md` | 9블록 표준 구조 |
-| `05_페이지_인덱스.md` | 토픽별 인덱스 |
-| `06_스토리_종합본.md` | 사기 사건 6막 깊이 학습 |
-| `07_실전상황별_가이드.md` | 22개 실전 상황 매뉴얼 |
-| `08_22건_스토리집.md` | 22개 상황 4막 압축 스토리 |
-| `09_판례집.md` | 대법원·고등법원 실제 판례 |
-| `10_심화팁_체크리스트.md` | 고소장 완성본 + 변호사 상담 체크리스트 + 추가 팁 |
-| `11_고소당했을때_대처법.md` | 피의자 방어 8단계 매뉴얼 |
+| `00_README.md` ~ `11_고소당했을때_대처법.md` | 원본 학습 자료 (md 12개) |
+| `site/` | **Astro Starlight** 빌드 프로젝트 (실제 사이트 생성처) |
+| `site/src/content/docs/*.md` | 사이트에 렌더되는 md (frontmatter 입혀진 사본) |
+| `site/astro.config.mjs` | 사이드바·테마·Mermaid 등 설정 |
+| `site/src/components/FontSizeControls.astro` | 헤더 글자크기 +/- 버튼 |
+| `.github/workflows/deploy.yml` | push → GitHub Pages 자동 배포 |
+| `_legacy/` | 이전 Pandoc 기반 단일 HTML 빌드 산출물 (보존용) |
 
 ---
 
 ## 🚀 사용법
 
 ### 1. 웹에서 바로 보기
-[Live Site](https://sinsa-99.github.io/criminal-complaint-guide/) 접속 → 사이드바 목차 클릭
+[Live Site](https://sinsa-99.github.io/criminal-complaint-guide/)
 
-### 2. 로컬에서 보기
+### 2. 로컬에서 미리보기
 ```bash
-git clone https://github.com/sinsa-99/criminal-complaint-guide.git
-cd criminal-complaint-guide
-open index.html
+cd site
+npm install   # 처음 한 번만
+npm run dev   # http://localhost:4321/criminal-complaint-guide/
 ```
 
-### 3. 재빌드 (md 수정 후)
+### 3. 빌드 (배포 산출물 생성)
 ```bash
-# Pandoc 필요 (brew install pandoc)
-bash _build_html.sh
-python3 _assemble.py
+cd site
+npm run build   # → site/dist/
 ```
+
+### 4. 자료 수정 후 배포
+1. `site/src/content/docs/*.md` 수정 (또는 원본 `*.md` 수정 후 다시 옮김)
+2. `git commit && git push`
+3. GitHub Actions가 자동으로 빌드 & 배포
 
 ---
 

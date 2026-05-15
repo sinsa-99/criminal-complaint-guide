@@ -1,0 +1,75 @@
+---
+/**
+ * Starlight 헤더 우측에 들어가는 글자크기 +/- 버튼.
+ * SocialIcons 슬롯을 override해서 다크모드 토글 옆에 표시됨.
+ *
+ * 동작: html { font-size: var(--font-size) }로 베이스 변경 → rem 기반 본문 비례 스케일.
+ * 저장: localStorage 'fontSize' (px).
+ */
+---
+
+<div class="font-size-controls">
+  <button type="button" data-action="dec" aria-label="글자 작게" title="글자 작게">A−</button>
+  <button type="button" data-action="reset" aria-label="기본 크기" title="기본 크기">A</button>
+  <button type="button" data-action="inc" aria-label="글자 크게" title="글자 크게">A+</button>
+</div>
+
+<script is:inline>
+  (function () {
+    const MIN = 14, MAX = 22, DEFAULT = 16, STEP = 1;
+    const KEY = "fontSize";
+
+    function apply(px) {
+      document.documentElement.style.setProperty("font-size", px + "px");
+    }
+    const saved = parseInt(localStorage.getItem(KEY) || DEFAULT, 10);
+    apply(Math.min(MAX, Math.max(MIN, saved)));
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn || !btn.parentElement?.classList.contains("font-size-controls")) return;
+      const cur = parseInt(localStorage.getItem(KEY) || DEFAULT, 10);
+      let next = cur;
+      if (btn.dataset.action === "inc") next = Math.min(MAX, cur + STEP);
+      else if (btn.dataset.action === "dec") next = Math.max(MIN, cur - STEP);
+      else if (btn.dataset.action === "reset") next = DEFAULT;
+      localStorage.setItem(KEY, String(next));
+      apply(next);
+    });
+  })();
+</script>
+
+<style>
+  .font-size-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-inline-start: 0.5rem;
+  }
+  .font-size-controls button {
+    background: transparent;
+    color: var(--sl-color-text);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .font-size-controls button:hover {
+    background: var(--sl-color-gray-6);
+    border-color: var(--sl-color-accent);
+  }
+  .font-size-controls button:active {
+    transform: translateY(1px);
+  }
+  /* 모바일에서 살짝 컴팩트 */
+  @media (max-width: 50rem) {
+    .font-size-controls button {
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+  }
+</style>
