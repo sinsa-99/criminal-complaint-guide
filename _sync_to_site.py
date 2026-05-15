@@ -15,9 +15,14 @@ SITE_DOCS = ROOT / "site" / "src" / "content" / "docs"
 
 # (원본 md 파일명, site 슬러그 파일명)
 PAIRS = [
+    ("01_절차_플로우차트.md", "procedure.md"),
     ("02_용어사전.md", "glossary.md"),
+    ("03_상황별_고소가능_죄목.md", "charges.md"),
+    ("04_고소장_작성법.md", "writing.md"),
     ("06_스토리_종합본.md", "story-overview.md"),
+    ("07_실전상황별_가이드.md", "scenarios-7.md"),
     ("08_22건_스토리집.md", "stories-22.md"),
+    ("09_판례집.md", "cases.md"),
     ("10_심화팁_체크리스트.md", "tips.md"),
     ("11_고소당했을때_대처법.md", "defense.md"),
 ]
