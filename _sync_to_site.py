@@ -16,6 +16,7 @@ SITE_DOCS = ROOT / "site" / "src" / "content" / "docs"
 # (원본 md 파일명, site 슬러그 파일명)
 PAIRS = [
     ("02_용어사전.md", "glossary.md"),
+    ("08_22건_스토리집.md", "stories-22.md"),
     ("11_고소당했을때_대처법.md", "defense.md"),
 ]
 
