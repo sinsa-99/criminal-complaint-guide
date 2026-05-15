@@ -90,10 +90,6 @@ new MutationObserver(() => {
           label: "4. 반대편 입장",
           items: [{ label: "피의자 방어 매뉴얼", link: "/defense/" }],
         },
-        {
-          label: "부록",
-          items: [{ label: "페이지 인덱스", link: "/page-index/" }],
-        },
       ],
     }),
   ],
