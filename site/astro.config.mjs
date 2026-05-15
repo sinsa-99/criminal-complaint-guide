@@ -26,8 +26,8 @@ export default defineConfig({
       components: {
         // SocialIcons 슬롯을 글자크기 버튼으로 교체 (다크모드 토글 옆에 위치)
         SocialIcons: "./src/components/FontSizeControls.astro",
-        // Footer 확장 — 기본 Footer + 우측 하단 서명
-        Footer: "./src/overrides/Footer.astro",
+        // SiteTitle 옆에 작은 서명 인라인 표시
+        SiteTitle: "./src/overrides/SiteTitle.astro",
       },
       head: [
         // Mermaid 클라이언트 렌더링
